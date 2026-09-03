@@ -1,0 +1,19 @@
+{
+  "name": "mini-game-land",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node --check dist/server/index.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:check": "wrangler deploy --dry-run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply mini-game-land-rankings --local",
+    "db:migrate:remote": "wrangler d1 migrations apply mini-game-land-rankings --remote"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.10",
+    "drizzle-orm": "0.45.2",
+    "wrangler": "^4.128.0"
+  }
+}

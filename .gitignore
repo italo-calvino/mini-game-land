@@ -1,0 +1,4 @@
+node_modules/
+.pnpm-store/
+site.tar.gz
+.site-package-stage/
