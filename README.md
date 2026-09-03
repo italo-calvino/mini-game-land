@@ -18,5 +18,5 @@ pnpm deploy
 
 Cloudflare D1 のバインディング名は `DB`、静的ファイルのバインディング名は `ASSETS` です。
 
-##ゲームはこちらから
+## ゲームはこちらから
 https://mini-game-land.akiduki2ha46.workers.dev/
