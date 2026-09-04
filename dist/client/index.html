@@ -123,6 +123,9 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 .shop-card p { color:var(--text2); font-size:11px; line-height:1.55; min-height:35px; }
 .shop-card .theme-dots i { width:22px; height:22px; }
 .shop-card .btn { width:100%; margin-top:14px; }
+.shop-section-title { font-size:20px; margin:24px 0 12px; }
+.avatar-shop-card { text-align:center; }
+.avatar-shop-icon { width:70px; height:70px; margin:0 auto 10px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,var(--surface2),var(--surface)); border:1px solid var(--border); font-size:38px; }
 .privacy-note { margin-top:12px; padding:10px; border-radius:10px; background:var(--surface2); color:var(--text2); font-size:10px; line-height:1.6; }
 
 /* GAME SCREEN */
@@ -592,7 +595,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 
 <section id="shop-page" aria-labelledby="shop-title">
   <div class="page-hero"><h2 id="shop-title">🛍️ テーマショップ</h2><p>ゲームで貯めたポイントを使って、画面のデザインを着せ替えよう。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
+  <h2 class="shop-section-title">🎨 カラーテーマ</h2>
   <div class="shop-grid" id="shop-grid"></div>
+  <h2 class="shop-section-title">👤 プレイヤーアイコン</h2>
+  <div class="shop-grid" id="avatar-shop-grid"></div>
 </section>
 
 <!-- GAME SCREEN -->
@@ -873,6 +879,8 @@ const ACHIEVEMENTS = [
   {id:'challenge5', icon:'🎲', name:'挑戦者', desc:'ランダム挑戦を5回達成する', reward:250, test:s=>(s.challengeClears||0)>=5},
   {id:'challenge20', icon:'🏅', name:'挑戦の達人', desc:'ランダム挑戦を20回達成する', reward:1000, test:s=>(s.challengeClears||0)>=20},
   {id:'themes3', icon:'🎨', name:'着せ替え好き', desc:'テーマを3種類所有する', reward:300, test:s=>(s.ownedThemes||[]).length>=3},
+  {id:'avatars5', icon:'😎', name:'アイコンコレクター', desc:'アイコンを5種類所有する', reward:250, test:s=>(s.ownedAvatars||[]).length>=5},
+  {id:'avatars_all', icon:'🪞', name:'七変化', desc:'すべてのアイコンを所有する', reward:1500, test:s=>(s.ownedAvatars||[]).length>=AVATAR_ITEMS.length},
 ];
 const THEMES = {
   default:{name:'ミッドナイト',desc:'落ち着いた定番のダークテーマ',price:0,colors:['#ff6b6b','#ffd93d','#4d96ff'],vars:{'--bg':'#0f0e17','--surface':'#1a1828','--surface2':'#252336','--accent1':'#ff6b6b','--accent2':'#ffd93d','--accent3':'#6bcb77','--accent4':'#4d96ff','--accent5':'#c77dff'}},
@@ -887,12 +895,21 @@ const THEMES = {
   galaxy:{name:'ギャラクシー',desc:'最高ランクの宇宙テーマ',price:10000,colors:['#7b2cbf','#4cc9f0','#f72585'],vars:{'--bg':'#050510','--surface':'#10102a','--surface2':'#1b1b44','--accent1':'#f72585','--accent2':'#4cc9f0','--accent3':'#72efdd','--accent4':'#4361ee','--accent5':'#b5179e'}},
 };
 const SCORE_RULES_VERSION = 1;
-const PROFILE_AVATARS = ['🎮','🦊','🐱','🐉','🤖','👻','🧙','🥷'];
+const AVATAR_ITEMS = [
+  {icon:'🎮',name:'ゲームパッド',price:0},{icon:'🙂',name:'スマイル',price:0},{icon:'🐣',name:'ひよこ',price:0},
+  {icon:'🦊',name:'キツネ',price:300},{icon:'🐱',name:'ネコ',price:300},{icon:'🐶',name:'イヌ',price:400},
+  {icon:'🐼',name:'パンダ',price:500},{icon:'🐸',name:'カエル',price:500},{icon:'🤖',name:'ロボット',price:800},
+  {icon:'👻',name:'ゴースト',price:800},{icon:'🧙',name:'魔法使い',price:1000},{icon:'🥷',name:'忍者',price:1200},
+  {icon:'🐉',name:'ドラゴン',price:1600},{icon:'👑',name:'キング',price:2500},{icon:'👾',name:'スペースモンスター',price:3000},
+  {icon:'🚀',name:'ロケット',price:4000}
+];
+const PROFILE_AVATARS = AVATAR_ITEMS.map(a=>a.icon);
+const FREE_AVATARS = AVATAR_ITEMS.filter(a=>a.price===0).map(a=>a.icon);
 let activeGameId='', activeGameStartedAt=0, selectedProfileAvatar='🎮', rankingGame='memory', onboardingMode=false;
 let gameSearchText='',gameTagFilter='すべて',favoriteOnly=false;
 let saveData = {
   level:1, xp:0, totalScore:0, wins:0, streak:0, highscores:{}, dailyBonus:0,
-  gameStats:{}, achievements:[], ownedThemes:['default'], activeTheme:'default',
+  gameStats:{}, achievements:[], ownedThemes:['default'], ownedAvatars:[...FREE_AVATARS], activeTheme:'default',
   daily:{date:'',plays:0,wins:0,score:0,claimed:[]},
   profile:{id:'',username:'プレイヤー',avatar:'🎮',createdAt:'',onboardingComplete:false}, scoreHistory:[], activeChallenge:null, challengeClears:0, favoriteGames:[]
 };
@@ -917,6 +934,9 @@ function normalizeSave(){
   if(!saveData.profile.id)saveData.profile.id=(globalThis.crypto?.randomUUID?globalThis.crypto.randomUUID():`local-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   if(!saveData.profile.username)saveData.profile.username='プレイヤー';
   if(!PROFILE_AVATARS.includes(saveData.profile.avatar))saveData.profile.avatar='🎮';
+  saveData.ownedAvatars=Array.isArray(saveData.ownedAvatars)?saveData.ownedAvatars.filter(a=>PROFILE_AVATARS.includes(a)):[...FREE_AVATARS];
+  FREE_AVATARS.forEach(a=>{if(!saveData.ownedAvatars.includes(a))saveData.ownedAvatars.push(a);});
+  if(!saveData.ownedAvatars.includes(saveData.profile.avatar))saveData.ownedAvatars.push(saveData.profile.avatar);
   if(!saveData.profile.createdAt)saveData.profile.createdAt=new Date().toISOString();
   if(typeof saveData.profile.onboardingComplete!=='boolean')saveData.profile.onboardingComplete=saveData.profile.username!=='プレイヤー';
 }
@@ -999,7 +1019,8 @@ function openProfile(required=false){
     <div class="profile-stats"><div class="profile-stat"><strong>${plays}</strong><span>プレイ</span></div><div class="profile-stat"><strong>${saveData.wins}</strong><span>勝利</span></div><div class="profile-stat"><strong>${masteryTotal}</strong><span>マスタリー合計</span></div></div>
     <button class="btn btn-purple btn-sm" style="width:100%;margin-bottom:14px" onclick="copyPlayerCard()">📋 カード情報をコピー</button>
     <label class="meta-sub" for="profile-name">ユーザーネーム（1〜16文字）</label><input id="profile-name" maxlength="16" value="${escapeHtml(saveData.profile.username)}" style="width:100%;margin:5px 0 10px">
-    <div class="meta-sub">アイコン</div><div class="avatar-picker">${PROFILE_AVATARS.map(a=>`<button class="avatar-option ${a===selectedProfileAvatar?'selected':''}" onclick="selectProfileAvatar('${a}')">${a}</button>`).join('')}</div>
+    <div class="meta-sub">所有しているアイコン</div><div class="avatar-picker">${saveData.ownedAvatars.map(a=>`<button class="avatar-option ${a===selectedProfileAvatar?'selected':''}" onclick="selectProfileAvatar('${a}')" aria-label="${escapeHtml(AVATAR_ITEMS.find(x=>x.icon===a)?.name||'アイコン')}">${a}</button>`).join('')}</div>
+    ${required?'':'<button class="btn btn-warn btn-sm" style="width:100%;margin-bottom:12px" onclick="closeProfile();openShop()">🛍️ アイコンをショップで見る</button>'}
     <div class="privacy-note">世界ランキングには、入力した名前・アイコン・ランダム生成ID・ゲーム名・得点・プレイ日時・プレイ時間が送信されます。メールアドレスや住所は収集しません。</div>`;
   document.getElementById('profile-modal').classList.add('open');
   gameDelay(()=>document.getElementById('profile-name')?.focus(),100);
@@ -1019,11 +1040,22 @@ function buyTheme(id){
   saveData.totalScore-=theme.price;saveData.ownedThemes.push(id);saveData.activeTheme=id;
   applyTheme();persistSave();checkMetaProgress();renderHome();renderShopPage();showToast(`🎨 ${theme.name}を購入！`,theme.colors[0]);
 }
+function buyAvatar(icon){
+  const item=AVATAR_ITEMS.find(a=>a.icon===icon);if(!item)return;
+  if(saveData.ownedAvatars.includes(icon)){saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();updateUI();renderShopPage();showToast(`${icon} ${item.name}を設定しました`,'#6bcb77');return;}
+  if(saveData.totalScore<item.price){showToast('ポイントが足りません','#ff6b6b');return;}
+  saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();updateUI();renderShopPage();showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
+}
 function renderShopPage(){
   const el=document.getElementById('shop-grid');if(!el)return;
   el.innerHTML=Object.entries(THEMES).map(([id,t])=>{
     const owned=saveData.ownedThemes.includes(id),active=saveData.activeTheme===id;
     return `<article class="shop-card ${active?'active':''}"><h3>${active?'✅ ':owned?'🎨 ':'🔒 '}${escapeHtml(t.name)}</h3><p>${escapeHtml(t.desc||'カラーテーマ')}</p><div class="theme-dots">${t.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</div><button class="btn ${active?'btn-success':owned?'btn-purple':'btn-warn'}" ${active?'disabled':''} onclick="buyTheme('${id}')">${active?'使用中':owned?'このテーマを使う':t.price.toLocaleString()+'ptで購入'}</button></article>`;
+  }).join('');
+  const avatarEl=document.getElementById('avatar-shop-grid');if(!avatarEl)return;
+  avatarEl.innerHTML=AVATAR_ITEMS.map(item=>{
+    const owned=saveData.ownedAvatars.includes(item.icon),active=saveData.profile.avatar===item.icon;
+    return `<article class="shop-card avatar-shop-card ${active?'active':''}"><div class="avatar-shop-icon">${item.icon}</div><h3>${escapeHtml(item.name)}</h3><p>${item.price===0?'最初から使える無料アイコン':'プロフィールとランキングで使えるアイコン'}</p><button class="btn ${active?'btn-success':owned?'btn-purple':'btn-warn'}" ${active?'disabled':''} onclick="buyAvatar('${item.icon}')">${active?'使用中':owned?'このアイコンを使う':item.price.toLocaleString()+'ptで購入'}</button></article>`;
   }).join('');
 }
 function openShop(){

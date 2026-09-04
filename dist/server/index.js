@@ -4,7 +4,7 @@ const GAME_IDS = new Set([
   'minesweeper','myquiz','animequiz','slot','pinball','snake','aimtrainer',
   'simon','typing','sokoban','reversi','lightsout','pong','fighter'
 ]);
-const AVATARS = new Set(['🎮','🦊','🐱','🐉','🤖','👻','🧙','🥷']);
+const AVATARS = new Set(['🎮','🙂','🐣','🦊','🐱','🐶','🐼','🐸','🤖','👻','🧙','🥷','🐉','👑','👾','🚀']);
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -111,3 +111,4 @@ export default {
     }
   }
 };
+
