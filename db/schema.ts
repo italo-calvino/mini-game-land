@@ -23,3 +23,19 @@ export const scores = sqliteTable(
     index('idx_scores_player_game').on(table.playerId, table.gameId),
   ],
 );
+
+export const playerProfiles = sqliteTable(
+  'player_profiles',
+  {
+    playerId: text('player_id').primaryKey(),
+    username: text('username').notNull(),
+    avatar: text('avatar').notNull().default('🎮'),
+    level: integer('level').notNull().default(1),
+    totalPoints: integer('total_points').notNull().default(0),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    index('idx_player_profiles_level').on(table.level, table.totalPoints),
+    index('idx_player_profiles_points').on(table.totalPoints, table.level),
+  ],
+);

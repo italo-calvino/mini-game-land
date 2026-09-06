@@ -92,6 +92,9 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 .theme-dots i { display:block; width:12px; height:12px; border-radius:50%; }
 .ranking-controls { display:flex; gap:7px; margin-bottom:8px; }
 .ranking-controls select { flex:1; min-width:0; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:7px; font-family:inherit; }
+.ranking-mode-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:12px; }
+.ranking-mode-tab { min-height:42px; border:1px solid var(--border); border-radius:11px; background:var(--surface2); color:var(--text2); font-family:inherit; font-size:12px; font-weight:800; cursor:pointer; }
+.ranking-mode-tab.active { background:var(--accent4); border-color:var(--accent4); color:#fff; }
 .ranking-row { display:grid; grid-template-columns:28px 1fr auto; align-items:center; gap:7px; padding:7px 4px; border-bottom:1px solid var(--border); font-size:11px; }
 .ranking-row:last-child { border-bottom:none; }
 .ranking-rank { color:var(--accent2); font-weight:900; }
@@ -957,7 +960,7 @@ const AVATAR_ITEMS = [
 ];
 const PROFILE_AVATARS = AVATAR_ITEMS.map(a=>a.icon);
 const FREE_AVATARS = AVATAR_ITEMS.filter(a=>a.price===0).map(a=>a.icon);
-let activeGameId='', activeGameStartedAt=0, selectedProfileAvatar='🎮', rankingGame='memory', onboardingMode=false;
+let activeGameId='', activeGameStartedAt=0, selectedProfileAvatar='🎮', rankingGame='memory', rankingMode='game', onboardingMode=false;
 let gameSearchText='',gameTagFilter='すべて',favoriteOnly=false;
 let saveData = {
   level:1, xp:0, totalScore:0, wins:0, streak:0, highscores:{}, dailyBonus:0,
@@ -1033,13 +1036,18 @@ function recordGameResult(gameId,score,won,details={}){
   persistSave();submitOnlineScore(entry);return entry;
 }
 function buildScoreSubmission(entry){
-  return {playerId:entry.playerId,username:entry.username,avatar:saveData.profile.avatar,gameId:entry.gameId,score:entry.score,won:entry.won,playedAt:entry.playedAt,durationMs:entry.durationMs,rulesVersion:entry.rulesVersion};
+  return {playerId:entry.playerId,username:entry.username,avatar:saveData.profile.avatar,level:saveData.level,totalPoints:saveData.totalScore,gameId:entry.gameId,score:entry.score,won:entry.won,playedAt:entry.playedAt,durationMs:entry.durationMs,rulesVersion:entry.rulesVersion};
+}
+function buildProfileSubmission(){return {playerId:saveData.profile.id,username:saveData.profile.username,avatar:saveData.profile.avatar,level:saveData.level,totalPoints:saveData.totalScore};}
+async function syncOnlineProfile(){
+  if(!saveData.profile.onboardingComplete)return;
+  try{await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildProfileSubmission())});}catch(error){}
 }
 async function submitOnlineScore(entry){
   try{
     const response=await fetch('/api/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildScoreSubmission(entry))});
     if(!response.ok)throw new Error('送信できませんでした');
-    if(entry.gameId===rankingGame)renderLocalRanking(rankingGame);
+    if(rankingMode!=='game'||entry.gameId===rankingGame)renderLocalRanking(rankingGame);
   }catch(error){
     showToast('オンライン順位への送信を後で再試行してください','#ff6b6b');
   }
@@ -1082,7 +1090,7 @@ function saveProfile(){
   const input=document.getElementById('profile-name'),name=input.value.trim();
   if(name.length<1||name.length>16||/[<>]/.test(name)){showToast('名前は1〜16文字で、< > は使用できません', '#ff6b6b');return;}
   if(onboardingMode&&name==='プレイヤー'){showToast('自分のユーザーネームを入力してください', '#ff6b6b');input.focus();return;}
-  saveData.profile.username=name;saveData.profile.avatar=selectedProfileAvatar;saveData.profile.onboardingComplete=true;onboardingMode=false;persistSave();updateUI();renderHome();closeProfile();showToast('プロフィールを保存しました', '#6bcb77');
+  saveData.profile.username=name;saveData.profile.avatar=selectedProfileAvatar;saveData.profile.onboardingComplete=true;onboardingMode=false;persistSave();updateUI();renderHome();syncOnlineProfile();closeProfile();showToast('プロフィールを保存しました', '#6bcb77');
 }
 function closeProfile(){if(onboardingMode)return;document.getElementById('profile-modal').classList.remove('open');}
 function buyTheme(id){
@@ -1090,13 +1098,13 @@ function buyTheme(id){
   if(saveData.ownedThemes.includes(id)){saveData.activeTheme=id;applyTheme();persistSave();renderHome();renderShopPage();return;}
   if(saveData.totalScore<theme.price){showToast('ポイントが足りません', '#ff6b6b');return;}
   saveData.totalScore-=theme.price;saveData.ownedThemes.push(id);saveData.activeTheme=id;
-  applyTheme();persistSave();checkMetaProgress();renderHome();renderShopPage();showToast(`🎨 ${theme.name}を購入！`,theme.colors[0]);
+  applyTheme();persistSave();checkMetaProgress();syncOnlineProfile();renderHome();renderShopPage();showToast(`🎨 ${theme.name}を購入！`,theme.colors[0]);
 }
 function buyAvatar(icon){
   const item=AVATAR_ITEMS.find(a=>a.icon===icon);if(!item)return;
-  if(saveData.ownedAvatars.includes(icon)){saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();updateUI();renderShopPage();showToast(`${icon} ${item.name}を設定しました`,'#6bcb77');return;}
+  if(saveData.ownedAvatars.includes(icon)){saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();syncOnlineProfile();updateUI();renderShopPage();showToast(`${icon} ${item.name}を設定しました`,'#6bcb77');return;}
   if(saveData.totalScore<item.price){showToast('ポイントが足りません','#ff6b6b');return;}
-  saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();updateUI();renderShopPage();showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
+  saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();syncOnlineProfile();updateUI();renderShopPage();showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
 }
 function renderShopPage(){
   const el=document.getElementById('shop-grid');if(!el)return;
@@ -1126,7 +1134,7 @@ function loadSave() {
       persistSave();
     }
   } catch(e) {}
-  updateUI();
+  updateUI();syncOnlineProfile();
 }
 function persistSave() {
   try { localStorage.setItem('minigameland_save', JSON.stringify(saveData)); } catch(e) {}
@@ -1174,21 +1182,28 @@ function renderMetaDashboard(){
 async function renderLocalRanking(gameId){
   rankingGame=gameId||rankingGame;
   const el=document.getElementById('local-ranking');if(!el)return;
-  const requestedGame=rankingGame;
-  const controls=`<div class="ranking-controls"><select onchange="renderLocalRanking(this.value)" aria-label="ランキングのゲーム">${GAME_DEFS.map(g=>`<option value="${g.id}" ${g.id===requestedGame?'selected':''}>${g.icon} ${g.title}</option>`).join('')}</select></div>`;
+  const requestedGame=rankingGame,requestedMode=rankingMode;
+  const tabs=`<div class="ranking-mode-tabs"><button class="ranking-mode-tab ${requestedMode==='game'?'active':''}" onclick="setRankingMode('game')">🎮 ゲーム別</button><button class="ranking-mode-tab ${requestedMode==='level'?'active':''}" onclick="setRankingMode('level')">⭐ レベル</button><button class="ranking-mode-tab ${requestedMode==='points'?'active':''}" onclick="setRankingMode('points')">💰 所持ポイント</button></div>`;
+  const gameSelect=requestedMode==='game'?`<div class="ranking-controls"><select onchange="renderLocalRanking(this.value)" aria-label="ランキングのゲーム">${GAME_DEFS.map(g=>`<option value="${g.id}" ${g.id===requestedGame?'selected':''}>${g.icon} ${g.title}</option>`).join('')}</select></div>`:'';
+  const controls=tabs+gameSelect;
   el.innerHTML=controls+'<div class="meta-sub" style="padding:12px 0;text-align:center">順位を読み込み中…</div>';
   try{
-    const response=await fetch(`/api/rankings?gameId=${encodeURIComponent(requestedGame)}&rulesVersion=${SCORE_RULES_VERSION}`,{cache:'no-store'});
+    const query=requestedMode==='game'?`gameId=${encodeURIComponent(requestedGame)}&rulesVersion=${SCORE_RULES_VERSION}`:`type=${requestedMode}`;
+    const response=await fetch(`/api/rankings?${query}`,{cache:'no-store'});
     if(!response.ok)throw new Error('取得できませんでした');
     const data=await response.json();
-    if(rankingGame!==requestedGame)return;
+    if(rankingGame!==requestedGame||rankingMode!==requestedMode)return;
     const rows=Array.isArray(data.rows)?data.rows:[];
-    el.innerHTML=controls+`${rows.length?rows.map((r,i)=>`<div class="ranking-row"><span class="ranking-rank">${i+1}</span><span>${escapeHtml(r.avatar||'🎮')} ${escapeHtml(r.username||'プレイヤー')}<br><span class="meta-sub">${new Date(r.playedAt).toLocaleDateString('ja-JP')}</span></span><span class="ranking-score">${Number(r.score).toLocaleString()}</span></div>`).join(''):'<div class="meta-sub" style="padding:12px 0;text-align:center">まだ記録がありません</div>'}<div class="meta-sub" style="margin-top:8px">ルール v${SCORE_RULES_VERSION}・プレイヤー別ベスト上位10人</div>`;
+    const value=r=>requestedMode==='level'?`Lv.${Number(r.level).toLocaleString()}`:requestedMode==='points'?`${Number(r.totalPoints).toLocaleString()} pt`:Number(r.score).toLocaleString();
+    const date=r=>new Date(requestedMode==='game'?r.playedAt:r.updatedAt).toLocaleDateString('ja-JP');
+    const note=requestedMode==='game'?`ルール v${SCORE_RULES_VERSION}・プレイヤー別ベスト上位10人`:requestedMode==='level'?'レベル上位10人（同レベルは所持ポイント順）':'現在の所持ポイント上位10人';
+    el.innerHTML=controls+`${rows.length?rows.map((r,i)=>`<div class="ranking-row"><span class="ranking-rank">${i+1}</span><span>${escapeHtml(r.avatar||'🎮')} ${escapeHtml(r.username||'プレイヤー')}<br><span class="meta-sub">更新 ${date(r)}</span></span><span class="ranking-score">${value(r)}</span></div>`).join(''):'<div class="meta-sub" style="padding:18px 0;text-align:center">まだ記録がありません。ゲームを遊ぶと登録されます。</div>'}<div class="meta-sub" style="margin-top:8px">${note}</div>`;
   }catch(error){
-    if(rankingGame!==requestedGame)return;
+    if(rankingGame!==requestedGame||rankingMode!==requestedMode)return;
     el.innerHTML=controls+'<div class="meta-sub" style="padding:12px 0;text-align:center">順位を取得できませんでした。時間をおいて再度お試しください。</div>';
   }
 }
+function setRankingMode(mode){if(!['game','level','points'].includes(mode))return;rankingMode=mode;renderLocalRanking(rankingGame);}
 
 function renderGameFilters(){
   const tags=['すべて',...new Set(GAME_DEFS.map(g=>g.tag))],row=document.getElementById('game-filters');
