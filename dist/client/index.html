@@ -283,7 +283,7 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 #game-screen[data-game="memory"] .memory-grid { width:min(100%,380px); }
 #game-screen[data-game="reaction"] #reaction-area { border:2px solid var(--border); box-shadow:var(--shadow); }
 #game-screen[data-game="quiz"] .quiz-q, #game-screen[data-game="trivia"] .quiz-q,
-#game-screen[data-game="animequiz"] .quiz-q, #game-screen[data-game="myquiz"] .quiz-q { border:1px solid var(--border); font-size:18px; }
+#game-screen[data-game="animequiz"] .quiz-q { border:1px solid var(--border); font-size:18px; }
 #game-screen[data-game="hangman"] .keyboard { max-width:520px; margin-inline:auto; }
 #game-screen[data-game="hangman"] .key { width:42px; height:42px; font-size:14px; }
 #game-screen[data-game="roulette"] .roulette-wrap { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:16px; }
@@ -759,7 +759,6 @@ const GAME_DEFS = [
   { id:'runner',    icon:'🏃', title:'ランナー',          desc:'障害物をジャンプで避けて走り続けろ！横スクロール',  tag:'アクション',color:'#6bcb77' },
   { id:'shooting',    icon:'🛸', title:'スペースシューター', desc:'迫り来る敵を撃ち落とせ！スマホ/PC対応', tag:'アクション', color:'#4d96ff' },
   { id:'minesweeper', icon:'💣', title:'マインスイーパー',   desc:'地雷を避けて安全なマスを全て開けよう', tag:'パズル', color:'#ff6b6b' },
-  { id:'myquiz',      icon:'✏️', title:'オリジナルクイズ',   desc:'自分でクイズを作って遊ぼう！問題を登録して出題',  tag:'クイズ',    color:'#ffd93d' },
   { id:'animequiz',   icon:'🤷‍♀️', title:'クイズ難', desc:'いろいろな知識を試せ！全10問4択',         tag:'クイズ',    color:'#c77dff' },
   { id:'slot',        icon:'🎰', title:'スロット',          desc:'3つのリールを揃えてポイントを稼げ！',           tag:'運',        color:'#ffd93d' },
   { id:'pinball',     icon:'🟣', title:'ピンボール',        desc:'フリッパーでボールを弾き、コンボで高得点を狙え！', tag:'アクション', color:'#ff9de2' },
@@ -790,7 +789,6 @@ const GAME_RULES = {
   runner:{goal:'障害物を避けて、できるだけ長く走ります。',controls:'Space、↑、クリック、タップでジャンプ。空中でもう一度押すと2段ジャンプします。',score:'走行距離がそのままスコアになります。衝突すると終了です。'},
   shooting:{goal:'敵に接触せず、迫ってくる宇宙船を撃破します。',controls:'PCは方向キー、スマホはドラッグで移動。射撃は自動です。',score:'敵1体につき5pt。敵との接触で終了します。'},
   minesweeper:{goal:'地雷以外のすべてのマスを開きます。',controls:'開くモードと旗モードを切り替えてマスを選びます。最初の周囲には地雷が置かれません。',score:'安全なマスをすべて開くと300ptです。'},
-  myquiz:{goal:'自分で問題と4つの選択肢を作って遊びます。',controls:'問題を追加し、正解を指定してからプレイします。',score:'1問20pt。全問題の60%以上正解で勝利です。'},
   animequiz:{goal:'難しめの知識クイズ10問に挑戦します。',controls:'4つの選択肢から回答します。回答後に解説が表示されます。',score:'1問20pt。7問以上正解で勝利です。'},
   slot:{goal:'3つのリールを止めて絵柄を揃えます。',controls:'ベット後にスピンし、STOPを1つずつ押します。',score:'絵柄に応じた倍率で払い戻されます。ベットを超える配当で勝利扱いです。'},
   pinball:{goal:'3つのボールでバンパーに当て、高得点を狙います。',controls:'←→キーまたは左右ボタンでフリッパー、Spaceまたは発射ボタンで開始します。',score:'バンパーは100点。短時間で連続ヒットすると最大8倍コンボになります。'},
@@ -1004,7 +1002,7 @@ async function submitOnlineScore(entry){
   }
 }
 function startRandomChallenge(){
-  const pool=GAME_DEFS.filter(g=>!['blackjack','roulette','slot','myquiz'].includes(g.id)),g=pool[Math.floor(Math.random()*pool.length)],hs=saveData.highscores[g.id]||0;
+  const pool=GAME_DEFS.filter(g=>!['blackjack','roulette','slot'].includes(g.id)),g=pool[Math.floor(Math.random()*pool.length)],hs=saveData.highscores[g.id]||0;
   const scoreMode=hs>0&&Math.random()<.55;saveData.activeChallenge={id:`challenge-${Date.now()}`,gameId:g.id,type:scoreMode?'score':'win',target:scoreMode?Math.max(10,Math.round(hs*.75)):0,reward:120,completed:false};persistSave();startGame(g.id);
 }
 function abandonChallenge(){saveData.activeChallenge=null;persistSave();renderHome();}
@@ -2910,205 +2908,6 @@ games.shooting = function(el) {
   init();
   shootRAF=requestAnimationFrame(tick);
   el._cleanup=()=>{gameOver=true;cancelAnimationFrame(shootRAF);for(const k in shootKeys)shootKeys[k]=false;};
-};
-
-// ================================================================
-// GAME 16: MY QUIZ (オリジナルクイズ作成＆プレイ)
-// ================================================================
-games.myquiz = function(el) {
-  // ローカルストレージからクイズを読み込み
-  let myQuestions = [];
-  try {
-    const saved = localStorage.getItem('minigameland_myquiz');
-    if (saved) myQuestions = JSON.parse(saved);
-  } catch(e) {}
-
-  function saveQuestions() {
-    try { localStorage.setItem('minigameland_myquiz', JSON.stringify(myQuestions)); } catch(e) {}
-  }
-
-  let mode = 'menu'; // 'menu' | 'edit' | 'play'
-  let editIdx = -1;  // -1=新規, 0以上=編集中のインデックス
-  let playIdx = 0, playScore = 0, playAnswered = false;
-
-  // ── メニュー画面
-  function renderMenu() {
-    mode = 'menu';
-    el.innerHTML = `
-      <div class="game-header"><h2>✏️ オリジナルクイズ</h2><p>自分でクイズを作って遊ぼう！</p></div>
-      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <button class="btn btn-success" onclick="mqNewQuestion()">＋ 問題を追加</button>
-        ${myQuestions.length>=1?`<button class="btn btn-warn" onclick="mqStartPlay()">▶ プレイ (${myQuestions.length}問)</button>`:''}
-        ${myQuestions.length>=1?`<button class="btn btn-danger btn-sm" onclick="mqClearAll()">🗑 全削除</button>`:''}
-      </div>
-      ${myQuestions.length===0
-        ? `<div style="background:var(--surface2);border-radius:var(--radius);padding:24px;text-align:center;color:var(--text2)">
-             まだ問題がありません。<br>「＋ 問題を追加」から作ってみよう！
-           </div>`
-        : `<div id="mq-list"></div>`}`;
-
-    if (myQuestions.length > 0) {
-      const list = document.getElementById('mq-list');
-      myQuestions.forEach((q, i) => {
-        const card = document.createElement('div');
-        card.style.cssText = 'background:var(--surface2);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px';
-        card.innerHTML = `
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:14px;margin-bottom:4px">Q${i+1}. ${escapeHtml(q.q)}</div>
-            <div style="font-size:11px;color:var(--text2)">
-              ${q.opts.map((o,oi)=>`<span style="margin-right:8px;${oi===q.a?'color:var(--accent3);font-weight:700':''}">
-                ${oi===q.a?'✅':'　'}${escapeHtml(o)}</span>`).join('')}
-            </div>
-          </div>
-          <button class="btn btn-sm" style="background:var(--surface);flex-shrink:0" onclick="mqEdit(${i})">編集</button>
-          <button class="btn btn-sm btn-danger" style="flex-shrink:0" onclick="mqDelete(${i})">削除</button>`;
-        list.appendChild(card);
-      });
-    }
-
-    window.mqNewQuestion = () => renderEdit(-1);
-    window.mqEdit = (i) => renderEdit(i);
-    window.mqDelete = (i) => {
-      if (confirm(`Q${i+1}「${myQuestions[i].q}」を削除しますか？`)) {
-        myQuestions.splice(i, 1); saveQuestions(); renderMenu();
-      }
-    };
-    window.mqClearAll = () => {
-      if (confirm('全問題を削除しますか？')) { myQuestions = []; saveQuestions(); renderMenu(); }
-    };
-    window.mqStartPlay = () => renderPlay();
-  }
-
-  // ── 問題編集画面
-  function renderEdit(idx) {
-    mode = 'edit'; editIdx = idx;
-    const q = idx >= 0 ? myQuestions[idx] : { q:'', opts:['','','',''], a:0 };
-    el.innerHTML = `
-      <div class="game-header"><h2>✏️ ${idx>=0?'問題を編集':'問題を追加'}</h2></div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">問題文</label>
-        <input id="mq-q" type="text" maxlength="80" placeholder="問題を入力してください"
-          style="width:100%;background:var(--surface2);border:2px solid var(--surface2);border-radius:var(--radius);padding:11px 14px;color:var(--text);font-family:inherit;font-size:15px;outline:none"
-          value="${escapeHtml(q.q)}"
-          onfocus="this.style.borderColor='var(--accent4)'" onblur="this.style.borderColor='var(--surface2)'">
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:6px">選択肢（正解を選んでください）</label>
-        ${[0,1,2,3].map(i=>`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <button id="mq-radio-${i}" onclick="mqSetAnswer(${i})"
-              style="width:32px;height:32px;border-radius:50%;border:3px solid ${q.a===i?'var(--accent3)':'var(--surface2)'};
-                     background:${q.a===i?'var(--accent3)':'var(--surface2)'};cursor:pointer;flex-shrink:0;transition:all 0.15s;font-size:14px">
-              ${q.a===i?'✓':''}
-            </button>
-            <input id="mq-opt-${i}" type="text" maxlength="40" placeholder="選択肢 ${i+1}"
-              style="flex:1;background:var(--surface2);border:2px solid ${q.a===i?'var(--accent3)':'var(--surface2)'};
-                     border-radius:var(--radius);padding:10px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none"
-              value="${escapeHtml(q.opts[i])}"
-              onfocus="this.style.borderColor='var(--accent4)'" onblur="this.style.borderColor='${q.a===i?'var(--accent3)':'var(--surface2)'}'">
-          </div>`).join('')}
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-success" onclick="mqSaveQuestion()">💾 保存</button>
-        <button class="btn btn-sm" style="background:var(--surface2)" onclick="mqBackMenu()">キャンセル</button>
-      </div>
-      <div id="mq-err" style="color:var(--accent1);font-size:13px;margin-top:10px;min-height:18px"></div>`;
-
-    // 正解選択ボタンの状態管理
-    let currentAnswer = q.a;
-    window.mqSetAnswer = (i) => {
-      currentAnswer = i;
-      [0,1,2,3].forEach(j => {
-        const rb = document.getElementById(`mq-radio-${j}`);
-        const inp = document.getElementById(`mq-opt-${j}`);
-        const sel = j === i;
-        rb.style.borderColor = sel ? 'var(--accent3)' : 'var(--surface2)';
-        rb.style.background = sel ? 'var(--accent3)' : 'var(--surface2)';
-        rb.textContent = sel ? '✓' : '';
-        inp.style.borderColor = sel ? 'var(--accent3)' : 'var(--surface2)';
-      });
-    };
-
-    window.mqSaveQuestion = () => {
-      const qText = document.getElementById('mq-q').value.trim();
-      const opts = [0,1,2,3].map(i => document.getElementById(`mq-opt-${i}`).value.trim());
-      const errEl = document.getElementById('mq-err');
-      if (!qText) { errEl.textContent = '⚠️ 問題文を入力してください'; return; }
-      if (opts.some(o => !o)) { errEl.textContent = '⚠️ 選択肢を全て入力してください'; return; }
-      if (new Set(opts).size < 4) { errEl.textContent = '⚠️ 選択肢が重複しています'; return; }
-      const newQ = { q: qText, opts, a: currentAnswer };
-      if (editIdx >= 0) myQuestions[editIdx] = newQ;
-      else myQuestions.push(newQ);
-      saveQuestions();
-      renderMenu();
-    };
-    window.mqBackMenu = renderMenu;
-  }
-
-  // ── プレイ画面
-  function renderPlay() {
-    mode = 'play'; playIdx = 0; playScore = 0; playAnswered = false;
-    const shuffled = [...myQuestions].sort(() => Math.random() - 0.5);
-    renderPlayQ(shuffled);
-  }
-
-  function renderPlayQ(questions) {
-    if (playIdx >= questions.length) {
-      // 結果表示
-      const pts = playScore * 20;
-      if (playScore >= Math.ceil(questions.length * 0.6)) recordWin('myquiz', pts);
-      else { addScore(pts, 'myquiz'); recordLoss(pts,'myquiz'); }
-      el.innerHTML = `
-        <div class="game-header"><h2>✏️ オリジナルクイズ 結果</h2></div>
-        <div class="result-box">
-          <div class="result-score">${playScore}/${questions.length}</div>
-          <p>正解数　| +${pts} pt</p>
-          ${xpResultHtml(pts,'myquiz')}
-          <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-            <button class="btn btn-warn" onclick="mqStartPlay()">もう一度</button>
-            <button class="btn btn-sm" style="background:var(--surface2)" onclick="mqBackMenu()">問題一覧へ</button>
-          </div>
-        </div>`;
-      window.mqStartPlay = renderPlay;
-      window.mqBackMenu = renderMenu;
-      return;
-    }
-
-    const q = questions[playIdx];
-    playAnswered = false;
-    el.innerHTML = `
-      <div class="game-header"><h2>✏️ オリジナルクイズ</h2><p>問${playIdx+1}/${questions.length}　正解: ${playScore}</p></div>
-      <div style="height:5px;background:var(--surface2);border-radius:999px;margin-bottom:14px;overflow:hidden">
-        <div style="height:100%;width:${playIdx/questions.length*100}%;background:var(--accent4);border-radius:999px;transition:width 0.3s"></div>
-      </div>
-      <div class="quiz-q">${escapeHtml(q.q)}</div>
-      <div class="quiz-options" id="mq-opts"></div>
-      <div id="mq-play-msg" style="margin-top:12px;text-align:center;font-size:14px;font-weight:700;min-height:20px"></div>`;
-
-    const opts = document.getElementById('mq-opts');
-    q.opts.forEach((o, i) => {
-      const b = document.createElement('button');
-      b.className = 'quiz-opt'; b.textContent = o;
-      b.onclick = () => {
-        if (playAnswered) return;
-        playAnswered = true;
-        document.querySelectorAll('.quiz-opt')[q.a].classList.add('correct');
-        if (i !== q.a) {
-          document.querySelectorAll('.quiz-opt')[i].classList.add('wrong');
-          document.getElementById('mq-play-msg').textContent = `❌ 正解は「${q.opts[q.a]}」`;
-        } else {
-          playScore++;
-          document.getElementById('mq-play-msg').textContent = '✅ 正解！';
-        }
-        gameDelay(() => { playIdx++; renderPlayQ(questions); },1200);
-      };
-      opts.appendChild(b);
-    });
-
-    window.mqBackMenu = renderMenu;
-  }
-
-  renderMenu();
 };
 
 // ================================================================

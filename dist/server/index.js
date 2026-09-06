@@ -1,7 +1,7 @@
 const GAME_IDS = new Set([
   'memory','reaction','quiz','blackjack','solitaire','hangman','slide','roulette',
   'shiritori','tetris','breakout','trivia','monster','runner','shooting',
-  'minesweeper','myquiz','animequiz','slot','pinball','snake','aimtrainer',
+  'minesweeper','animequiz','slot','pinball','snake','aimtrainer',
   'simon','typing','sokoban','reversi','lightsout','pong','fighter'
 ]);
 const AVATARS = new Set(['🎮','🙂','🐣','🦊','🐱','🐶','🐼','🐸','🤖','👻','🧙','🥷','🐉','👑','👾','🚀']);
@@ -111,4 +111,3 @@ export default {
     }
   }
 };
-
