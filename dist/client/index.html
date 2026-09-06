@@ -123,9 +123,10 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 .games-empty { grid-column:1/-1; color:var(--text2); text-align:center; padding:40px 15px; background:var(--surface); border-radius:var(--radius-lg); }
 .hub-link { width:100%; border:0; color:var(--text); background:linear-gradient(135deg,var(--surface2),var(--surface)); border-radius:12px; padding:12px; cursor:pointer; font:inherit; font-size:12px; font-weight:800; text-align:left; }
 .hub-link:hover { outline:1px solid var(--accent4); }
-#shop-page { display:none; padding:20px; max-width:1100px; margin:0 auto; }
+.app-page { display:none; padding:20px; max-width:1100px; margin:0 auto; }
 .page-hero { background:linear-gradient(135deg,rgba(199,125,255,.2),rgba(77,150,255,.14)); border:1px solid var(--border); border-radius:24px; padding:24px; margin-bottom:18px; }
 .page-hero h2 { font-size:26px; margin-bottom:6px; }
+.page-content { max-width:760px; margin:0 auto; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; box-shadow:0 8px 22px rgba(0,0,0,.14); }
 .shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
 .shop-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:17px; box-shadow:0 8px 22px rgba(0,0,0,.14); }
 .shop-card.active { border-color:var(--accent3); }
@@ -138,22 +139,13 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 .avatar-shop-icon { width:70px; height:70px; margin:0 auto 10px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,var(--surface2),var(--surface)); border:1px solid var(--border); font-size:38px; }
 .privacy-note { margin-top:12px; padding:10px; border-radius:10px; background:var(--surface2); color:var(--text2); font-size:10px; line-height:1.6; }
 
-/* APP TASKBAR & HUB PANELS */
+/* APP TASKBAR & FEATURE PAGES */
 .app-taskbar { position:fixed; left:50%; bottom:max(12px,env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; width:min(820px,calc(100% - 24px)); display:grid; grid-template-columns:repeat(6,1fr); gap:5px; padding:8px; border:1px solid var(--border); border-radius:22px; background:rgba(26,24,40,.94); box-shadow:0 14px 40px rgba(0,0,0,.48); backdrop-filter:blur(16px); }
 .taskbar-item { min-width:0; min-height:55px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:0; border-radius:15px; background:transparent; color:var(--text2); font-family:inherit; font-size:10px; font-weight:800; cursor:pointer; }
 .taskbar-item:hover { background:var(--surface2); color:var(--text); }
 .taskbar-item.active { color:#fff; background:linear-gradient(135deg,var(--accent4),var(--accent5)); }
 .taskbar-icon { font-size:20px; line-height:1; }
 .taskbar-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
-#hub-modal { display:none; position:fixed; inset:0; z-index:505; padding:18px 18px 100px; background:rgba(0,0,0,.7); align-items:flex-end; justify-content:center; }
-#hub-modal.open { display:flex; }
-.hub-sheet { width:min(760px,100%); max-height:min(78dvh,760px); display:flex; flex-direction:column; overflow:hidden; background:var(--surface); border:1px solid var(--border); border-radius:26px; box-shadow:var(--shadow); }
-.hub-sheet-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid var(--border); }
-.hub-sheet-header h2 { font-size:21px; }
-.hub-close { width:40px; height:40px; flex:0 0 auto; border:0; border-radius:50%; background:var(--surface2); color:var(--text); font-size:20px; cursor:pointer; }
-.hub-sheet-content { overflow:auto; padding:18px 20px 24px; }
-.hub-section { display:none; }
-.hub-section.active { display:block; }
 #hub-achievements .achievement-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
 #hub-achievements .achievement-badge { padding:12px; border-radius:13px; font-size:12px; line-height:1.45; }
 #hub-ranking .ranking-row { grid-template-columns:36px 1fr auto; padding:12px 6px; font-size:13px; }
@@ -432,10 +424,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   .app-taskbar { bottom:0; width:100%; gap:1px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-radius:18px 18px 0 0; border-left:0; border-right:0; border-bottom:0; }
   .taskbar-item { min-height:52px; padding:4px 2px; font-size:9px; border-radius:12px; }
   .taskbar-icon { font-size:19px; }
-  #hub-modal { padding:10px 8px calc(75px + env(safe-area-inset-bottom)); }
-  .hub-sheet { max-height:75dvh; border-radius:22px; }
-  .hub-sheet-header { padding:15px 16px; }
-  .hub-sheet-content { padding:14px 15px 20px; }
+  .app-page { padding:14px; }
+  .app-page .page-hero { padding:19px; border-radius:20px; }
+  .app-page .page-hero h2 { font-size:22px; }
+  .page-content { padding:15px; border-radius:17px; }
   #hub-achievements .achievement-list { grid-template-columns:1fr; }
   .game-browser-top { align-items:stretch; }
   #rules-modal { padding:8px; }
@@ -608,18 +600,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   </div>
 </div>
 
-<div id="hub-modal" onclick="if(event.target===this)closeHubPanel()" role="dialog" aria-modal="true" aria-labelledby="hub-title">
-  <div class="hub-sheet">
-    <div class="hub-sheet-header"><h2 id="hub-title">メニュー</h2><button class="hub-close" onclick="closeHubPanel()" aria-label="閉じる">×</button></div>
-    <div class="hub-sheet-content">
-      <section class="hub-section" id="hub-daily" data-hub="daily"><div id="daily-missions"></div></section>
-      <section class="hub-section" id="hub-achievements" data-hub="achievements"><div class="meta-sub" id="achievement-count" style="margin-bottom:12px">0/0</div><div id="achievement-list" class="achievement-list"></div></section>
-      <section class="hub-section" id="hub-ranking" data-hub="ranking"><div id="local-ranking"></div></section>
-      <section class="hub-section" id="hub-challenge" data-hub="challenge"><div id="random-challenge"></div></section>
-    </div>
-  </div>
-</div>
-
 <!-- HOME -->
 <div id="home">
   <div class="home-banner">
@@ -638,7 +618,27 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   <div class="games-grid" id="games-grid"></div>
 </div>
 
-<section id="shop-page" aria-labelledby="shop-title">
+<section id="daily-page" class="app-page" aria-labelledby="daily-title">
+  <div class="page-hero"><h2 id="daily-title">📅 デイリーミッション</h2><p>毎日の目標を確認して、ゲーム内ポイントを獲得しよう。</p></div>
+  <div class="page-content" id="hub-daily"><div id="daily-missions"></div></div>
+</section>
+
+<section id="achievements-page" class="app-page" aria-labelledby="achievements-title">
+  <div class="page-hero"><h2 id="achievements-title">🏅 実績</h2><p>プレイの記録と、まだ達成していない目標を一覧で確認できます。</p></div>
+  <div class="page-content" id="hub-achievements"><div class="meta-sub" id="achievement-count" style="margin-bottom:12px">0/0</div><div id="achievement-list" class="achievement-list"></div></div>
+</section>
+
+<section id="ranking-page" class="app-page" aria-labelledby="ranking-title">
+  <div class="page-hero"><h2 id="ranking-title">🌐 世界ランキング</h2><p>ゲームを選んで、オンラインの上位記録を確認しよう。</p></div>
+  <div class="page-content" id="hub-ranking"><div id="local-ranking"></div></div>
+</section>
+
+<section id="challenge-page" class="app-page" aria-labelledby="challenge-title">
+  <div class="page-hero"><h2 id="challenge-title">🎲 ランダム挑戦</h2><p>ランダムに選ばれたゲームと目標を達成して、報酬を獲得しよう。</p></div>
+  <div class="page-content" id="hub-challenge"><div id="random-challenge"></div></div>
+</section>
+
+<section id="shop-page" class="app-page" aria-labelledby="shop-title">
   <div class="page-hero"><h2 id="shop-title">🛍️ テーマショップ</h2><p>ゲームで貯めたポイントを使って、画面のデザインを着せ替えよう。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
   <h2 class="shop-section-title">🎨 カラーテーマ</h2>
   <div class="shop-grid" id="shop-grid"></div>
@@ -651,11 +651,11 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 
 <nav class="app-taskbar" aria-label="メインメニュー">
   <button class="taskbar-item active" data-taskbar="home" onclick="goHome()"><span class="taskbar-icon">🏠</span><span class="taskbar-label">ホーム</span></button>
-  <button class="taskbar-item" data-taskbar="daily" onclick="openHubPanel('daily')"><span class="taskbar-icon">📅</span><span class="taskbar-label">デイリー</span></button>
-  <button class="taskbar-item" data-taskbar="achievements" onclick="openHubPanel('achievements')"><span class="taskbar-icon">🏅</span><span class="taskbar-label">実績</span></button>
+  <button class="taskbar-item" data-taskbar="daily" onclick="openFeaturePage('daily')"><span class="taskbar-icon">📅</span><span class="taskbar-label">デイリー</span></button>
+  <button class="taskbar-item" data-taskbar="achievements" onclick="openFeaturePage('achievements')"><span class="taskbar-icon">🏅</span><span class="taskbar-label">実績</span></button>
   <button class="taskbar-item" data-taskbar="shop" onclick="openShop()"><span class="taskbar-icon">🛍️</span><span class="taskbar-label">ショップ</span></button>
-  <button class="taskbar-item" data-taskbar="ranking" onclick="openHubPanel('ranking')"><span class="taskbar-icon">🌐</span><span class="taskbar-label">ランキング</span></button>
-  <button class="taskbar-item" data-taskbar="challenge" onclick="openHubPanel('challenge')"><span class="taskbar-icon">🎲</span><span class="taskbar-label">挑戦</span></button>
+  <button class="taskbar-item" data-taskbar="ranking" onclick="openFeaturePage('ranking')"><span class="taskbar-icon">🌐</span><span class="taskbar-label">ランキング</span></button>
+  <button class="taskbar-item" data-taskbar="challenge" onclick="openFeaturePage('challenge')"><span class="taskbar-icon">🎲</span><span class="taskbar-label">挑戦</span></button>
 </nav>
 
 <script>
@@ -856,7 +856,7 @@ function renderRules(query=''){
   const list=GAME_DEFS.filter(g=>`${g.title} ${g.tag} ${g.desc} ${Object.values(GAME_RULES[g.id]||{}).join(' ')}`.toLocaleLowerCase('ja').includes(q));
   grid.innerHTML=list.length?list.map(g=>{const r=GAME_RULES[g.id]||{goal:g.desc,controls:'画面の案内に従って操作します。',score:'結果画面で確認できます。'};return `<article class="rule-card" id="rule-${g.id}"><div class="rule-card-head"><span class="rule-card-icon">${g.icon}</span><div><h3>${escapeHtml(g.title)}</h3><div class="rule-tag">${escapeHtml(g.tag)}</div></div></div><div class="rule-section"><strong>目的：</strong>${escapeHtml(r.goal)}</div><div class="rule-section"><strong>操作：</strong>${escapeHtml(r.controls)}</div><div class="rule-section"><strong>勝敗・得点：</strong>${escapeHtml(r.score)}</div><button class="btn btn-sm mt" onclick="closeRules();startGame('${g.id}')">このゲームを遊ぶ</button></article>`;}).join(''):'<div class="rules-empty">該当するゲームがありません</div>';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRules();closeProfile();closeModal();closeBgm();closeHubPanel();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRules();closeProfile();closeModal();closeBgm();}});
 // === ここから差し替え ===(gemini2回目)
 const BASE_NAMES = ['ビギナー', 'アマチュア', 'プレイヤー', 'にゃんこ', 'プロ', 'マスター', 'グランドマスター', 'レジェンド', '神', 'ゲーム神'];
 // 11〜99レベル用の接頭辞（10レベルごとに切り替わる）
@@ -1111,7 +1111,7 @@ function renderShopPage(){
   }).join('');
 }
 function openShop(){
-  closeHubPanel(false);setTaskbarActive('shop');document.getElementById('home').style.display='none';document.getElementById('game-screen').style.display='none';document.getElementById('shop-page').style.display='block';document.getElementById('back-btn').style.display='inline-block';renderShopPage();window.scrollTo({top:0,behavior:'smooth'});
+  goHome();document.getElementById('home').style.display='none';document.getElementById('shop-page').style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive('shop');renderShopPage();window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function loadSave() {
@@ -1360,28 +1360,16 @@ function closeModal() { document.getElementById('save-modal').classList.remove('
 const gameTimeouts=new Set();
 function gameDelay(fn,ms){const id=setTimeout(()=>{gameTimeouts.delete(id);fn();},ms);gameTimeouts.add(id);return id;}
 function clearGameTimeouts(){gameTimeouts.forEach(clearTimeout);gameTimeouts.clear();}
-const HUB_TITLES={daily:'📅 デイリーミッション',achievements:'🏅 実績',ranking:'🌐 世界ランキング',challenge:'🎲 ランダム挑戦'};
 function setTaskbarActive(name){document.querySelectorAll('.taskbar-item').forEach(button=>button.classList.toggle('active',button.dataset.taskbar===name));}
-function openHubPanel(name){
-  if(!HUB_TITLES[name])return;
-  document.getElementById('hub-title').textContent=HUB_TITLES[name];
-  document.querySelectorAll('.hub-section').forEach(section=>section.classList.toggle('active',section.dataset.hub===name));
-  document.getElementById('hub-modal').classList.add('open');
-  setTaskbarActive(name);renderMetaDashboard();
-}
-function closeHubPanel(restore=true){
-  document.getElementById('hub-modal')?.classList.remove('open');
-  if(restore){
-    const shopOpen=document.getElementById('shop-page')?.style.display==='block';
-    const gameOpen=document.getElementById('game-screen')?.style.display==='block';
-    setTaskbarActive(shopOpen?'shop':gameOpen?'':'home');
-  }
+function openFeaturePage(name){
+  if(!['daily','achievements','ranking','challenge'].includes(name))return;
+  goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
-  closeHubPanel(false);setTaskbarActive('home');
+  setTaskbarActive('home');
   document.getElementById('home').style.display = 'block';
   document.getElementById('game-screen').style.display = 'none';
-  document.getElementById('shop-page').style.display = 'none';
+  document.querySelectorAll('.app-page').forEach(page=>page.style.display='none');
   document.getElementById('back-btn').style.display = 'none';
   document.removeEventListener('keydown', slideKeyHandler);
   document.removeEventListener('keydown', tetrisKeyHandler);
@@ -1402,10 +1390,10 @@ function goHome() {
   renderHome();
 }
 function startGame(name) {
-  closeHubPanel(false);setTaskbarActive('');
+  setTaskbarActive('');
   document.getElementById('home').style.display = 'none';
   document.getElementById('game-screen').style.display = 'block';
-  document.getElementById('shop-page').style.display = 'none';
+  document.querySelectorAll('.app-page').forEach(page=>page.style.display='none');
   document.getElementById('back-btn').style.display = 'inline-block';
   document.removeEventListener('keydown', slideKeyHandler);
   document.removeEventListener('keydown', tetrisKeyHandler);
