@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4d96ff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ゲームランド">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <title>🎮 ミニゲームランド</title>
 <style>
 :root {
@@ -31,6 +39,8 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-s
 .tb-load-btn { background: var(--accent4); color: #fff; border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tb-profile-btn { background:var(--accent5); color:#fff; border:none; border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
 .tb-rules-btn { background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.tb-install-btn { display:none; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:0; border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+.tb-install-btn.visible { display:inline-block; }
 
 /* HOME */
 #home { padding: 20px; }
@@ -488,6 +498,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
     <div class="tb-pill pt" id="tb-pt">0 pt</div>
     <button class="tb-rules-btn" onclick="openRules()">📖 遊び方</button>
     <button class="tb-bgm-btn" id="bgm-btn" onclick="openBgm()">🎵 BGM</button>
+    <button class="tb-install-btn" id="install-btn" type="button">📲 インストール</button>
     <button class="tb-profile-btn" id="profile-btn" onclick="openProfile()">👤 プレイヤー</button>
     <button class="tb-save-btn" onclick="openSave()">💾 セーブ</button>
     <button class="tb-load-btn" onclick="openLoad()">📂 ロード</button>
@@ -4981,6 +4992,35 @@ games.fighter = function(el) {
 // ================================================================
 // INIT
 // ================================================================
+let deferredInstallPrompt = null;
+const installButton = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installButton?.classList.add('visible');
+});
+
+installButton?.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installButton.classList.remove('visible');
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  installButton?.classList.remove('visible');
+  showToast('アプリをインストールしました！', '#6bcb77');
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+  });
+}
+
 loadSave();
 renderHome();
 if(!saveData.profile.onboardingComplete)gameDelay(()=>openProfile(true),120);
