@@ -143,6 +143,35 @@ body.playing-game .app-taskbar { display:none; }
 .avatar-shop-card { text-align:center; }
 .avatar-shop-icon { width:70px; height:70px; margin:0 auto 10px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,var(--surface2),var(--surface)); border:1px solid var(--border); font-size:38px; }
 .privacy-note { margin-top:12px; padding:10px; border-radius:10px; background:var(--surface2); color:var(--text2); font-size:10px; line-height:1.6; }
+.gacha-panel { position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(199,125,255,.22),rgba(77,150,255,.13)); border:1px solid rgba(199,125,255,.4); border-radius:22px; padding:20px; }
+.gacha-panel::after { content:'GACHA'; position:absolute; right:-8px; top:-18px; font-size:76px; font-weight:1000; color:rgba(255,255,255,.035); transform:rotate(8deg); pointer-events:none; }
+.gacha-wallet { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+.gacha-wallet span { background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:900; }
+.gacha-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; position:relative; z-index:1; }
+.gacha-actions .btn { width:100%; }
+.gacha-rates { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:14px; }
+.gacha-rate { background:rgba(15,14,23,.42); border-radius:10px; padding:8px 4px; text-align:center; font-size:10px; }
+.gacha-rate strong { display:block; font-size:13px; }
+.gacha-results { display:grid; grid-template-columns:repeat(auto-fill,minmax(115px,1fr)); gap:9px; margin-top:14px; }
+.gacha-result { background:var(--surface); border:2px solid var(--border); border-radius:15px; padding:12px 7px; text-align:center; animation:gachaPop .36s ease both; }
+.gacha-result-icon { font-size:34px; line-height:1.2; margin-bottom:5px; }
+.gacha-result strong,.gacha-item-rarity { display:block; font-size:11px; }
+.gacha-result small { color:var(--text2); font-size:9px; }
+.rarity-N { border-color:#89909d; }.rarity-R { border-color:#4d96ff; }.rarity-SR { border-color:#c77dff; }.rarity-UR { border-color:#ffd93d; box-shadow:0 0 18px rgba(255,217,61,.25); }.rarity-SECRET { border-color:#fff; box-shadow:0 0 22px rgba(199,125,255,.5); background:linear-gradient(135deg,rgba(255,107,107,.2),rgba(77,150,255,.2),rgba(107,203,119,.2)); }
+.gacha-collection { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+.gacha-collection-card { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:11px; }
+.gacha-collection-card.locked { opacity:.5; filter:grayscale(1); }
+.gacha-collection-card .gacha-result-icon { margin:0; min-width:42px; text-align:center; }
+.gacha-collection-info { flex:1; min-width:0; }.gacha-collection-info strong { display:block; font-size:12px; }.gacha-collection-info small { color:var(--text2); font-size:9px; }
+.gacha-collection-card .btn { width:auto; min-height:32px; margin:0; padding:5px 9px; font-size:10px; }
+.profile-avatar.frame-blue { box-shadow:0 0 0 3px #4d96ff,0 0 15px rgba(77,150,255,.6); }
+.profile-avatar.frame-red { box-shadow:0 0 0 3px #ff6b6b,0 0 15px rgba(255,107,107,.6); }
+.profile-avatar.frame-neon { box-shadow:0 0 0 3px #00f5d4,0 0 18px #f15bb5; }
+.profile-avatar.frame-gold { box-shadow:0 0 0 4px #ffd93d,0 0 22px rgba(255,217,61,.8); }
+.profile-avatar.frame-cosmic { box-shadow:0 0 0 4px #7b2cbf,0 0 25px #4cc9f0; }
+.profile-avatar.frame-secret { animation:secretGlow 1.6s linear infinite; }
+@keyframes gachaPop { from { opacity:0; transform:translateY(10px) scale(.9); } to { opacity:1; transform:none; } }
+@keyframes secretGlow { 0%{box-shadow:0 0 0 4px #ff6b6b,0 0 25px #ff6b6b} 33%{box-shadow:0 0 0 4px #6bcb77,0 0 25px #6bcb77} 66%{box-shadow:0 0 0 4px #4d96ff,0 0 25px #4d96ff} 100%{box-shadow:0 0 0 4px #ff6b6b,0 0 25px #ff6b6b} }
 
 /* APP TASKBAR & FEATURE PAGES */
 .app-taskbar { position:fixed; left:50%; bottom:max(12px,env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; width:min(820px,calc(100% - 24px)); display:grid; grid-template-columns:repeat(6,1fr); gap:5px; padding:8px; border:1px solid var(--border); border-radius:22px; background:rgba(26,24,40,.94); box-shadow:0 14px 40px rgba(0,0,0,.48); backdrop-filter:blur(16px); }
@@ -644,7 +673,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 </section>
 
 <section id="shop-page" class="app-page" aria-labelledby="shop-title">
-  <div class="page-hero"><h2 id="shop-title">🛍️ テーマショップ</h2><p>ゲームで貯めたポイントを使って、画面のデザインを着せ替えよう。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
+  <div class="page-hero"><h2 id="shop-title">🛍️ ショップ＆ガチャ</h2><p>ゲームで貯めたポイントを使って、コレクションや画面の着せ替えを楽しもう。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
+  <h2 class="shop-section-title">🎁 コレクションガチャ</h2>
+  <div id="gacha-area"></div>
   <h2 class="shop-section-title">🎨 カラーテーマ</h2>
   <div class="shop-grid" id="shop-grid"></div>
   <h2 class="shop-section-title">👤 プレイヤーアイコン</h2>
@@ -950,6 +981,9 @@ const THEMES = {
   mono:{name:'モノクローム',desc:'白とグレーでまとめた硬派なテーマ',price:5000,colors:['#ffffff','#adb5bd','#495057'],vars:{'--bg':'#0b0c0d','--surface':'#191b1d','--surface2':'#292c2f','--accent1':'#f07178','--accent2':'#f8f9fa','--accent3':'#adb5bd','--accent4':'#6c757d','--accent5':'#dee2e6'}},
   candy:{name:'キャンディポップ',desc:'お菓子のように明るいカラフル配色',price:7000,colors:['#ff70a6','#ff9770','#70d6ff'],vars:{'--bg':'#1b1020','--surface':'#2d1836','--surface2':'#43234f','--accent1':'#ff70a6','--accent2':'#ffd670','--accent3':'#70e000','--accent4':'#70d6ff','--accent5':'#e76bf3'}},
   galaxy:{name:'ギャラクシー',desc:'最高ランクの宇宙テーマ',price:10000,colors:['#7b2cbf','#4cc9f0','#f72585'],vars:{'--bg':'#050510','--surface':'#10102a','--surface2':'#1b1b44','--accent1':'#f72585','--accent2':'#4cc9f0','--accent3':'#72efdd','--accent4':'#4361ee','--accent5':'#b5179e'}},
+  gachaAurora:{name:'オーロラドリーム',desc:'ガチャ限定の幻想的な光のテーマ',price:0,gachaOnly:true,colors:['#80ffdb','#72efdd','#c77dff'],vars:{'--bg':'#07151b','--surface':'#102630','--surface2':'#193a45','--accent1':'#ff8fab','--accent2':'#80ffdb','--accent3':'#72efdd','--accent4':'#4d96ff','--accent5':'#c77dff'}},
+  gachaVoid:{name:'ヴォイドレジェンド',desc:'UR限定の深い宇宙テーマ',price:0,gachaOnly:true,colors:['#f72585','#7209b7','#4cc9f0'],vars:{'--bg':'#03010a','--surface':'#100522','--surface2':'#241044','--accent1':'#f72585','--accent2':'#4cc9f0','--accent3':'#72efdd','--accent4':'#4361ee','--accent5':'#b5179e'}},
+  gachaSecret:{name:'シークレットプリズム',desc:'奇跡を引いた者だけが使える虹色テーマ',price:0,gachaOnly:true,colors:['#ff6b6b','#ffd93d','#4d96ff'],vars:{'--bg':'#090414','--surface':'#1b1030','--surface2':'#31205a','--accent1':'#ff70a6','--accent2':'#ffd670','--accent3':'#70e000','--accent4':'#70d6ff','--accent5':'#e76bf3'}},
 };
 const SCORE_RULES_VERSION = 1;
 const AVATAR_ITEMS = [
@@ -958,7 +992,18 @@ const AVATAR_ITEMS = [
   {icon:'🐼',name:'パンダ',price:500},{icon:'🐸',name:'カエル',price:500},{icon:'🤖',name:'ロボット',price:800},
   {icon:'👻',name:'ゴースト',price:800},{icon:'🧙',name:'魔法使い',price:1000},{icon:'🥷',name:'忍者',price:1200},
   {icon:'🐉',name:'ドラゴン',price:1600},{icon:'👑',name:'キング',price:2500},{icon:'👾',name:'スペースモンスター',price:3000},
-  {icon:'🚀',name:'ロケット',price:4000}
+  {icon:'🚀',name:'ロケット',price:4000},
+  {icon:'🐹',name:'ハムスター',price:0,gachaOnly:true},{icon:'🐰',name:'ウサギ',price:0,gachaOnly:true},{icon:'🐧',name:'ペンギン',price:0,gachaOnly:true},{icon:'🐵',name:'モンキー',price:0,gachaOnly:true},{icon:'🐙',name:'オクトパス',price:0,gachaOnly:true},{icon:'🦁',name:'ライオン',price:0,gachaOnly:true},
+  {icon:'🦄',name:'ユニコーン',price:0,gachaOnly:true},{icon:'🦈',name:'シャーク',price:0,gachaOnly:true},{icon:'🦖',name:'恐竜',price:0,gachaOnly:true},{icon:'🧛',name:'ヴァンパイア',price:0,gachaOnly:true},{icon:'🧚',name:'フェアリー',price:0,gachaOnly:true},{icon:'🌠',name:'流星の化身',price:0,gachaOnly:true},{icon:'💠',name:'奇跡のプリズム',price:0,gachaOnly:true}
+];
+const GACHA_RATES={N:.6,R:.3,SR:.089,UR:.01,SECRET:.001};
+const GACHA_MEDALS={N:1,R:3,SR:10,UR:30,SECRET:100};
+const GACHA_ITEMS=[
+  {id:'n_hamster',rarity:'N',type:'avatar',icon:'🐹',name:'ハムスター'},{id:'n_rabbit',rarity:'N',type:'avatar',icon:'🐰',name:'ウサギ'},{id:'n_penguin',rarity:'N',type:'avatar',icon:'🐧',name:'ペンギン'},{id:'n_monkey',rarity:'N',type:'avatar',icon:'🐵',name:'モンキー'},{id:'n_octopus',rarity:'N',type:'avatar',icon:'🐙',name:'オクトパス'},{id:'n_lion',rarity:'N',type:'avatar',icon:'🦁',name:'ライオン'},
+  {id:'r_unicorn',rarity:'R',type:'avatar',icon:'🦄',name:'ユニコーン'},{id:'r_shark',rarity:'R',type:'avatar',icon:'🦈',name:'シャーク'},{id:'r_dino',rarity:'R',type:'avatar',icon:'🦖',name:'恐竜'},{id:'r_blue',rarity:'R',type:'frame',icon:'🔵',name:'ブルーフレーム',frameClass:'frame-blue'},{id:'r_red',rarity:'R',type:'frame',icon:'🔴',name:'レッドフレーム',frameClass:'frame-red'},{id:'r_rookie',rarity:'R',type:'title',icon:'🏷️',name:'称号「ラッキールーキー」',title:'ラッキールーキー'},
+  {id:'sr_vampire',rarity:'SR',type:'avatar',icon:'🧛',name:'ヴァンパイア'},{id:'sr_fairy',rarity:'SR',type:'avatar',icon:'🧚',name:'フェアリー'},{id:'sr_neon',rarity:'SR',type:'frame',icon:'💚',name:'ネオンフレーム',frameClass:'frame-neon'},{id:'sr_gold',rarity:'SR',type:'frame',icon:'🟡',name:'ゴールドフレーム',frameClass:'frame-gold'},{id:'sr_collector',rarity:'SR',type:'title',icon:'🎖️',name:'称号「コレクター」',title:'コレクター'},{id:'sr_aurora',rarity:'SR',type:'theme',icon:'🌈',name:'オーロラドリーム',themeId:'gachaAurora'},
+  {id:'ur_meteor',rarity:'UR',type:'avatar',icon:'🌠',name:'流星の化身'},{id:'ur_cosmic',rarity:'UR',type:'frame',icon:'🌌',name:'コズミックフレーム',frameClass:'frame-cosmic'},{id:'ur_legend',rarity:'UR',type:'title',icon:'👑',name:'称号「ガチャレジェンド」',title:'ガチャレジェンド'},{id:'ur_void',rarity:'UR',type:'theme',icon:'🪐',name:'ヴォイドレジェンド',themeId:'gachaVoid'},
+  {id:'secret_prism',rarity:'SECRET',type:'bundle',icon:'💠',name:'奇跡のプリズムセット',avatar:'💠',frameClass:'frame-secret',title:'奇跡を引いた者',themeId:'gachaSecret'}
 ];
 const PROFILE_AVATARS = AVATAR_ITEMS.map(a=>a.icon);
 const FREE_AVATARS = AVATAR_ITEMS.filter(a=>a.price===0).map(a=>a.icon);
@@ -968,7 +1013,8 @@ let saveData = {
   level:1, xp:0, totalScore:0, wins:0, streak:0, highscores:{}, dailyBonus:0,
   gameStats:{}, achievements:[], ownedThemes:['default'], ownedAvatars:[...FREE_AVATARS], activeTheme:'default',
   daily:{date:'',plays:0,wins:0,score:0,claimed:[]},
-  profile:{id:'',username:'プレイヤー',avatar:'🎮',createdAt:'',onboardingComplete:false}, scoreHistory:[], activeChallenge:null, challengeClears:0, favoriteGames:[]
+  profile:{id:'',username:'プレイヤー',avatar:'🎮',createdAt:'',onboardingComplete:false}, scoreHistory:[], activeChallenge:null, challengeClears:0, favoriteGames:[],
+  gachaInventory:[],gachaMedals:0,gachaDraws:0,gachaFreeUsed:false,activeFrame:'',activeTitle:''
 };
 
 function localDateKey(){
@@ -987,6 +1033,12 @@ function normalizeSave(){
   saveData.scoreHistory=Array.isArray(saveData.scoreHistory)?saveData.scoreHistory:[];
   saveData.challengeClears=Number(saveData.challengeClears)||0;
   saveData.favoriteGames=Array.isArray(saveData.favoriteGames)?saveData.favoriteGames.filter(id=>GAME_DEFS.some(g=>g.id===id)):[];
+  saveData.gachaInventory=Array.isArray(saveData.gachaInventory)?saveData.gachaInventory.filter(id=>GACHA_ITEMS.some(item=>item.id===id)):[];
+  saveData.gachaMedals=Math.max(0,Math.floor(Number(saveData.gachaMedals)||0));
+  saveData.gachaDraws=Math.max(0,Math.floor(Number(saveData.gachaDraws)||0));
+  saveData.gachaFreeUsed=!!saveData.gachaFreeUsed;
+  if(!saveData.gachaInventory.includes(saveData.activeFrame))saveData.activeFrame='';
+  if(!saveData.gachaInventory.includes(saveData.activeTitle))saveData.activeTitle='';
   saveData.profile=saveData.profile||{};
   if(!saveData.profile.id)saveData.profile.id=(globalThis.crypto?.randomUUID?globalThis.crypto.randomUUID():`local-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   if(!saveData.profile.username)saveData.profile.username='プレイヤー';
@@ -1002,6 +1054,8 @@ function applyTheme(){
   const theme=THEMES[saveData.activeTheme]||THEMES.default;
   Object.entries(theme.vars).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
 }
+function activeFrameClass(){return GACHA_ITEMS.find(item=>item.id===saveData.activeFrame)?.frameClass||'';}
+function activeTitleText(){return GACHA_ITEMS.find(item=>item.id===saveData.activeTitle)?.title||'';}
 function checkMetaProgress(){
   normalizeSave();
   let notices=[];
@@ -1077,7 +1131,7 @@ function openProfile(required=false){
   document.getElementById('profile-save-btn').textContent=required?'この名前で始める':'保存';
   document.getElementById('profile-modal-content').innerHTML=`
     ${required?'<p style="color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:14px">最初にランキングで使うユーザーネームとアイコンを決めてください。本名やメールアドレスは入力しないでください。</p>':''}
-    <div class="player-card"><div class="player-card-main"><div class="profile-avatar" id="profile-avatar-preview">${selectedProfileAvatar}</div><div><strong style="font-size:18px">${escapeHtml(saveData.profile.username)}</strong><div style="color:var(--accent2);font-weight:700">Lv.${saveData.level} ${escapeHtml(getLvName(saveData.level))}</div><div class="meta-sub">得意：${escapeHtml(favoriteName)} ／ ID: ${escapeHtml(saveData.profile.id.slice(0,8))}</div></div></div></div>
+    <div class="player-card"><div class="player-card-main"><div class="profile-avatar ${activeFrameClass()}" id="profile-avatar-preview">${selectedProfileAvatar}</div><div><strong style="font-size:18px">${escapeHtml(saveData.profile.username)}</strong>${activeTitleText()?`<div style="color:var(--accent2);font-size:11px;font-weight:900">✦ ${escapeHtml(activeTitleText())}</div>`:''}<div style="color:var(--accent2);font-weight:700">Lv.${saveData.level} ${escapeHtml(getLvName(saveData.level))}</div><div class="meta-sub">得意：${escapeHtml(favoriteName)} ／ ID: ${escapeHtml(saveData.profile.id.slice(0,8))}</div></div></div></div>
     <div class="profile-stats"><div class="profile-stat"><strong>${plays}</strong><span>プレイ</span></div><div class="profile-stat"><strong>${saveData.wins}</strong><span>勝利</span></div><div class="profile-stat"><strong>${masteryTotal}</strong><span>マスタリー合計</span></div></div>
     <button class="btn btn-purple btn-sm" style="width:100%;margin-bottom:14px" onclick="copyPlayerCard()">📋 カード情報をコピー</button>
     <label class="meta-sub" for="profile-name">ユーザーネーム（1〜16文字）</label><input id="profile-name" maxlength="16" value="${escapeHtml(saveData.profile.username)}" style="width:100%;margin:5px 0 10px">
@@ -1108,14 +1162,68 @@ function buyAvatar(icon){
   if(saveData.totalScore<item.price){showToast('ポイントが足りません','#ff6b6b');return;}
   saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();syncOnlineProfile();updateUI();renderShopPage();showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
 }
-function renderShopPage(){
+function rollGachaRarity(rPlusOnly=false){
+  const entries=Object.entries(GACHA_RATES).filter(([rarity])=>!rPlusOnly||rarity!=='N');
+  const total=entries.reduce((sum,[,rate])=>sum+rate,0),roll=Math.random()*total;let cursor=0;
+  for(const [rarity,rate] of entries){cursor+=rate;if(roll<cursor)return rarity;}return entries[entries.length-1][0];
+}
+function rollGachaItem(rPlusOnly=false){
+  const rarity=rollGachaRarity(rPlusOnly),pool=GACHA_ITEMS.filter(item=>item.rarity===rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function grantGachaItem(item){
+  if(saveData.gachaInventory.includes(item.id)){const medals=GACHA_MEDALS[item.rarity];saveData.gachaMedals+=medals;return {item,isNew:false,medals};}
+  saveData.gachaInventory.push(item.id);
+  if(item.type==='avatar'&&!saveData.ownedAvatars.includes(item.icon))saveData.ownedAvatars.push(item.icon);
+  if(item.type==='theme'&&!saveData.ownedThemes.includes(item.themeId))saveData.ownedThemes.push(item.themeId);
+  if(item.type==='bundle'){
+    if(!saveData.ownedAvatars.includes(item.avatar))saveData.ownedAvatars.push(item.avatar);
+    if(!saveData.ownedThemes.includes(item.themeId))saveData.ownedThemes.push(item.themeId);
+  }
+  return {item,isNew:true,medals:0};
+}
+function drawGacha(count){
+  normalizeSave();const isFree=count===1&&!saveData.gachaFreeUsed,cost=isFree?0:count===10?4500:500;
+  if(saveData.totalScore<cost){showToast(`ポイントが足りません（必要 ${cost.toLocaleString()}pt）`,'#ff6b6b');return;}
+  saveData.totalScore-=cost;if(isFree)saveData.gachaFreeUsed=true;
+  const items=Array.from({length:count},()=>rollGachaItem(false));
+  if(count===10&&items.every(item=>item.rarity==='N'))items[items.length-1]=rollGachaItem(true);
+  const results=items.map(grantGachaItem);saveData.gachaDraws+=count;
+  persistSave();updateUI();syncOnlineProfile();renderShopPage(results);
+  const best=results.reduce((a,b)=>['N','R','SR','UR','SECRET'].indexOf(a.item.rarity)>['N','R','SR','UR','SECRET'].indexOf(b.item.rarity)?a:b);
+  showToast(best.item.rarity==='SECRET'?'💠 SECRET！奇跡のプリズムセット獲得！':`🎁 ${count}回ガチャを引きました` ,best.item.rarity==='UR'?'#ffd93d':'#c77dff');
+}
+function equipGachaItem(id){
+  const item=GACHA_ITEMS.find(x=>x.id===id);if(!item||!saveData.gachaInventory.includes(id))return;
+  if(item.type==='avatar'){saveData.profile.avatar=item.icon;selectedProfileAvatar=item.icon;}
+  if(item.type==='frame')saveData.activeFrame=id;
+  if(item.type==='title')saveData.activeTitle=id;
+  if(item.type==='theme'){saveData.activeTheme=item.themeId;applyTheme();}
+  if(item.type==='bundle'){saveData.profile.avatar=item.avatar;selectedProfileAvatar=item.avatar;saveData.activeFrame=id;saveData.activeTitle=id;saveData.activeTheme=item.themeId;applyTheme();}
+  persistSave();updateUI();syncOnlineProfile();renderShopPage();showToast(`${item.icon} ${item.name}を使用中`,'#6bcb77');
+}
+function gachaItemActive(item){
+  if(item.type==='avatar')return saveData.profile.avatar===item.icon;
+  if(item.type==='frame')return saveData.activeFrame===item.id;
+  if(item.type==='title')return saveData.activeTitle===item.id;
+  if(item.type==='theme')return saveData.activeTheme===item.themeId;
+  return item.type==='bundle'&&saveData.activeFrame===item.id&&saveData.activeTitle===item.id&&saveData.activeTheme===item.themeId;
+}
+function renderGacha(results=[]){
+  const el=document.getElementById('gacha-area');if(!el)return;
+  const rates=Object.entries(GACHA_RATES).map(([rarity,rate])=>`<div class="gacha-rate rarity-${rarity}"><strong>${rarity}</strong>${(rate*100).toFixed(rarity==='SECRET'?1:rarity==='SR'?1:0)}%</div>`).join('');
+  const resultHtml=results.length?`<div class="gacha-results" aria-live="polite">${results.map((result,i)=>`<div class="gacha-result rarity-${result.item.rarity}" style="animation-delay:${i*.04}s"><span class="gacha-item-rarity">${result.item.rarity}</span><div class="gacha-result-icon">${result.item.icon}</div><strong>${escapeHtml(result.item.name)}</strong><small>${result.isNew?'NEW!':`重複 +${result.medals}メダル`}</small></div>`).join('')}</div>`:'';
+  el.innerHTML=`<div class="gacha-panel"><h3>✨ ミニゲームランド・コレクション</h3><p class="meta-sub">限定アイコン・フレーム・称号・テーマが登場。能力差はなく、見た目を楽しむガチャです。</p><div class="gacha-wallet"><span>💰 ${saveData.totalScore.toLocaleString()}pt</span><span>🪙 ${saveData.gachaMedals.toLocaleString()}メダル</span><span>🎟️ 累計 ${saveData.gachaDraws.toLocaleString()}回</span></div><div class="gacha-actions"><button class="btn btn-purple" onclick="drawGacha(1)">${saveData.gachaFreeUsed?'1回引く　500pt':'初回無料で1回引く'}</button><button class="btn btn-warn" onclick="drawGacha(10)">10連　4,500pt<br><small>R以上1個確定</small></button></div><div class="gacha-rates">${rates}</div><div class="privacy-note">天井・最高レア確定はありません。重複時は N:1／R:3／SR:10／UR:30／SECRET:100 メダルに変換されます。現実のお金は使用しません。</div>${resultHtml}</div><h2 class="shop-section-title">📚 ガチャコレクション <span class="meta-sub">${saveData.gachaInventory.length}/${GACHA_ITEMS.length}</span></h2><div class="gacha-collection">${GACHA_ITEMS.map(item=>{const owned=saveData.gachaInventory.includes(item.id),active=gachaItemActive(item);return `<article class="gacha-collection-card rarity-${item.rarity} ${owned?'':'locked'}"><div class="gacha-result-icon">${owned?item.icon:'❔'}</div><div class="gacha-collection-info"><strong>${owned?escapeHtml(item.name):`${item.rarity} 未獲得`}</strong><small>${item.rarity}・${item.type==='avatar'?'アイコン':item.type==='frame'?'フレーム':item.type==='title'?'称号':item.type==='theme'?'テーマ':'限定セット'}</small></div>${owned?`<button class="btn ${active?'btn-success':'btn-purple'}" ${active?'disabled':''} onclick="equipGachaItem('${item.id}')">${active?'使用中':'使う'}</button>`:''}</article>`;}).join('')}</div>`;
+}
+function renderShopPage(gachaResults=[]){
+  renderGacha(gachaResults);
   const el=document.getElementById('shop-grid');if(!el)return;
-  el.innerHTML=Object.entries(THEMES).map(([id,t])=>{
+  el.innerHTML=Object.entries(THEMES).filter(([,t])=>!t.gachaOnly).map(([id,t])=>{
     const owned=saveData.ownedThemes.includes(id),active=saveData.activeTheme===id;
     return `<article class="shop-card ${active?'active':''}"><h3>${active?'✅ ':owned?'🎨 ':'🔒 '}${escapeHtml(t.name)}</h3><p>${escapeHtml(t.desc||'カラーテーマ')}</p><div class="theme-dots">${t.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</div><button class="btn ${active?'btn-success':owned?'btn-purple':'btn-warn'}" ${active?'disabled':''} onclick="buyTheme('${id}')">${active?'使用中':owned?'このテーマを使う':t.price.toLocaleString()+'ptで購入'}</button></article>`;
   }).join('');
   const avatarEl=document.getElementById('avatar-shop-grid');if(!avatarEl)return;
-  avatarEl.innerHTML=AVATAR_ITEMS.map(item=>{
+  avatarEl.innerHTML=AVATAR_ITEMS.filter(item=>!item.gachaOnly).map(item=>{
     const owned=saveData.ownedAvatars.includes(item.icon),active=saveData.profile.avatar===item.icon;
     return `<article class="shop-card avatar-shop-card ${active?'active':''}"><div class="avatar-shop-icon">${item.icon}</div><h3>${escapeHtml(item.name)}</h3><p>${item.price===0?'最初から使える無料アイコン':'プロフィールとランキングで使えるアイコン'}</p><button class="btn ${active?'btn-success':owned?'btn-purple':'btn-warn'}" ${active?'disabled':''} onclick="buyAvatar('${item.icon}')">${active?'使用中':owned?'このアイコンを使う':item.price.toLocaleString()+'ptで購入'}</button></article>`;
   }).join('');
@@ -1149,7 +1257,7 @@ function updateUI() {
   document.getElementById('tb-pt').textContent = saveData.totalScore.toLocaleString() + ' pt';
   document.getElementById('stat-wins').textContent = saveData.wins;
   document.getElementById('stat-total').textContent = saveData.totalScore.toLocaleString();
-  const profileBtn=document.getElementById('profile-btn');if(profileBtn)profileBtn.textContent=`${saveData.profile?.avatar||'🎮'} ${saveData.profile?.username||'プレイヤー'}`;
+  const profileBtn=document.getElementById('profile-btn');if(profileBtn)profileBtn.textContent=`${saveData.profile?.avatar||'🎮'} ${saveData.profile?.username||'プレイヤー'}${activeTitleText()?`・${activeTitleText()}`:''}`;
 
   const lvName = getLvName(saveData.level);
   document.getElementById('lv-name').textContent = lvName + (saveData.streak >= 3 ? ` 🔥×${saveData.streak}` : '');
