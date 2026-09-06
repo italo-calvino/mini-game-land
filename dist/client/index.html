@@ -347,14 +347,16 @@ body.playing-game .app-taskbar { display:none; }
 .fighter-controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
 .fighter-control-group { display:flex; justify-content:center; gap:7px; padding:9px; background:var(--surface2); border:1px solid var(--border); border-radius:14px; }
 .fighter-key { min-width:58px; min-height:52px; padding:8px !important; font-size:16px; touch-action:none; user-select:none; }
-.sol-top { display:grid; grid-template-columns:repeat(2,68px) 1fr repeat(4,68px); gap:8px; align-items:start; margin:14px auto; }
-.sol-board { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; min-height:350px; }
-.sol-pile { min-width:0; min-height:94px; border:2px dashed var(--border); border-radius:10px; position:relative; }
-.sol-card { width:100%; aspect-ratio:.7; min-height:88px; border:2px solid #d8d8df; border-radius:9px; background:#fff; color:#20202b; padding:5px; font:900 17px/1 sans-serif; cursor:pointer; position:relative; text-align:left; box-shadow:0 3px 8px rgba(0,0,0,.22); user-select:none; touch-action:manipulation; }
+.sol-top,.sol-board { width:min(100%,524px); display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; margin-left:auto; margin-right:auto; }
+.sol-top { align-items:start; margin-top:14px; margin-bottom:14px; }
+.sol-board { min-height:350px; }
+.sol-pile { min-width:0; min-height:0; aspect-ratio:.7; border:2px dashed var(--border); border-radius:10px; position:relative; }
+.sol-card { width:100%; aspect-ratio:.7; min-height:0; border:2px solid #d8d8df; border-radius:9px; background:#fff; color:#20202b; padding:5px; font:900 clamp(11px,2.4vw,17px)/1 sans-serif; cursor:pointer; position:relative; text-align:left; box-shadow:0 3px 8px rgba(0,0,0,.22); user-select:none; touch-action:manipulation; }
 .sol-card.red { color:#d92f43; }
 .sol-card.back { color:transparent; border-color:#8585b8; background:repeating-linear-gradient(45deg,#343477 0 7px,#4d4da0 7px 14px); }
 .sol-card.selected { outline:4px solid var(--accent2); transform:translateY(-3px); z-index:20; }
-.sol-tableau .sol-card + .sol-card { margin-top:-61px; }
+.sol-tableau .sol-card + .sol-card { margin-top:-100%; }
+.sol-tableau .sol-card.back + .sol-card { margin-top:-116%; }
 .sol-slot-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text2); font-size:23px; pointer-events:none; }
 .sol-tableau { min-width:0; }
 .sol-status { min-height:38px; padding:9px 12px; text-align:center; color:var(--text2); font-size:13px; }
@@ -481,11 +483,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   .fighter-controls { grid-template-columns:1fr; gap:8px; }
   .fighter-control-group { padding:7px; }
   .fighter-key { min-width:54px; min-height:54px; flex:1; }
-  .sol-top { grid-template-columns:repeat(2,42px) 1fr repeat(4,42px); gap:4px; }
-  .sol-board { gap:3px; min-height:300px; }
-  .sol-pile { min-height:61px; border-radius:7px; }
-  .sol-card { min-height:59px; padding:3px; font-size:12px; border-radius:6px; }
-  .sol-tableau .sol-card + .sol-card { margin-top:-42px; }
+  .sol-top,.sol-board { gap:3px; }
+  .sol-board { min-height:300px; }
+  .sol-pile { border-radius:7px; }
+  .sol-card { padding:3px; font-size:11px; border-radius:6px; }
   .sol-slot-label { font-size:16px; }
   #tetris-wrap { flex-wrap:nowrap; gap:9px; }
   #tetris-side { min-width:104px; }
