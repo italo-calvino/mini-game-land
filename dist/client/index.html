@@ -23,6 +23,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; padding-bottom:92px; }
+body.playing-game { padding-bottom:0; }
+body.playing-game .app-taskbar { display:none; }
 /*1~13,16,17のゲームはclaude が作成、14と15はgeminiが作成*/
 /* TOP BAR */
 #topbar { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 2px solid var(--surface2); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
@@ -1381,6 +1383,7 @@ function openFeaturePage(name){
   goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
+  document.body.classList.remove('playing-game');
   setTaskbarActive('home');
   document.getElementById('home').style.display = 'block';
   document.getElementById('game-screen').style.display = 'none';
@@ -1405,6 +1408,7 @@ function goHome() {
   renderHome();
 }
 function startGame(name) {
+  document.body.classList.add('playing-game');
   setTaskbarActive('');
   document.getElementById('home').style.display = 'none';
   document.getElementById('game-screen').style.display = 'block';
