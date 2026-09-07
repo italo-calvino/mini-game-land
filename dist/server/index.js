@@ -4,8 +4,9 @@ const GAME_IDS = new Set([
   'minesweeper','animequiz','slot','pinball','snake','aimtrainer',
   'simon','typing','sokoban','reversi','lightsout','pong','fighter'
 ]);
-const AVATARS = new Set(['🎮','🙂','🐣','🦊','🐱','🐶','🐼','🐸','🤖','👻','🧙','🥷','🐉','👑','👾','🚀']);
+const AVATARS = new Set(['🎮','🙂','🐣','🦊','🐱','🐶','🐼','🐸','🤖','👻','🧙','🥷','🐉','👑','👾','🚀','🐹','🐰','🐧','🐵','🐙','🦁','🦄','🦈','🦖','🧛','🧚','🌠','💠']);
 let playerProfilesReady = null;
+let cloudSavesReady = null;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -41,6 +42,76 @@ async function ensurePlayerProfiles(env) {
     });
   }
   return playerProfilesReady;
+}
+
+async function ensureCloudSaves(env) {
+  if (!cloudSavesReady) {
+    cloudSavesReady = env.DB.batch([
+      env.DB.prepare(`CREATE TABLE IF NOT EXISTS cloud_saves (
+        code_hash text PRIMARY KEY NOT NULL,
+        player_id text NOT NULL,
+        username text NOT NULL,
+        save_json text NOT NULL,
+        updated_at text NOT NULL
+      )`),
+      env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_cloud_saves_player ON cloud_saves (player_id, updated_at)')
+    ]).catch((error) => {
+      cloudSavesReady = null;
+      throw error;
+    });
+  }
+  return cloudSavesReady;
+}
+
+function cleanCloudCode(value) {
+  const code = typeof value === 'string' ? value.toUpperCase().replace(/[^A-Z2-9]/g, '') : '';
+  return /^[A-Z2-9]{20}$/.test(code) ? code : '';
+}
+
+async function hashCloudCode(code) {
+  const bytes = new TextEncoder().encode(code);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function putCloudSave(request, env) {
+  const length = Number(request.headers.get('content-length') || 0);
+  if (length > 220000) return json({ error: 'Request too large' }, 413);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }
+  const code = cleanCloudCode(body.code);
+  const data = body.saveData;
+  if (!code || !data || typeof data !== 'object' || Array.isArray(data)) return json({ error: 'Invalid save data' }, 400);
+  const playerId = cleanText(data.profile?.id, 80);
+  const username = cleanText(data.profile?.username, 16);
+  if (playerId.length < 8 || username.length < 1 || /[<>]/.test(username)) return json({ error: 'Invalid profile' }, 400);
+  const saveJson = JSON.stringify(data);
+  if (saveJson.length > 180000) return json({ error: 'Save data too large' }, 413);
+  const codeHash = await hashCloudCode(code), updatedAt = new Date().toISOString();
+  await ensureCloudSaves(env);
+  await env.DB.prepare(
+    `INSERT INTO cloud_saves (code_hash, player_id, username, save_json, updated_at)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(code_hash) DO UPDATE SET
+       player_id = excluded.player_id,
+       username = excluded.username,
+       save_json = excluded.save_json,
+       updated_at = excluded.updated_at`
+  ).bind(codeHash, playerId, username, saveJson, updatedAt).run();
+  return json({ ok: true, updatedAt }, 201);
+}
+
+async function getCloudSave(request, env) {
+  const code = cleanCloudCode(new URL(request.url).searchParams.get('code'));
+  if (!code) return json({ error: 'Invalid code' }, 400);
+  await ensureCloudSaves(env);
+  const row = await env.DB.prepare(
+    'SELECT save_json, updated_at FROM cloud_saves WHERE code_hash = ? LIMIT 1'
+  ).bind(await hashCloudCode(code)).first();
+  if (!row) return json({ error: 'Save not found' }, 404);
+  let saveData;
+  try { saveData = JSON.parse(row.save_json); } catch { return json({ error: 'Invalid stored save' }, 500); }
+  return json({ saveData, updatedAt: row.updated_at });
 }
 
 async function getRankings(request, env) {
@@ -195,6 +266,12 @@ export default {
       }
       if (request.method === 'POST' && url.pathname === '/api/profile') {
         return await savePlayerProfile(request, env);
+      }
+      if (request.method === 'POST' && url.pathname === '/api/cloud-save') {
+        return await putCloudSave(request, env);
+      }
+      if (request.method === 'GET' && url.pathname === '/api/cloud-save') {
+        return await getCloudSave(request, env);
       }
       if (url.pathname.startsWith('/api/')) return json({ error: 'Not found' }, 404);
       return env.ASSETS.fetch(request);
