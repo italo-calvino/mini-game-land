@@ -662,7 +662,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 
 <section id="daily-page" class="app-page" aria-labelledby="daily-title">
   <div class="page-hero"><h2 id="daily-title">📅 デイリーミッション</h2><p>毎日の目標を確認して、ゲーム内ポイントを獲得しよう。</p></div>
-  <div class="page-content" id="hub-daily"><div id="daily-missions"></div></div>
+  <div class="page-content" id="hub-daily"><div class="privacy-note" style="margin-bottom:12px">💡 ログイン50pt＋ミッション350pt＋ゲーム報酬で、毎日ガチャ1回分（500pt）が目安です。ゲームの記録はスコア、買い物に使う通貨はポイントとして別々に計算されます。</div><div id="daily-missions"></div></div>
 </section>
 
 <section id="achievements-page" class="app-page" aria-labelledby="achievements-title">
@@ -943,9 +943,9 @@ function getXpMult(lv) {
 }
 
 const DAILY_MISSIONS = [
-  {id:'play3', label:'ゲームを3回プレイ', key:'plays', target:3, reward:100},
-  {id:'win2', label:'2回勝利する', key:'wins', target:2, reward:150},
-  {id:'score300', label:'合計300pt獲得', key:'score', target:300, reward:200},
+  {id:'play3', label:'ゲームを3回プレイ', key:'plays', target:3, reward:80},
+  {id:'win2', label:'2回勝利する', key:'wins', target:2, reward:120},
+  {id:'score300', label:'ゲーム報酬を合計100pt獲得', key:'score', target:100, reward:150},
 ];
 const ACHIEVEMENTS = [
   {id:'first_play', icon:'🎮', name:'ゲームスタート', desc:'初めてゲームを遊ぶ', reward:30, test:s=>Object.values(s.gameStats||{}).reduce((n,g)=>n+(g.plays||0),0)>=1},
@@ -1413,14 +1413,28 @@ function addXP(baseXp) {
   return finalXp;
 }
 
-function addScore(n, gameId) {
-  if (n <= 0) return;
-  saveData.totalScore += n;
-  normalizeSave(); saveData.daily.score += n;
-  if (gameId && n > (saveData.highscores[gameId] || 0)) { saveData.highscores[gameId] = n; }
+// 賭けゲームは入出金をそのまま反映し、通常ゲームはスコアを一定範囲の報酬へ換算する。
+// これによりゲームごとのスコア桁数が違っても、ショップ・ガチャの経済が崩れにくくなる。
+const DIRECT_POINT_GAMES = new Set(['blackjack','roulette','slot','pachinko']);
+
+function gamePointReward(score, won=false) {
+  const raw = Math.max(0, Number(score) || 0);
+  if (raw <= 0) return won ? 30 : 0;
+  if (won) return Math.min(120, Math.round(30 + Math.sqrt(raw) * 1.5));
+  return Math.min(45, Math.round(5 + Math.sqrt(raw) * 0.45));
+}
+
+function addScore(n, gameId, won=false) {
+  const raw = Math.max(0, Number(n) || 0);
+  if (raw <= 0 && !won) return 0;
+  const reward = DIRECT_POINT_GAMES.has(gameId) ? raw : gamePointReward(raw, won);
+  saveData.totalScore += reward;
+  normalizeSave(); saveData.daily.score += reward;
+  if (gameId && raw > (saveData.highscores[gameId] || 0)) { saveData.highscores[gameId] = raw; }
   document.getElementById('tb-pt').textContent = saveData.totalScore.toLocaleString() + ' pt';
   document.getElementById('stat-total').textContent = saveData.totalScore.toLocaleString();
   checkMetaProgress();
+  return reward;
 }
 
 function recordWin(gameId, score) {
@@ -1430,10 +1444,11 @@ function recordWin(gameId, score) {
   saveData.daily.wins++;
   const stat=saveData.gameStats[gameId]||(saveData.gameStats[gameId]={plays:0,wins:0});stat.wins++;
   document.getElementById('stat-wins').textContent = saveData.wins;
-  addScore(score, gameId);
+  const points = addScore(score, gameId, true);
   const gained = addXP(score);
   recordGameResult(gameId,score,true);
   checkMetaProgress();
+  if (!DIRECT_POINT_GAMES.has(gameId) && points > 0) showToast(`🎮 ゲーム報酬 +${points}pt`);
   return gained;
 }
 
@@ -1673,7 +1688,7 @@ games.memory = function(el) {
               <div class="result-box" style="margin-top:16px">
                 <div class="result-score">🎉 クリア！</div>
                 <p>${moves}手でクリア！</p>
-                <div style="font-size:22px;font-weight:900;color:var(--accent2);margin-top:6px">+${score} pt</div>
+                <div style="font-size:22px;font-weight:900;color:var(--accent2);margin-top:6px">スコア ${score}</div>
                 ${xpResultHtml(score,'memory')}
                 <button class="btn mt" onclick="startGame('memory')">もう一度</button>
                 <button class="btn btn-sm mt" style="margin-left:8px" onclick="goHome()">ホームへ</button>
@@ -1780,7 +1795,7 @@ games.quiz = function(el) {
     else {addScore(pts, 'quiz');recordLoss(pts,'quiz');}
     el.innerHTML = `<div class="game-header"><h2>❓ 結果</h2></div>
       <div class="result-box"><div class="result-score">${score}/${QUIZ_DATA.length}</div>
-      <p>正解数 | +${pts}pt</p><div class="xp-gain">${score>=7?'+'+pts+' XP (勝利!)':'惜しい！7問以上で勝利'}</div>
+      <p>正解数 ${score}/10 ／ スコア ${pts}</p><div class="xp-gain">${score>=7?'+'+pts+' XP (勝利!)':'惜しい！7問以上で勝利'}</div>
       <button class="btn mt" onclick="startGame('quiz')">もう一度</button></div>`;
   }
   render();
@@ -1909,7 +1924,7 @@ games.hangman = function(el) {
       </svg>
       <div class="word-hint">${display}</div>
       ${wrongLetters.length?`<div class="word-wrong">${wrongLetters.map(c=>`<span>${c}</span>`).join('')}</div>`:''}
-      ${won?`<div class="result-box"><div class="result-score">🎉 正解！</div><p>+${(maxWrong-wrong)*20}pt</p><div class="xp-gain">+${(maxWrong-wrong)*20} XP</div><button class="btn mt" onclick="startGame('hangman')">次の問題</button></div>`:
+      ${won?`<div class="result-box"><div class="result-score">🎉 正解！</div><p>スコア ${(maxWrong-wrong)*20}</p><div class="xp-gain">+${(maxWrong-wrong)*20} XP</div><button class="btn mt" onclick="startGame('hangman')">次の問題</button></div>`:
         lost?`<div class="result-box"><div style="font-size:26px;font-weight:900;color:var(--accent1)">😢 ゲームオーバー</div><p>答えは「${word}」</p><button class="btn mt" onclick="startGame('hangman')">リトライ</button></div>`:
         `<div class="keyboard" id="keys"></div>`}`;
     if(!won&&!lost) {
@@ -1953,7 +1968,7 @@ games.slide = function(el) {
       if(JSON.stringify(nb)!==JSON.stringify(board))moved=true; board=nb;
     }
     if(moved){addRandom();render();}
-    if(board.includes(2048)){ended=true;gameDelay(()=>{recordWin('slide',score);alert('🎉 2048達成！ +'+score+'pt');startGame('slide');},100);return;}
+    if(board.includes(2048)){ended=true;gameDelay(()=>{recordWin('slide',score);alert('🎉 2048達成！ スコア '+score);startGame('slide');},100);return;}
     const canMove=board.includes(0)||board.some((v,i)=>(i%4<3&&v===board[i+1])||(i<12&&v===board[i+4]));
     if(!canMove){ended=true;addScore(score,'slide');recordLoss(score,'slide');el.insertAdjacentHTML('beforeend',`<div class="result-box"><div class="result-score">${score}</div><p>動かせるマスがありません</p><button class="btn mt" onclick="startGame('slide')">もう一度</button></div>`);}
   }
@@ -2433,7 +2448,7 @@ games.trivia = function(el) {
       combo++; maxCombo=Math.max(maxCombo,combo);
       const pts=10*combo+(timeLeft>=10?5:timeLeft>=5?3:1);
       score+=pts;
-      document.getElementById('tv-msg').innerHTML=`✅ +${pts}pt ${combo>=2?'🔥コンボ×'+combo:''}`;
+      document.getElementById('tv-msg').innerHTML=`✅ スコア +${pts} ${combo>=2?'🔥コンボ×'+combo:''}`;
     }
     gameDelay(next,1100);
   }
@@ -2550,7 +2565,7 @@ games.monster = function(el) {
     pXp+=monster.xp;
     if(pXp>=pXpNeeded){pXp-=pXpNeeded;pLv++;pXpNeeded=Math.round(pXpNeeded*1.55);pMaxHp+=14;pAtk+=2;pDef+=1;pMaxMp+=7;pHp=Math.min(pMaxHp,pHp+Math.round(pMaxHp*.45));pMp=Math.min(pMaxMp,pMp+18);addLog(`✨ プレイヤーLv.${pLv}にアップ！`);}
     else{pHp=Math.min(pMaxHp,pHp+Math.round(pMaxHp*.14));pMp=Math.min(pMaxMp,pMp+10);}
-    addLog(`🏆 ${monster.name}を倒した！ +${pt}pt +${monster.xp}XP`);
+    addLog(`🏆 ${monster.name}を倒した！ スコア +${pt}・+${monster.xp}XP`);
     recordWin('monster',pt);
     newMonster();render();
   }
@@ -3074,7 +3089,7 @@ games.shooting = function(el) {
         const pt = score * 5; // 1キル5pt
         if (pt > 0) recordWin('shooting', pt); else recordLoss(0,'shooting');
         draw();
-        el.innerHTML += `<div class="result-box" style="margin-top:10px"><div class="result-score">${score} Kills</div><p>獲得: +${pt}pt</p>${xpResultHtml(pt,'shooting')}<button class="btn mt" onclick="startGame('shooting')">もう一度</button></div>`;
+        el.innerHTML += `<div class="result-box" style="margin-top:10px"><div class="result-score">${score} Kills</div><p>スコア: ${pt}</p>${xpResultHtml(pt,'shooting')}<button class="btn mt" onclick="startGame('shooting')">もう一度</button></div>`;
         return;
       }
     }
@@ -3293,7 +3308,7 @@ games.animequiz = function(el) {
         <div style="font-size:48px;margin-bottom:8px">${perfect ? '🏆' : score >= 7 ? '🎉' : '😢'}</div>
         <div class="result-score">${score} / ${questions.length}</div>
         <p>${perfect ? '全問正解！完璧です！' : score >= 7 ? '合格！よくできました！' : 'もう少し！7問以上で勝利'}</p>
-        <div style="font-size:20px;font-weight:900;color:var(--accent2);margin-top:8px">+${pts} pt</div>
+        <div style="font-size:20px;font-weight:900;color:var(--accent2);margin-top:8px">スコア ${pts}</div>
         ${xpResultHtml(pts, 'animequiz')}
         <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
           <button class="btn btn-warn" onclick="startGame('animequiz')">もう一度</button>
@@ -4185,7 +4200,7 @@ games.aimtrainer = function(el) {
     if (pts > 0) {
       const msg = document.getElementById('aim-msg');
       if (msg) {
-        msg.textContent = combo >= 5 ? `🔥 ${combo}コンボ！ +${pts}pt` : combo >= 2 ? `⚡ ${combo}連続 +${pts}pt` : `+${pts}pt`;
+        msg.textContent = combo >= 5 ? `🔥 ${combo}コンボ！ スコア +${pts}` : combo >= 2 ? `⚡ ${combo}連続 スコア +${pts}` : `スコア +${pts}`;
         msg.style.color = combo >= 5 ? 'var(--accent1)' : combo >= 2 ? 'var(--accent2)' : 'var(--text)';
       }
     }
@@ -4679,7 +4694,7 @@ games.sokoban = function(el) {
   }
   function completeStage(){
     completed=true;const earned=Math.max(150,800-moves*8-pushes*5)+(level+1)*75;totalScore+=earned;render();
-    status.textContent=`ステージ ${level+1} クリア！ +${earned}pt`;
+    status.textContent=`ステージ ${level+1} クリア！ スコア +${earned}`;
     if(level===LEVELS.length-1){
       recordWin('sokoban',totalScore);
       result.innerHTML=`<div class="result-box mt"><div class="result-score">${totalScore.toLocaleString()}</div><p>🎉 全5ステージ攻略！</p>${xpResultHtml(totalScore,'sokoban')}<button class="btn btn-warn mt" onclick="startGame('sokoban')">もう一度</button></div>`;
@@ -4753,7 +4768,7 @@ games.typing = function(el) {
       if(value===current){
         correctChars+=current.length;words++;combo++;maxCombo=Math.max(maxCombo,combo);
         const gained=Math.round((current.length*12+combo*5)*LEVELS[level].mult);score+=gained;
-        feedback.textContent=`+${gained}pt  ${combo>=3?'🔥 '+combo+'コンボ！':'正解！'}`;feedback.style.color='var(--accent2)';
+        feedback.textContent=`スコア +${gained}  ${combo>=3?'🔥 '+combo+'コンボ！':'正解！'}`;feedback.style.color='var(--accent2)';
         input.value='';input.classList.remove('wrong');pickWord();updateHud();return;
       }
       const correctPrefix=current.startsWith(value);
@@ -4927,7 +4942,7 @@ games.solitaire = function(el) {
     if(waste.length){const c=waste.at(-1),fi=suits.indexOf(c.s),ft=foundations[fi].at(-1);if((!ft&&c.r===1)||(ft&&c.r===ft.r+1))text=`捨て札の ${label(c.r)}${c.s} を組札へ移せます`;}
     else if(stock.length)text='山札をめくってみましょう';message=`💡 ${text}`;selected=null;render();
   }
-  function checkWin(){if(foundations.every(p=>p.length===13)){ended=true;clearInterval(timer);const score=Math.max(300,Math.round(3000-seconds*7-moves*4));recordWin('solitaire',score);render();el.querySelector('#sol-result').innerHTML=`<div class="result-box mt"><div class="result-score">🎉 CLEAR</div><p>${timeText()}・${moves}手・${score.toLocaleString()}pt</p>${xpResultHtml(score,'solitaire')}<button class="btn btn-success mt" onclick="startGame('solitaire')">もう一度</button></div>`;}}
+  function checkWin(){if(foundations.every(p=>p.length===13)){ended=true;clearInterval(timer);const score=Math.max(300,Math.round(3000-seconds*7-moves*4));recordWin('solitaire',score);render();el.querySelector('#sol-result').innerHTML=`<div class="result-box mt"><div class="result-score">🎉 CLEAR</div><p>${timeText()}・${moves}手・スコア ${score.toLocaleString()}</p>${xpResultHtml(score,'solitaire')}<button class="btn btn-success mt" onclick="startGame('solitaire')">もう一度</button></div>`;}}
   window.solStock=stockClick;window.solWaste=wasteClick;window.solTableau=tableauClick;window.solFoundation=foundationClick;window.solHint=hint;
   el._cleanup=()=>{ended=true;clearInterval(timer);['solStock','solWaste','solTableau','solFoundation','solHint'].forEach(k=>delete window[k]);};
   newGame();
