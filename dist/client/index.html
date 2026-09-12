@@ -27,7 +27,7 @@ body.playing-game { padding-bottom:0; }
 body.playing-game .app-taskbar { display:none; }
 /*1~13,16,17のゲームはclaude が作成、14と15はgeminiが作成*/
 /* TOP BAR */
-#topbar { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--surface); border-bottom: 2px solid var(--surface2); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+#topbar { display: flex; align-items: center; gap: 12px; padding: 11px 20px; background:rgba(26,24,40,.96); border-bottom:1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter:blur(16px); }
 #topbar h1 { font-size: 20px; font-weight: 900; }
 #topbar h1 span { color: var(--accent2); }
 .back-btn { background: var(--surface2); border: none; color: var(--text); padding: 7px 14px; border-radius: 999px; font-family: inherit; font-size: 13px; cursor: pointer; display: none; }
@@ -39,7 +39,7 @@ body.playing-game .app-taskbar { display:none; }
 .tb-save-btn { background: var(--accent3); color: #111; border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tb-save-btn:hover { opacity: 0.85; }
 .tb-load-btn { background: var(--accent4); color: #fff; border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.tb-profile-btn { background:var(--accent5); color:#fff; border:none; border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.tb-profile-btn { width:38px; height:38px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:none; border-radius:50%; padding:0; font-family:inherit; font-size:20px; cursor:pointer; }
 .tb-rules-btn { background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
 .tb-install-btn { display:none; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:0; border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .tb-install-btn.visible { display:inline-block; }
@@ -132,6 +132,15 @@ body.playing-game .app-taskbar { display:none; }
 .page-hero { background:linear-gradient(135deg,rgba(199,125,255,.2),rgba(77,150,255,.14)); border:1px solid var(--border); border-radius:24px; padding:24px; margin-bottom:18px; }
 .page-hero h2 { font-size:26px; margin-bottom:6px; }
 .page-content { max-width:760px; margin:0 auto; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; box-shadow:0 8px 22px rgba(0,0,0,.14); }
+.menu-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.menu-card { display:flex; align-items:center; gap:14px; min-height:92px; padding:16px; border:1px solid var(--border); border-radius:18px; background:var(--surface); color:var(--text); text-align:left; font:inherit; cursor:pointer; box-shadow:0 8px 22px rgba(0,0,0,.12); }
+.menu-card:hover { border-color:var(--accent4); transform:translateY(-1px); }
+.menu-card-icon { width:48px; height:48px; flex:0 0 48px; display:grid; place-items:center; border-radius:15px; background:var(--surface2); font-size:26px; }
+.menu-card strong { display:block; font-size:15px; margin-bottom:3px; }
+.menu-card small { display:block; color:var(--text2); font-size:10px; line-height:1.45; }
+.store-choice { max-width:850px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.store-choice .menu-card { min-height:150px; padding:22px; }
+.store-choice .menu-card-icon { width:64px; height:64px; flex-basis:64px; font-size:36px; }
 .shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
 .shop-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:17px; box-shadow:0 8px 22px rgba(0,0,0,.14); }
 .shop-card.active { border-color:var(--accent3); }
@@ -174,7 +183,7 @@ body.playing-game .app-taskbar { display:none; }
 @keyframes secretGlow { 0%{box-shadow:0 0 0 4px #ff6b6b,0 0 25px #ff6b6b} 33%{box-shadow:0 0 0 4px #6bcb77,0 0 25px #6bcb77} 66%{box-shadow:0 0 0 4px #4d96ff,0 0 25px #4d96ff} 100%{box-shadow:0 0 0 4px #ff6b6b,0 0 25px #ff6b6b} }
 
 /* APP TASKBAR & FEATURE PAGES */
-.app-taskbar { position:fixed; left:50%; bottom:max(12px,env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; width:min(820px,calc(100% - 24px)); display:grid; grid-template-columns:repeat(6,1fr); gap:5px; padding:8px; border:1px solid var(--border); border-radius:22px; background:rgba(26,24,40,.94); box-shadow:0 14px 40px rgba(0,0,0,.48); backdrop-filter:blur(16px); }
+.app-taskbar { position:fixed; left:50%; bottom:max(12px,env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; width:min(720px,calc(100% - 24px)); display:grid; grid-template-columns:repeat(5,1fr); gap:5px; padding:8px; border:1px solid var(--border); border-radius:22px; background:rgba(26,24,40,.94); box-shadow:0 14px 40px rgba(0,0,0,.48); backdrop-filter:blur(16px); }
 .taskbar-item { min-width:0; min-height:55px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:0; border-radius:15px; background:transparent; color:var(--text2); font-family:inherit; font-size:10px; font-weight:800; cursor:pointer; }
 .taskbar-item:hover { background:var(--surface2); color:var(--text); }
 .taskbar-item.active { color:#fff; background:linear-gradient(135deg,var(--accent4),var(--accent5)); }
@@ -330,8 +339,7 @@ body.playing-game .app-taskbar { display:none; }
 /* GAME-SPECIFIC PLAYABILITY */
 #game-screen[data-game="memory"] .memory-grid { width:min(100%,380px); }
 #game-screen[data-game="reaction"] #reaction-area { border:2px solid var(--border); box-shadow:var(--shadow); }
-#game-screen[data-game="quiz"] .quiz-q, #game-screen[data-game="trivia"] .quiz-q,
-#game-screen[data-game="animequiz"] .quiz-q { border:1px solid var(--border); font-size:18px; }
+#game-screen[data-game="quiz"] .quiz-q { border:1px solid var(--border); font-size:18px; }
 #game-screen[data-game="hangman"] .keyboard { max-width:520px; margin-inline:auto; }
 #game-screen[data-game="hangman"] .key { width:42px; height:42px; font-size:14px; }
 #game-screen[data-game="roulette"] .roulette-wrap { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:16px; }
@@ -452,8 +460,22 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 @media (max-width:520px) {
   #home, #game-screen { padding:14px; }
   #topbar { padding:10px 12px; gap:8px; }
+  #topbar h1 { font-size:16px; }
+  #topbar-right { gap:5px; flex-wrap:nowrap; }
+  .tb-pill { padding:5px 9px; font-size:11px; }
+  .tb-profile-btn { width:34px; height:34px; font-size:18px; }
   .games-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-  .game-card { padding:17px 13px; border-radius:18px; }
+  .game-card { padding:15px 12px; border-radius:17px; }
+  .game-icon { font-size:30px; margin-bottom:7px; }
+  .game-title { font-size:14px; }
+  .game-desc { display:none; }
+  .game-meta { margin-top:8px; }
+  .home-banner { padding:15px; gap:12px; margin-bottom:13px; }
+  .home-stats { width:100%; }
+  .stat-card { flex:1; padding:8px; }
+  .menu-grid, .store-choice { grid-template-columns:1fr; gap:9px; }
+  .menu-card, .store-choice .menu-card { min-height:78px; padding:13px; }
+  .store-choice .menu-card-icon { width:48px; height:48px; flex-basis:48px; font-size:26px; }
   .monster-stage { grid-template-columns:1fr; }
   .skill-grid, .quiz-options { grid-template-columns:1fr; }
   body { padding-bottom:82px; }
@@ -555,14 +577,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   <button class="back-btn" id="back-btn" onclick="goHome()">← ホームへ</button>
   <h1>🎮 <span>ミニゲームランド</span></h1>
   <div id="topbar-right">
+    <button class="tb-bgm-btn" onclick="openBgm()" aria-label="サウンド設定">🎵</button>
     <div class="tb-pill lv" id="tb-lv">Lv.1</div>
     <div class="tb-pill pt" id="tb-pt">0 pt</div>
-    <button class="tb-rules-btn" onclick="openRules()">📖 遊び方</button>
-    <button class="tb-bgm-btn" id="bgm-btn" onclick="openBgm()">🎵 BGM</button>
-    <button class="tb-install-btn" id="install-btn" type="button">📲 インストール</button>
-    <button class="tb-profile-btn" id="profile-btn" onclick="openProfile()">👤 プレイヤー</button>
-    <button class="tb-save-btn" onclick="openSave()">☁️ セーブ</button>
-    <button class="tb-load-btn" onclick="openLoad()">📥 復元</button>
+    <button class="tb-profile-btn" id="profile-btn" onclick="openProfile()" aria-label="プロフィールを開く">👤</button>
   </div>
 </div>
 <div id="lvup-toast">🎉 レベルアップ！ Lv.1</div>
@@ -570,9 +588,13 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 <!-- BGM MODAL -->
 <div id="bgm-modal">
   <div class="modal-box" style="max-width:520px">
-    <h3>🎵 BGM設定</h3>
+    <h3>🎵 サウンド設定</h3>
+    <label style="display:block;margin:14px 0">効果音の音量（0でミュート）
+      <input aria-label="効果音の音量" class="bgm-vol" id="sfx-vol" type="range" min="0" max="1" step="0.05" oninput="sound.volume=Number(this.value);saveSound()" onchange="playSfx()">
+    </label>
+    <label style="display:block;margin-bottom:14px"><input id="sound-auto" type="checkbox" onchange="sound.auto=this.checked;saveSound();if(!this.checked)bgmStop()"> ゲーム開始時にBGMを再生</label>
     <p style="color:var(--text2);font-size:12px;margin-bottom:14px;line-height:1.6">
-      MP3ファイルをアップロードしてBGMとして再生できます。<br>
+      内蔵のオリジナルBGMを選んですぐ再生できます。<br>好きな音楽ファイルも追加できます。<br>
       ファイルはブラウザのメモリに読み込まれ、ページを閉じると消えます。
     </p>
 
@@ -681,13 +703,39 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 </section>
 
 <section id="shop-page" class="app-page" aria-labelledby="shop-title">
-  <div class="page-hero"><h2 id="shop-title">🛍️ ショップ＆ガチャ</h2><p>ゲームで貯めたポイントを使って、コレクションや画面の着せ替えを楽しもう。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
+  <div class="page-hero"><h2 id="shop-title">🛍️ ショップ</h2><p>目的に合わせて売り場を選んでください。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
+  <div class="store-choice">
+    <button class="menu-card" onclick="openStorePage('gacha')"><span class="menu-card-icon">🎁</span><span><strong>コレクションガチャ</strong><small>限定アイコン・フレーム・称号を入手</small></span></button>
+    <button class="menu-card" onclick="openStorePage('items')"><span class="menu-card-icon">🎨</span><span><strong>アイテムショップ</strong><small>テーマとプレイヤーアイコンを選んで購入</small></span></button>
+  </div>
+</section>
+
+<section id="gacha-page" class="app-page" aria-labelledby="gacha-title">
+  <div class="page-hero"><h2 id="gacha-title">🎁 コレクションガチャ</h2><p>ガチャ、メダル交換、コレクションの確認ができます。</p></div>
   <h2 class="shop-section-title">🎁 コレクションガチャ</h2>
   <div id="gacha-area"></div>
+</section>
+
+<section id="items-page" class="app-page" aria-labelledby="items-title">
+  <div class="page-hero"><h2 id="items-title">🎨 アイテムショップ</h2><p>好きなテーマやアイコンを購入・設定できます。</p></div>
   <h2 class="shop-section-title">🎨 カラーテーマ</h2>
   <div class="shop-grid" id="shop-grid"></div>
   <h2 class="shop-section-title">👤 プレイヤーアイコン</h2>
   <div class="shop-grid" id="avatar-shop-grid"></div>
+</section>
+
+<section id="more-page" class="app-page" aria-labelledby="more-title">
+  <div class="page-hero"><h2 id="more-title">☰ その他</h2><p>プロフィールや設定、記録などをまとめています。</p></div>
+  <div class="menu-grid">
+    <button class="menu-card" onclick="openProfile()"><span class="menu-card-icon">👤</span><span><strong>プロフィール</strong><small>名前・アイコン・プレイヤーカード</small></span></button>
+    <button class="menu-card" onclick="openFeaturePage('achievements')"><span class="menu-card-icon">🏅</span><span><strong>実績</strong><small>達成状況と獲得報酬を確認</small></span></button>
+    <button class="menu-card" onclick="openFeaturePage('challenge')"><span class="menu-card-icon">🎲</span><span><strong>ランダム挑戦</strong><small>ランダムなゲームと目標に挑戦</small></span></button>
+    <button class="menu-card" onclick="openRules()"><span class="menu-card-icon">📖</span><span><strong>ゲームの遊び方</strong><small>目的・操作・クリア条件を検索</small></span></button>
+    <button class="menu-card" id="bgm-btn" onclick="openBgm()"><span class="menu-card-icon">🎵</span><span><strong>BGM</strong><small>効果音・内蔵BGM・音量の設定</small></span></button>
+    <button class="menu-card" onclick="openSave()"><span class="menu-card-icon">☁️</span><span><strong>セーブ</strong><small>クラウド保存とバックアップ</small></span></button>
+    <button class="menu-card" onclick="openLoad()"><span class="menu-card-icon">📥</span><span><strong>データ復元</strong><small>別の端末へプレイデータを引き継ぐ</small></span></button>
+    <button class="menu-card tb-install-btn" id="install-btn" type="button"><span class="menu-card-icon">📲</span><span><strong>アプリをインストール</strong><small>ホーム画面からすぐ遊べるようにする</small></span></button>
+  </div>
 </section>
 
 <!-- GAME SCREEN -->
@@ -696,10 +744,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 <nav class="app-taskbar" aria-label="メインメニュー">
   <button class="taskbar-item active" data-taskbar="home" onclick="goHome()"><span class="taskbar-icon">🏠</span><span class="taskbar-label">ホーム</span></button>
   <button class="taskbar-item" data-taskbar="daily" onclick="openFeaturePage('daily')"><span class="taskbar-icon">📅</span><span class="taskbar-label">デイリー</span></button>
-  <button class="taskbar-item" data-taskbar="achievements" onclick="openFeaturePage('achievements')"><span class="taskbar-icon">🏅</span><span class="taskbar-label">実績</span></button>
   <button class="taskbar-item" data-taskbar="shop" onclick="openShop()"><span class="taskbar-icon">🛍️</span><span class="taskbar-label">ショップ</span></button>
   <button class="taskbar-item" data-taskbar="ranking" onclick="openFeaturePage('ranking')"><span class="taskbar-icon">🌐</span><span class="taskbar-label">ランキング</span></button>
-  <button class="taskbar-item" data-taskbar="challenge" onclick="openFeaturePage('challenge')"><span class="taskbar-icon">🎲</span><span class="taskbar-label">挑戦</span></button>
+  <button class="taskbar-item" data-taskbar="more" onclick="openFeaturePage('more')"><span class="taskbar-icon">☰</span><span class="taskbar-label">その他</span></button>
 </nav>
 
 <script>
@@ -708,13 +755,59 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 // ================================================================
 const bgm = {
   audio: null,
-  tracks: [],   // { name, url, file }
+  tracks: [{name:'ピクセル・パレード',builtin:0},{name:'星空チル',builtin:1}],
   current: -1,
   vol: 0.5,
   loop: true,
 };
 
+// Original melodies, synthesized locally; no downloads or external audio service.
+const sound = { ctx:null, volume:0.35, auto:true };
+try { const saved=JSON.parse(localStorage.getItem('mini-game-sound')||'{}');
+  if(Number.isFinite(saved.volume))sound.volume=Math.max(0,Math.min(1,saved.volume));
+  if(Number.isFinite(saved.bgm))bgm.vol=Math.max(0,Math.min(1,saved.bgm));
+  if(typeof saved.auto==='boolean')sound.auto=saved.auto;
+} catch(e) {}
+function saveSound(){try{localStorage.setItem('mini-game-sound',JSON.stringify({volume:sound.volume,bgm:bgm.vol,auto:sound.auto}));}catch(e){}}
+function playSfx(kind='click'){
+  if(!sound.volume||document.hidden)return;
+  try{
+    sound.ctx ||= new (window.AudioContext||window.webkitAudioContext)();
+    if(sound.ctx.state==='suspended')sound.ctx.resume().catch(()=>{});
+    const notes={click:[660],start:[392,523,784],win:[523,659,784,1047],loss:[330,277,220],level:[523,659,784,1047,1319]}[kind]||[660];
+    notes.forEach((freq,i)=>{const osc=sound.ctx.createOscillator(),gain=sound.ctx.createGain(),at=sound.ctx.currentTime+i*.09;
+      osc.type='triangle';osc.frequency.value=freq;gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(sound.volume*.22,at+.005);gain.gain.exponentialRampToValueAtTime(.0001,at+.13);
+      osc.connect(gain);gain.connect(sound.ctx.destination);osc.start(at);osc.stop(at+.14);osc.onended=()=>{osc.disconnect();gain.disconnect();};
+    });
+  }catch(e){}
+}
+function makeBgm(track){
+  const rate=22050,beat=track===0?.25:.375,length=64*beat,count=Math.round(rate*length);
+  const data=new ArrayBuffer(44+count*2),view=new DataView(data);
+  const str=(at,v)=>{for(let i=0;i<v.length;i++)view.setUint8(at+i,v.charCodeAt(i));};
+  str(0,'RIFF');view.setUint32(4,36+count*2,true);str(8,'WAVE');str(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,rate,true);view.setUint32(28,rate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);str(36,'data');view.setUint32(40,count*2,true);
+  const melody=track===0?[72,76,79,76,74,77,81,77,71,74,79,74,72,76,79,83,81,79,76,72,77,81,84,81,79,76,74,71,72,76,79,72]:[76,0,79,83,0,79,76,0,74,0,77,81,0,77,74,0,72,0,76,79,0,76,72,0,71,0,74,79,0,74,71,0];
+  const roots=[48,53,55,48,57,53,55,48],freq=n=>440*2**((n-69)/12);
+  for(let i=0;i<count;i++){const t=i/rate,step=Math.floor(t/beat),phase=t%beat,n=melody[step%32],env=Math.min(1,phase/.012)*Math.max(0,1-phase/(beat*.9));
+    const lead=n?Math.sin(2*Math.PI*freq(n)*phase)*env*.19:0;
+    const bp=t%(beat*2),bass=Math.sin(2*Math.PI*freq(roots[Math.floor(step/8)])*bp)*Math.min(1,bp/.015)*Math.max(0,1-bp/(beat*2))*.16;
+    const kick=track===0?Math.sin(2*Math.PI*(65*phase+3*(1-Math.exp(-phase*25))))*Math.exp(-phase*30)*.10:0;
+    const fade=Math.min(1,t/.015,(length-t)/.025);
+    view.setInt16(44+i*2,Math.round((lead+bass+kick)*fade*32767),true);
+  }
+  return URL.createObjectURL(new Blob([data],{type:'audio/wav'}));
+}
+document.addEventListener('click',event=>{
+  if(event.target.closest('button,.game-card,.bgm-track')&&!event.target.closest('#bgm-modal'))playSfx();
+});
+let resumeBgmOnVisible=false;
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){resumeBgmOnVisible=!!bgm.audio&&!bgm.audio.paused;if(bgm.audio)bgm.audio.pause();if(sound.ctx)sound.ctx.suspend().catch(()=>{});}
+  else {if(resumeBgmOnVisible&&bgm.audio)bgm.audio.play().catch(()=>{});resumeBgmOnVisible=false;}
+});
 function openBgm() {
+  document.getElementById('sfx-vol').value=sound.volume;
+  document.getElementById('sound-auto').checked=sound.auto;
   document.getElementById('bgm-modal').classList.add('open');
   bgmRenderTracks();
 }
@@ -735,7 +828,7 @@ function bgmRenderTracks() {
           <div class="track-file">クリックで再生</div>
         </div>
         <div class="track-status">${bgm.current===i ? (bgm.audio&&!bgm.audio.paused?'再生中':'一時停止') : ''}</div>
-        <button onclick="event.stopPropagation();bgmRemove(${i})" style="background:none;border:none;color:var(--accent1);cursor:pointer;font-size:16px;padding:4px">✕</button>
+        ${t.builtin===undefined?`<button aria-label="曲を削除" onclick="event.stopPropagation();bgmRemove(${i})" style="background:none;border:none;color:var(--accent1);cursor:pointer;font-size:16px;padding:4px">✕</button>`:''}
       </div>`).join('');
   }
   // 再生中パネル
@@ -763,6 +856,7 @@ function bgmRenderTracks() {
 }
 
 function bgmAddFiles(files) {
+  const firstAdded=bgm.tracks.length;
   Array.from(files).forEach(file => {
     const url = URL.createObjectURL(file);
     const name = file.name.replace(/\.[^.]+$/, '');
@@ -770,7 +864,7 @@ function bgmAddFiles(files) {
   });
   // 最初のファイル追加時に自動再生
   if (bgm.current < 0 && bgm.tracks.length > 0) {
-    bgmPlay(0);
+    bgmPlay(firstAdded);
   } else {
     bgmRenderTracks();
   }
@@ -779,11 +873,14 @@ function bgmAddFiles(files) {
 function bgmPlay(idx) {
   if (idx < 0 || idx >= bgm.tracks.length) return;
   if (bgm.audio) { bgm.audio.pause(); bgm.audio.src = ''; }
+  if(bgm.tracks[idx].builtin!==undefined&&!bgm.tracks[idx].url)bgm.tracks[idx].url=makeBgm(bgm.tracks[idx].builtin);
   bgm.current = idx;
   bgm.audio = new Audio(bgm.tracks[idx].url);
   bgm.audio.volume = bgm.vol;
   bgm.audio.loop = bgm.loop;
-  bgm.audio.play().catch(() => {});
+  bgm.audio.addEventListener('play',bgmRenderTracks);
+  bgm.audio.addEventListener('pause',bgmRenderTracks);
+  bgm.audio.play().catch(() => {bgmRenderTracks();});
   bgm.audio.addEventListener('ended', () => {
     if (!bgm.loop) bgmNext();
   });
@@ -809,7 +906,8 @@ function bgmStop() {
 }
 
 function bgmSetVol(v) {
-  bgm.vol = parseFloat(v);
+  bgm.vol = Math.max(0,Math.min(1,parseFloat(v)||0));
+  saveSound();
   if (bgm.audio) bgm.audio.volume = bgm.vol;
 }
 
@@ -819,6 +917,7 @@ function bgmSetLoop(v) {
 }
 
 function bgmRemove(idx) {
+  if(!bgm.tracks[idx]||bgm.tracks[idx].builtin!==undefined)return;
   URL.revokeObjectURL(bgm.tracks[idx].url);
   bgm.tracks.splice(idx, 1);
   if (bgm.current === idx) { bgmStop(); }
@@ -832,7 +931,7 @@ function bgmRemove(idx) {
 const GAME_DEFS = [
   { id:'memory',    icon:'🧠', title:'神経衰弱',           desc:'ペアを見つけよう！記憶力を鍛える定番カード',      tag:'パズル',    color:'#4d96ff' },
   { id:'reaction',  icon:'⚡', title:'反応速度テスト',     desc:'緑になったら即クリック！反射神経を試せ',           tag:'反射',      color:'#ffd93d' },
-  { id:'quiz',      icon:'❓', title:'雑学クイズ',         desc:'10問の雑学クイズ。全問正解できるかな？',           tag:'クイズ',    color:'#6bcb77' },
+  { id:'quiz',      icon:'❓', title:'雑学クイズ',         desc:'全80問からランダム10問！解説を読んで知識を増やそう',           tag:'クイズ',    color:'#6bcb77' },
   { id:'blackjack', icon:'🃏', title:'ブラックジャック',   desc:'21に近い数を目指せ！所持ポイントを賭けよう',       tag:'カード',    color:'#ff6b6b' },
   { id:'solitaire', icon:'♠️', title:'ソリティア',           desc:'1枚めくりのクロンダイク。4組のカードを完成させよう', tag:'カード',    color:'#6bcb77' },
   { id:'hangman',   icon:'🔤', title:'ハングマン',         desc:'隠された単語を当てろ！失敗は6回まで',             tag:'言葉',      color:'#c77dff' },
@@ -841,14 +940,12 @@ const GAME_DEFS = [
   { id:'shiritori', icon:'🗣️', title:'しりとり',          desc:'10秒制限！AIとしりとり対決しよう',                tag:'言葉',      color:'#6bcb77' },
   { id:'tetris',    icon:'🧱', title:'テトリス',           desc:'落ちてくるブロックを積んでラインを消せ！',         tag:'パズル',    color:'#ffd93d' },
   { id:'breakout',  icon:'🏓', title:'ブロック崩し',       desc:'パドルでボールを操りブロックを全部壊せ！',         tag:'アクション',color:'#ff9de2' },
-  { id:'trivia',    icon:'🎓', title:'タイムアタッククイズ',desc:'制限時間内に早押しで正解を狙え！ボーナスあり',    tag:'クイズ',    color:'#c77dff' },
   { id:'monster',   icon:'⚔️', title:'モンスター討伐',    desc:'敵を倒してレベルアップしよう',         tag:'RPG',       color:'#ff6b6b' },
   { id:'runner',    icon:'🏃', title:'ランナー',          desc:'障害物をジャンプで避けて走り続けろ！横スクロール',  tag:'アクション',color:'#6bcb77' },
   { id:'shooting',    icon:'🛸', title:'スペースシューター', desc:'迫り来る敵を撃ち落とせ！スマホ/PC対応', tag:'アクション', color:'#4d96ff' },
   { id:'minesweeper', icon:'💣', title:'マインスイーパー',   desc:'地雷を避けて安全なマスを全て開けよう', tag:'パズル', color:'#ff6b6b' },
-  { id:'animequiz',   icon:'🤷‍♀️', title:'クイズ難', desc:'いろいろな知識を試せ！全10問4択',         tag:'クイズ',    color:'#c77dff' },
   { id:'slot',        icon:'🎰', title:'スロット',          desc:'3つのリールを揃えてポイントを稼げ！',           tag:'運',        color:'#ffd93d' },
-  { id:'pinball',     icon:'🟣', title:'ピンボール',        desc:'フリッパーでボールを弾き、コンボで高得点を狙え！', tag:'アクション', color:'#ff9de2' },
+  { id:'pinball',     icon:'🟣', title:'ピンボール',        desc:'宇宙の盤面で狙い撃ち！レーンとミッションで高得点', tag:'アクション', color:'#ff9de2' },
   { id:'snake',       icon:'🐍', title:'Snake',             desc:'エサを食べて伸び続けろ！壁と自分の体に注意',          tag:'アーケード', color:'#6bcb77' },
   { id:'aimtrainer',  icon:'🎯', title:'エイム練習',        desc:'FPS風エイムトレーナー！精度・速度・連続ヒットを鍛えよう', tag:'アクション', color:'#ff6b6b' },
   { id:'simon',       icon:'🎵', title:'サイモンゲーム',      desc:'光るボタンの順番を覚えて、どこまで再現できるか挑戦！',       tag:'記憶',       color:'#4d96ff' },
@@ -862,7 +959,7 @@ const GAME_DEFS = [
 const GAME_RULES = {
   memory:{goal:'同じ絵柄のカードをすべて見つけます。',controls:'カードをクリック／タップして2枚ずつめくります。',score:'少ない手数ほど高得点。最低50ptです。'},
   reaction:{goal:'合図が出てから、できるだけ早く反応します。',controls:'「今！」と表示された瞬間にエリアをクリック／タップします。合図前はフライングです。',score:'5回の平均反応時間からスコアを計算します。'},
-  quiz:{goal:'10問の雑学4択クイズに挑戦します。',controls:'正しいと思う選択肢をクリック／タップします。',score:'1問15pt。7問以上正解で勝利とXPを獲得します。'},
+  quiz:{goal:'全80問からランダムな10問に挑戦する4択クイズです。',controls:'回答後に正解と解説を確認し、「次の問題へ」で進みます。時間制限はありません。',score:'1問15点、最大150点。7問以上正解で勝利です。'},
   blackjack:{goal:'カードの合計を21に近づけ、ディーラーを上回ります。',controls:'ヒットでカード追加、スタンドで勝負します。Aは1または11として扱われます。',score:'勝利でベット額を獲得、敗北でベット額を失います。同点は引き分けです。'},
   solitaire:{goal:'すべてのカードを、スート別にAからKの順で4つの組札へ移します。',controls:'カードを選び、移動先を押します。場札の裏カードや山札を押すとめくれます。選択中のカードをもう一度押すと解除します。',score:'クリア時、短い時間・少ない手数ほど高得点です。「ヒント」も利用できます。'},
   hangman:{goal:'ヒントを頼りに隠された英単語を完成させます。',controls:'画面のアルファベットを選択します。',score:'6回間違える前に完成すると勝利。残り回数が多いほど高得点です。'},
@@ -871,14 +968,12 @@ const GAME_RULES = {
   shiritori:{goal:'CPUと交互に、直前の末尾文字から始まる言葉を答えます。',controls:'10秒以内に言葉を入力して送信します。',score:'「ん」で終わる、時間切れ、使用済み単語で敗北。継続ターン数で得点します。'},
   tetris:{goal:'ブロックを横一列に揃えて消し続けます。',controls:'←→移動、↑回転、↓落下、Spaceでハードドロップ。画面ボタンにも対応します。',score:'同時に消したラインが多いほど高得点。上まで積み上がると終了です。'},
   breakout:{goal:'ボールを落とさず、すべてのブロックを壊します。',controls:'マウスまたは指でパドルを移動し、クリックで開始します。',score:'ブロック破壊で加点。全破壊で次レベルへ進み、ボールが速くなります。'},
-  trivia:{goal:'制限時間付きクイズを10問解きます。',controls:'各問題を15秒以内に選択します。',score:'早い正解と連続正解で加点。80点以上で勝利です。'},
   monster:{goal:'連続するモンスターを倒し、より高いステージを目指します。',controls:'攻撃・魔法・回復スキルを選びます。スキルにはMPを消費します。',score:'敵撃破で得点。敵は瀕死で凶暴化し、4行動ごとに強攻撃を使います。'},
   runner:{goal:'障害物を避けて、できるだけ長く走ります。',controls:'Space、↑、クリック、タップでジャンプ。空中でもう一度押すと2段ジャンプします。',score:'走行距離がそのままスコアになります。衝突すると終了です。'},
   shooting:{goal:'敵に接触せず、迫ってくる宇宙船を撃破します。',controls:'PCは方向キー、スマホはドラッグで移動。射撃は自動です。',score:'敵1体につき5pt。敵との接触で終了します。'},
   minesweeper:{goal:'地雷以外のすべてのマスを開きます。',controls:'開くモードと旗モードを切り替えてマスを選びます。最初の周囲には地雷が置かれません。',score:'安全なマスをすべて開くと300ptです。'},
-  animequiz:{goal:'難しめの知識クイズ10問に挑戦します。',controls:'4つの選択肢から回答します。回答後に解説が表示されます。',score:'1問20pt。7問以上正解で勝利です。'},
   slot:{goal:'3つのリールを止めて絵柄を揃えます。',controls:'ベット後にスピンし、STOPを1つずつ押します。',score:'絵柄に応じた倍率で払い戻されます。ベットを超える配当で勝利扱いです。'},
-  pinball:{goal:'3つのボールでバンパーに当て、高得点を狙います。',controls:'←→キーまたは左右ボタンでフリッパー、Spaceまたは発射ボタンで開始します。',score:'バンパーは100点。短時間で連続ヒットすると最大8倍コンボになります。'},
+  pinball:{goal:'3球でバンパー・レーン・4つのターゲットを狙う宇宙ピンボールです。',controls:'←→またはZ・M、左右ボタンで操作。Spaceか発射ボタンで打ち出します。発射後12秒またはその球が無得点なら落下を救済します。',score:'バンパー100点、ターゲット150点、上部レーン250点。4つのターゲットを点灯すると1,000点です。'},
   snake:{goal:'エサを食べてヘビを長く成長させます。',controls:'方向キー、画面ボタン、スマホのスワイプで方向転換します。',score:'エサ1個につき10点。壁または自分の体との衝突で終了します。'},
   aimtrainer:{goal:'複数のモードで照準の速さと正確さを鍛えます。',controls:'マウス移動とクリック、またはスマホのタップでターゲットを撃ちます。',score:'命中、反応速度、コンボから得点を計算し、結果画面で命中率も確認できます。'},
   simon:{goal:'毎ラウンド長くなる光の順番を記憶し、同じ順番で再現します。',controls:'4色のボタンをクリック／タップします。PCでは1〜4キーでも入力できます。',score:'1入力10ptにラウンドボーナスを加算。ラウンド12を再現すると完全クリアです。'},
@@ -958,7 +1053,7 @@ const ACHIEVEMENTS = [
   {id:'wins100', icon:'🏰', name:'百戦錬磨', desc:'100回勝利する', reward:1200, test:s=>s.wins>=100},
   {id:'explorer5', icon:'🧭', name:'ゲーム探検家', desc:'5種類のゲームを遊ぶ', reward:200, test:s=>Object.keys(s.gameStats||{}).length>=5},
   {id:'explorer15', icon:'🗺️', name:'ジャンル横断者', desc:'15種類のゲームを遊ぶ', reward:500, test:s=>Object.keys(s.gameStats||{}).length>=15},
-  {id:'explorer_all', icon:'🌍', name:'全ゲーム制覇への道', desc:'すべてのゲームを遊ぶ', reward:1500, test:s=>Object.keys(s.gameStats||{}).length>=GAME_DEFS.length},
+  {id:'explorer_all', icon:'🌍', name:'全ゲーム制覇への道', desc:'すべてのゲームを遊ぶ', reward:1500, test:s=>GAME_DEFS.every(g=>(s.gameStats?.[g.id]?.plays||0)>0)},
   {id:'score1000', icon:'💰', name:'ポイント長者', desc:'1,000ptを貯める', reward:250, test:s=>s.totalScore>=1000},
   {id:'score5000', icon:'💎', name:'ポイント富豪', desc:'5,000ptを貯める', reward:600, test:s=>s.totalScore>=5000},
   {id:'score20000', icon:'👛', name:'ポイント王', desc:'20,000ptを貯める', reward:1800, test:s=>s.totalScore>=20000},
@@ -1047,6 +1142,8 @@ function normalizeSave(){
   saveData.daily.claimed=Array.isArray(saveData.daily.claimed)?saveData.daily.claimed:[];
   saveData.scoreHistory=Array.isArray(saveData.scoreHistory)?saveData.scoreHistory:[];
   saveData.challengeClears=Number(saveData.challengeClears)||0;
+  if(['trivia','animequiz'].includes(saveData.activeChallenge?.gameId))saveData.activeChallenge=null;
+  if(Array.isArray(saveData.favoriteGames))saveData.favoriteGames=[...new Set(saveData.favoriteGames.map(id=>['trivia','animequiz'].includes(id)?'quiz':id))];
   saveData.favoriteGames=Array.isArray(saveData.favoriteGames)?saveData.favoriteGames.filter(id=>GAME_DEFS.some(g=>g.id===id)):[];
   saveData.gachaInventory=Array.isArray(saveData.gachaInventory)?saveData.gachaInventory.filter(id=>GACHA_ITEMS.some(item=>item.id===id)):[];
   saveData.gachaMedals=Math.max(0,Math.floor(Number(saveData.gachaMedals)||0));
@@ -1438,6 +1535,7 @@ function addScore(n, gameId, won=false) {
 }
 
 function recordWin(gameId, score) {
+  playSfx('win');
   normalizeSave();
   saveData.wins++;
   saveData.streak = (saveData.streak || 0) + 1;
@@ -1452,9 +1550,10 @@ function recordWin(gameId, score) {
   return gained;
 }
 
-function recordLoss(score=0,gameId=activeGameId) { saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress(); }
+function recordLoss(score=0,gameId=activeGameId) { playSfx('loss'); saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress(); }
 
 function showLvUp() {
+  playSfx('level');
   showToast(`🎉 レベルアップ！ Lv.${saveData.level} ${getLvName(saveData.level)}`, '#c77dff');
 }
 
@@ -1577,7 +1676,6 @@ function goHome() {
   clearInterval(tetrisInterval);
   clearInterval(shiriTimerInterval);
   clearInterval(breakoutInterval);
-  clearInterval(triviaTimerInterval);
   clearGameTimeouts();
   cancelAnimationFrame(runnerRAF);
   cancelAnimationFrame(rouletteRAF);
@@ -1591,6 +1689,9 @@ function goHome() {
   renderHome();
 }
 function startGame(name) {
+  playSfx('start');
+  if(sound.auto&&bgm.current<0)bgmPlay(0);
+  if(name==='trivia'||name==='animequiz')name='quiz';
   document.body.classList.add('playing-game');
   setTaskbarActive('');
   document.getElementById('home').style.display = 'none';
@@ -1602,7 +1703,6 @@ function startGame(name) {
   clearInterval(tetrisInterval);
   clearInterval(shiriTimerInterval);
   clearInterval(breakoutInterval);
-  clearInterval(triviaTimerInterval);
   clearGameTimeouts();
   cancelAnimationFrame(runnerRAF);
   cancelAnimationFrame(rouletteRAF);
@@ -1752,54 +1852,924 @@ games.reaction = function(el) {
 
 // GAME 3: QUIZ
 const QUIZ_DATA = [
-  { q:'日本の国鳥はどれ？', opts:['キジ','ツル','スズメ','トキ'], a:0 },
-  { q:'1円玉の主な素材は？', opts:['鉄','銅','アルミニウム','銀'], a:2 },
-  { q:'地球の衛星はどれ？', opts:['月','火星','金星','太陽'], a:0 },
-  { q:'英語で「図書館」を表す単語は？', opts:['Museum','Library','Hospital','Station'], a:1 },
-  { q:'植物が光合成で取り込む気体は？', opts:['酸素','水素','窒素','二酸化炭素'], a:3 },
-  { q:'三角形の内角の和は？', opts:['90度','180度','270度','360度'], a:1 },
-  { q:'世界で最も面積が大きい国は？', opts:['カナダ','中国','ロシア','ブラジル'], a:2 },
-  { q:'オリンピックのシンボルにある輪の数は？', opts:['4個','5個','6個','7個'], a:1 },
-  { q:'「吾輩は猫である」の作者は？', opts:['芥川龍之介','太宰治','夏目漱石','宮沢賢治'], a:2 },
-  { q:'太陽が沈む方角は？', opts:['東','西','南','北'], a:1 },
+  {
+    "q": "日本の国鳥はどれ？",
+    "opts": [
+      "キジ",
+      "ツル",
+      "スズメ",
+      "トキ"
+    ],
+    "a": 0,
+    "exp": "キジは日本の国鳥として選ばれています。"
+  },
+  {
+    "q": "1円玉の主な素材は？",
+    "opts": [
+      "鉄",
+      "銅",
+      "アルミニウム",
+      "銀"
+    ],
+    "a": 2,
+    "exp": "1円硬貨はアルミニウムでできています。"
+  },
+  {
+    "q": "地球の衛星はどれ？",
+    "opts": [
+      "月",
+      "火星",
+      "金星",
+      "太陽"
+    ],
+    "a": 0,
+    "exp": "月は地球の周りを回る自然衛星です。"
+  },
+  {
+    "q": "英語で「図書館」を表す単語は？",
+    "opts": [
+      "Museum",
+      "Library",
+      "Hospital",
+      "Station"
+    ],
+    "a": 1,
+    "exp": "Libraryは図書館、Museumは博物館を表します。"
+  },
+  {
+    "q": "植物が光合成で取り込む気体は？",
+    "opts": [
+      "酸素",
+      "水素",
+      "窒素",
+      "二酸化炭素"
+    ],
+    "a": 3,
+    "exp": "植物は光合成で二酸化炭素と水から養分を作ります。"
+  },
+  {
+    "q": "三角形の内角の和は？",
+    "opts": [
+      "90度",
+      "180度",
+      "270度",
+      "360度"
+    ],
+    "a": 1,
+    "exp": "平面上の三角形の内角を足すと180度になります。"
+  },
+  {
+    "q": "世界で最も面積が大きい国は？",
+    "opts": [
+      "カナダ",
+      "中国",
+      "ロシア",
+      "ブラジル"
+    ],
+    "a": 2,
+    "exp": "ロシアはユーラシア大陸に広がる世界最大の面積の国です。"
+  },
+  {
+    "q": "オリンピックのシンボルにある輪の数は？",
+    "opts": [
+      "4個",
+      "5個",
+      "6個",
+      "7個"
+    ],
+    "a": 1,
+    "exp": "オリンピックのシンボルは5つの輪を組み合わせたものです。"
+  },
+  {
+    "q": "「吾輩は猫である」の作者は？",
+    "opts": [
+      "芥川龍之介",
+      "太宰治",
+      "夏目漱石",
+      "宮沢賢治"
+    ],
+    "a": 2,
+    "exp": "「吾輩は猫である」は夏目漱石の小説です。"
+  },
+  {
+    "q": "太陽が沈む方角は？",
+    "opts": [
+      "東",
+      "西",
+      "南",
+      "北"
+    ],
+    "a": 1,
+    "exp": "地球が西から東へ自転するため、太陽は西へ沈むように見えます。"
+  },
+  {
+    "q": "日本で最も面積が大きい都道府県は？",
+    "opts": [
+      "岩手県",
+      "長野県",
+      "北海道",
+      "福島県"
+    ],
+    "a": 2,
+    "exp": "北海道は日本の都道府県で最も面積が大きい地域です。"
+  },
+  {
+    "q": "元素記号「Fe」が表す元素は？",
+    "opts": [
+      "鉄",
+      "フッ素",
+      "鉛",
+      "銀"
+    ],
+    "a": 0,
+    "exp": "Feは鉄の元素記号です。"
+  },
+  {
+    "q": "正十二面体の面の数は？",
+    "opts": [
+      "8",
+      "10",
+      "12",
+      "20"
+    ],
+    "a": 2,
+    "exp": "正十二面体は12枚の正五角形からできています。"
+  },
+  {
+    "q": "「枕草子」の作者は？",
+    "opts": [
+      "紫式部",
+      "清少納言",
+      "与謝野晶子",
+      "樋口一葉"
+    ],
+    "a": 1,
+    "exp": "「枕草子」は平安時代の清少納言による随筆です。"
+  },
+  {
+    "q": "世界で最も深い海溝は？",
+    "opts": [
+      "日本海溝",
+      "トンガ海溝",
+      "マリアナ海溝",
+      "ペルー・チリ海溝"
+    ],
+    "a": 2,
+    "exp": "マリアナ海溝には世界で最も深い海域が含まれます。"
+  },
+  {
+    "q": "HTTPのステータスコード404が示すものは？",
+    "opts": [
+      "成功",
+      "認証が必要",
+      "見つからない",
+      "サーバー内部エラー"
+    ],
+    "a": 2,
+    "exp": "404は要求されたリソースが見つからないことを表します。"
+  },
+  {
+    "q": "血液中で酸素を運ぶ主な成分は？",
+    "opts": [
+      "ヘモグロビン",
+      "インスリン",
+      "コラーゲン",
+      "ケラチン"
+    ],
+    "a": 0,
+    "exp": "赤血球に含まれるヘモグロビンが酸素を運びます。"
+  },
+  {
+    "q": "地球が太陽を1周するのにかかる期間は約何日？",
+    "opts": [
+      "30日",
+      "180日",
+      "365日",
+      "730日"
+    ],
+    "a": 2,
+    "exp": "地球の公転周期は約365.25日です。"
+  },
+  {
+    "q": "点字を考案した人物は？",
+    "opts": [
+      "エジソン",
+      "ベル",
+      "ルイ・ブライユ",
+      "ニュートン"
+    ],
+    "a": 2,
+    "exp": "ルイ・ブライユは6点を使う点字の体系を考案しました。"
+  },
+  {
+    "q": "オーストラリアの首都は？",
+    "opts": [
+      "シドニー",
+      "メルボルン",
+      "キャンベラ",
+      "パース"
+    ],
+    "a": 2,
+    "exp": "オーストラリアの首都は内陸のキャンベラです。"
+  },
+  {
+    "q": "一般的な将棋で使う駒は、両者合わせて何枚？",
+    "opts": [
+      "32枚",
+      "36枚",
+      "40枚",
+      "44枚"
+    ],
+    "a": 2,
+    "exp": "将棋はそれぞれ20枚、合計40枚の駒を使います。"
+  },
+  {
+    "q": "太陽系で自転周期が最も短い惑星は？",
+    "opts": [
+      "地球",
+      "火星",
+      "木星",
+      "海王星"
+    ],
+    "a": 2,
+    "exp": "木星は約10時間で1回自転します。"
+  },
+  {
+    "q": "国際単位系で電流の単位は？",
+    "opts": [
+      "ボルト",
+      "ワット",
+      "アンペア",
+      "オーム"
+    ],
+    "a": 2,
+    "exp": "電流の単位はアンペアで、記号はAです。"
+  },
+  {
+    "q": "「モナ・リザ」を描いた人物は？",
+    "opts": [
+      "ミケランジェロ",
+      "ラファエロ",
+      "ゴッホ",
+      "レオナルド・ダ・ヴィンチ"
+    ],
+    "a": 3,
+    "exp": "「モナ・リザ」はレオナルド・ダ・ヴィンチの作品です。"
+  },
+  {
+    "q": "日本で最初に新幹線が開業した年は？",
+    "opts": [
+      "1954年",
+      "1964年",
+      "1974年",
+      "1984年"
+    ],
+    "a": 1,
+    "exp": "東海道新幹線は1964年に東京と新大阪の間で開業しました。"
+  },
+  {
+    "q": "「不可逆圧縮」に分類される画像形式はどれ？",
+    "opts": [
+      "PNG",
+      "BMP",
+      "JPEG",
+      "TIFF"
+    ],
+    "a": 2,
+    "exp": "JPEGはデータの一部を省いて容量を減らす不可逆圧縮を主に使用します。"
+  },
+  {
+    "q": "古代エジプトの文字を解読する手掛かりとなった石碑は？",
+    "opts": [
+      "ロゼッタ・ストーン",
+      "ハンムラビ法典碑",
+      "モアイ像",
+      "オベリスク"
+    ],
+    "a": 0,
+    "exp": "ロゼッタ・ストーンには同じ内容が複数の文字で刻まれ、ヒエログリフ解読の鍵になりました。"
+  },
+  {
+    "q": "人間の体で最も小さい骨「アブミ骨」がある場所は？",
+    "opts": [
+      "耳",
+      "手首",
+      "足首",
+      "鼻"
+    ],
+    "a": 0,
+    "exp": "アブミ骨は中耳にあり、音の振動を内耳へ伝えます。"
+  },
+  {
+    "q": "IPv6アドレスの長さは何ビット？",
+    "opts": [
+      "32ビット",
+      "64ビット",
+      "128ビット",
+      "256ビット"
+    ],
+    "a": 2,
+    "exp": "IPv6アドレスは128ビットで、IPv4の32ビットより非常に広いアドレス空間を持ちます。"
+  },
+  {
+    "q": "日本の標準時子午線が通る市は？",
+    "opts": [
+      "明石市",
+      "神戸市",
+      "京都市",
+      "奈良市"
+    ],
+    "a": 0,
+    "exp": "東経135度の日本標準時子午線は兵庫県明石市を通ります。"
+  },
+  {
+    "q": "音楽用語「ア・カペラ」の語源に最も近い意味は？",
+    "opts": [
+      "舞台風に",
+      "礼拝堂風に",
+      "行進曲風に",
+      "即興風に"
+    ],
+    "a": 1,
+    "exp": "イタリア語の「a cappella」は「礼拝堂風に」という意味に由来します。"
+  },
+  {
+    "q": "数学で「0!（0の階乗）」の値はいくつ？",
+    "opts": [
+      "0",
+      "1",
+      "定義されない",
+      "無限大"
+    ],
+    "a": 1,
+    "exp": "階乗の定義や組合せの整合性から、0!は1と定められています。"
+  },
+  {
+    "q": "地球の大気で2番目に多い気体は？",
+    "opts": [
+      "酸素",
+      "窒素",
+      "アルゴン",
+      "二酸化炭素"
+    ],
+    "a": 0,
+    "exp": "地球の大気は窒素が約78%、酸素が約21%を占めます。"
+  },
+  {
+    "q": "国際連合の本部が置かれている都市は？",
+    "opts": [
+      "ジュネーブ",
+      "パリ",
+      "ニューヨーク",
+      "ハーグ"
+    ],
+    "a": 2,
+    "exp": "国際連合本部はアメリカ合衆国のニューヨークに置かれています。"
+  },
+  {
+    "q": "コンピューターで二進数「1010」を十進数に直すと？",
+    "opts": [
+      "8",
+      "10",
+      "12",
+      "14"
+    ],
+    "a": 1,
+    "exp": "1010は8＋2なので、十進数では10です。"
+  },
+  {
+    "q": "水の化学式は？",
+    "opts": [
+      "H2O",
+      "CO2",
+      "O2",
+      "NaCl"
+    ],
+    "a": 0,
+    "exp": "水分子は水素原子2個と酸素原子1個でできています。"
+  },
+  {
+    "q": "昆虫の脚は何本？",
+    "opts": [
+      "6本",
+      "4本",
+      "8本",
+      "10本"
+    ],
+    "a": 0,
+    "exp": "昆虫の胸には3対、合計6本の脚があります。"
+  },
+  {
+    "q": "光を通して物が見える目の部分は？",
+    "opts": [
+      "瞳孔",
+      "鼓膜",
+      "舌",
+      "爪"
+    ],
+    "a": 0,
+    "exp": "瞳孔は虹彩の中央にある、光が通る穴です。"
+  },
+  {
+    "q": "磁石の同じ極どうしを近づけると？",
+    "opts": [
+      "反発する",
+      "引き合う",
+      "溶ける",
+      "光る"
+    ],
+    "a": 0,
+    "exp": "同じ極は反発し、異なる極は引き合います。"
+  },
+  {
+    "q": "水が氷になる変化を何という？",
+    "opts": [
+      "凝固",
+      "蒸発",
+      "融解",
+      "昇華"
+    ],
+    "a": 0,
+    "exp": "液体が固体になる変化を凝固といいます。"
+  },
+  {
+    "q": "音が伝わらない場所は？",
+    "opts": [
+      "真空",
+      "水中",
+      "空気中",
+      "鉄の中"
+    ],
+    "a": 0,
+    "exp": "音は物質の振動として伝わるため、真空では伝わりません。"
+  },
+  {
+    "q": "太陽系で太陽に最も近い惑星は？",
+    "opts": [
+      "水星",
+      "金星",
+      "地球",
+      "火星"
+    ],
+    "a": 0,
+    "exp": "太陽に近い順に水星、金星、地球、火星と並びます。"
+  },
+  {
+    "q": "光合成を行う細胞内のつくりは？",
+    "opts": [
+      "葉緑体",
+      "核",
+      "細胞壁",
+      "液胞"
+    ],
+    "a": 0,
+    "exp": "葉緑体には光を吸収する葉緑素が含まれます。"
+  },
+  {
+    "q": "カエルは何類？",
+    "opts": [
+      "両生類",
+      "哺乳類",
+      "鳥類",
+      "爬虫類"
+    ],
+    "a": 0,
+    "exp": "カエルは両生類で、幼生のおたまじゃくしは水中で生活します。"
+  },
+  {
+    "q": "炭素の元素記号は？",
+    "opts": [
+      "C",
+      "Ca",
+      "Co",
+      "Cu"
+    ],
+    "a": 0,
+    "exp": "Cは炭素、Caはカルシウム、Coはコバルト、Cuは銅です。"
+  },
+  {
+    "q": "フランスの首都は？",
+    "opts": [
+      "パリ",
+      "ローマ",
+      "マドリード",
+      "ベルリン"
+    ],
+    "a": 0,
+    "exp": "パリはセーヌ川が流れるフランスの首都です。"
+  },
+  {
+    "q": "エジプトを流れる大河は？",
+    "opts": [
+      "ナイル川",
+      "アマゾン川",
+      "セーヌ川",
+      "テムズ川"
+    ],
+    "a": 0,
+    "exp": "ナイル川の流域で古代エジプト文明が発展しました。"
+  },
+  {
+    "q": "日本で最も高い山は？",
+    "opts": [
+      "富士山",
+      "北岳",
+      "槍ヶ岳",
+      "筑波山"
+    ],
+    "a": 0,
+    "exp": "富士山の標高は3,776メートルです。"
+  },
+  {
+    "q": "ブラジルがある大陸は？",
+    "opts": [
+      "南アメリカ",
+      "アフリカ",
+      "ヨーロッパ",
+      "オーストラリア"
+    ],
+    "a": 0,
+    "exp": "ブラジルは南アメリカ大陸にあります。"
+  },
+  {
+    "q": "緯度0度の線は？",
+    "opts": [
+      "赤道",
+      "本初子午線",
+      "北回帰線",
+      "南極圏"
+    ],
+    "a": 0,
+    "exp": "赤道を基準に北緯と南緯を測ります。"
+  },
+  {
+    "q": "イタリアの首都は？",
+    "opts": [
+      "ローマ",
+      "ミラノ",
+      "ベネチア",
+      "ナポリ"
+    ],
+    "a": 0,
+    "exp": "ローマには古代ローマの遺跡が多く残っています。"
+  },
+  {
+    "q": "日本の都道府県はいくつ？",
+    "opts": [
+      "47",
+      "43",
+      "45",
+      "49"
+    ],
+    "a": 0,
+    "exp": "1都1道2府43県を合わせて47都道府県です。"
+  },
+  {
+    "q": "琵琶湖がある県は？",
+    "opts": [
+      "滋賀県",
+      "岐阜県",
+      "長野県",
+      "奈良県"
+    ],
+    "a": 0,
+    "exp": "琵琶湖は滋賀県にある日本最大の湖です。"
+  },
+  {
+    "q": "「源氏物語」の作者は？",
+    "opts": [
+      "紫式部",
+      "清少納言",
+      "小野小町",
+      "松尾芭蕉"
+    ],
+    "a": 0,
+    "exp": "紫式部が平安時代に書いた物語です。"
+  },
+  {
+    "q": "江戸幕府を開いた人物は？",
+    "opts": [
+      "徳川家康",
+      "織田信長",
+      "豊臣秀吉",
+      "武田信玄"
+    ],
+    "a": 0,
+    "exp": "徳川家康は1603年に征夷大将軍に任じられました。"
+  },
+  {
+    "q": "関ヶ原の戦いが起きた年は？",
+    "opts": [
+      "1600年",
+      "1192年",
+      "1543年",
+      "1868年"
+    ],
+    "a": 0,
+    "exp": "1600年に徳川家康の東軍と石田三成らの西軍が戦いました。"
+  },
+  {
+    "q": "「奥の細道」で知られる俳人は？",
+    "opts": [
+      "松尾芭蕉",
+      "夏目漱石",
+      "福沢諭吉",
+      "森鷗外"
+    ],
+    "a": 0,
+    "exp": "松尾芭蕉が旅をもとにまとめた紀行作品です。"
+  },
+  {
+    "q": "ピラミッドで有名な古代文明は？",
+    "opts": [
+      "エジプト文明",
+      "インダス文明",
+      "黄河文明",
+      "縄文文化"
+    ],
+    "a": 0,
+    "exp": "古代エジプトでは王の墓として巨大なピラミッドが建造されました。"
+  },
+  {
+    "q": "「走れメロス」の作者は？",
+    "opts": [
+      "太宰治",
+      "夏目漱石",
+      "川端康成",
+      "芥川龍之介"
+    ],
+    "a": 0,
+    "exp": "太宰治が書いた、友情と信頼を描く短編小説です。"
+  },
+  {
+    "q": "「犬」を英語でいうと？",
+    "opts": [
+      "dog",
+      "cat",
+      "bird",
+      "fish"
+    ],
+    "a": 0,
+    "exp": "dogは犬、catは猫、birdは鳥、fishは魚です。"
+  },
+  {
+    "q": "「温故知新」の意味は？",
+    "opts": [
+      "昔を学び新しい知識を得る",
+      "急いで決断する",
+      "旅に出る",
+      "失敗を忘れる"
+    ],
+    "a": 0,
+    "exp": "古い事柄を学び直し、そこから新しい知識や理解を得ることです。"
+  },
+  {
+    "q": "「石の上にも三年」が表すことは？",
+    "opts": [
+      "辛抱して続けること",
+      "石を集めること",
+      "早く諦めること",
+      "三年休むこと"
+    ],
+    "a": 0,
+    "exp": "辛抱強く続ければ成果につながるというたとえです。"
+  },
+  {
+    "q": "「海」の音読みは？",
+    "opts": [
+      "カイ",
+      "うみ",
+      "うな",
+      "ミ"
+    ],
+    "a": 0,
+    "exp": "海岸や海外の「カイ」が音読みです。"
+  },
+  {
+    "q": "俳句の基本の音数は？",
+    "opts": [
+      "五・七・五",
+      "七・五・七",
+      "五・七・五・七・七",
+      "七・七・七"
+    ],
+    "a": 0,
+    "exp": "俳句は基本的に五・七・五の17音で作ります。"
+  },
+  {
+    "q": "英語の「Wednesday」は何曜日？",
+    "opts": [
+      "水曜日",
+      "火曜日",
+      "木曜日",
+      "金曜日"
+    ],
+    "a": 0,
+    "exp": "Wednesdayは水曜日を表します。"
+  },
+  {
+    "q": "12×8はいくつ？",
+    "opts": [
+      "96",
+      "86",
+      "108",
+      "88"
+    ],
+    "a": 0,
+    "exp": "12×8は、10×8と2×8を足して96です。"
+  },
+  {
+    "q": "1時間は何秒？",
+    "opts": [
+      "3600秒",
+      "60秒",
+      "600秒",
+      "1200秒"
+    ],
+    "a": 0,
+    "exp": "60分×60秒で3,600秒です。"
+  },
+  {
+    "q": "辺の長さが3と4の直角三角形の斜辺は？",
+    "opts": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "a": 0,
+    "exp": "三平方の定理より、斜辺の二乗は9＋16＝25です。"
+  },
+  {
+    "q": "次のうち素数は？",
+    "opts": [
+      "17",
+      "21",
+      "27",
+      "33"
+    ],
+    "a": 0,
+    "exp": "17は1と17以外の正の整数では割り切れません。"
+  },
+  {
+    "q": "500円の20％はいくら？",
+    "opts": [
+      "100円",
+      "20円",
+      "50円",
+      "200円"
+    ],
+    "a": 0,
+    "exp": "500×0.2＝100円です。"
+  },
+  {
+    "q": "正方形の対角線は何本？",
+    "opts": [
+      "2本",
+      "1本",
+      "3本",
+      "4本"
+    ],
+    "a": 0,
+    "exp": "向かい合う頂点を結ぶ線が2本あります。"
+  },
+  {
+    "q": "1キログラムは何グラム？",
+    "opts": [
+      "1000グラム",
+      "10グラム",
+      "100グラム",
+      "10000グラム"
+    ],
+    "a": 0,
+    "exp": "キロは1,000倍を表す接頭語です。"
+  },
+  {
+    "q": "半径3の円の直径は？",
+    "opts": [
+      "6",
+      "3",
+      "9",
+      "12"
+    ],
+    "a": 0,
+    "exp": "直径は半径の2倍なので6です。"
+  },
+  {
+    "q": "トランプのジョーカーを除く枚数は？",
+    "opts": [
+      "52枚",
+      "48枚",
+      "54枚",
+      "60枚"
+    ],
+    "a": 0,
+    "exp": "4種類のスートに13枚ずつあり、4×13＝52枚です。"
+  },
+  {
+    "q": "オセロで石を裏返す条件は？",
+    "opts": [
+      "自分の石で相手の石を挟む",
+      "角に置く",
+      "隣に置くだけ",
+      "同じ色を挟む"
+    ],
+    "a": 0,
+    "exp": "縦・横・斜めに相手の石を自分の石で挟むと裏返せます。"
+  },
+  {
+    "q": "ピアノの鍵盤でドの次の白鍵は？",
+    "opts": [
+      "レ",
+      "ミ",
+      "ファ",
+      "ソ"
+    ],
+    "a": 0,
+    "exp": "白鍵はド・レ・ミ・ファ・ソ・ラ・シの順に並びます。"
+  },
+  {
+    "q": "楽譜のシャープ記号が示すのは？",
+    "opts": [
+      "半音上げる",
+      "半音下げる",
+      "一拍休む",
+      "音を伸ばす"
+    ],
+    "a": 0,
+    "exp": "シャープは音の高さを半音上げる記号です。"
+  },
+  {
+    "q": "サッカーで通常、1チームが同時に出場する人数は？",
+    "opts": [
+      "11人",
+      "9人",
+      "6人",
+      "15人"
+    ],
+    "a": 0,
+    "exp": "ゴールキーパー1人を含む11人でプレーします。"
+  },
+  {
+    "q": "ボウリングで第1投で10本倒すと？",
+    "opts": [
+      "ストライク",
+      "スペア",
+      "ファウル",
+      "ガター"
+    ],
+    "a": 0,
+    "exp": "1投目で全て倒すとストライク、2投で倒すとスペアです。"
+  },
+  {
+    "q": "将棋で斜め方向に何マスでも進める駒は？",
+    "opts": [
+      "角行",
+      "金将",
+      "銀将",
+      "桂馬"
+    ],
+    "a": 0,
+    "exp": "角行は途中に駒がなければ斜めに何マスでも進めます。"
+  }
 ];
 games.quiz = function(el) {
-  let idx = 0, score = 0, answered = false;
-  function render() {
-    const q = QUIZ_DATA[idx];
-    el.innerHTML = `
-      <div class="game-header"><h2>❓ 雑学クイズ</h2><p>問${idx+1}/${QUIZ_DATA.length}</p></div>
-      <div class="quiz-progress"><div class="quiz-bar" style="width:${idx/QUIZ_DATA.length*100}%"></div></div>
-      <div class="quiz-q">${q.q}</div>
-      <div class="quiz-options" id="quiz-opts"></div>
-      <div id="quiz-msg" style="margin-top:14px;text-align:center;font-size:13px;color:var(--text2)"></div>`;
-    const opts = document.getElementById('quiz-opts');
-    q.opts.forEach((o,i) => {
-      const b = document.createElement('button');
-      b.className = 'quiz-opt'; b.textContent = o;
-      b.onclick = () => answer(i); opts.appendChild(b);
-    });
+  const questions = quizShuffle(QUIZ_DATA).slice(0,10).map(q=>{
+    const options=quizShuffle(q.opts.map((text,i)=>({text,correct:i===q.a})));
+    return {...q,opts:options.map(o=>o.text),a:options.findIndex(o=>o.correct)};
+  });
+  let idx=0, score=0, answered=false, finished=false;
+  function render(){
+    answered=false;
+    const q=questions[idx];
+    el.innerHTML=`<div class="game-header"><h2>❓ 雑学クイズ</h2><p>問${idx+1}/10 ・ 正解 ${score} ・ 全80問から出題</p></div>
+      <div class="quiz-progress"><div class="quiz-bar" style="width:${idx*10}%"></div></div>
+      <div class="quiz-q">${escapeHtml(q.q)}</div><div class="quiz-options" id="quiz-opts"></div>
+      <div id="quiz-msg" role="status" style="margin-top:16px;line-height:1.7"></div>
+      <button class="btn mt" id="quiz-next" hidden>${idx===9?'結果を見る':'次の問題へ'}</button>`;
+    const opts=el.querySelector('#quiz-opts');
+    q.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='quiz-opt';b.textContent=o;b.onclick=()=>answer(i);opts.appendChild(b);});
+    el.querySelector('#quiz-next').onclick=()=>{if(!answered||finished)return;idx++;if(idx<10)render();else end();};
   }
-  function answer(i) {
-    if (answered) return; answered = true;
-    const q = QUIZ_DATA[idx];
-    document.querySelectorAll('.quiz-opt')[q.a].classList.add('correct');
-    if (i !== q.a) document.querySelectorAll('.quiz-opt')[i].classList.add('wrong');
-    else score++;
-    document.getElementById('quiz-msg').textContent = i === q.a ? '✅ 正解！' : `❌ 正解は「${q.opts[q.a]}」`;
-    gameDelay(() => { idx++; answered = false; if (idx < QUIZ_DATA.length) render(); else showEnd(); },1200);
+  function answer(i){
+    if(answered||finished)return;answered=true;
+    const q=questions[idx],buttons=el.querySelectorAll('.quiz-opt');
+    buttons.forEach(b=>b.disabled=true);buttons[q.a].classList.add('correct');
+    if(i===q.a)score++;else buttons[i].classList.add('wrong');
+    el.querySelector('#quiz-msg').innerHTML=`<strong>${i===q.a?'✅ 正解！':'❌ 正解は「'+escapeHtml(q.opts[q.a])+'」'}</strong><p>${escapeHtml(q.exp||'正解は「'+q.opts[q.a]+'」です。')}</p>`;
+    const next=el.querySelector('#quiz-next');next.hidden=false;next.focus();
   }
-  function showEnd() {
-    const pts = score * 15;
-    if (score >= 7) recordWin('quiz', pts);
-    else {addScore(pts, 'quiz');recordLoss(pts,'quiz');}
-    el.innerHTML = `<div class="game-header"><h2>❓ 結果</h2></div>
-      <div class="result-box"><div class="result-score">${score}/${QUIZ_DATA.length}</div>
-      <p>正解数 ${score}/10 ／ スコア ${pts}</p><div class="xp-gain">${score>=7?'+'+pts+' XP (勝利!)':'惜しい！7問以上で勝利'}</div>
-      <button class="btn mt" onclick="startGame('quiz')">もう一度</button></div>`;
+  function end(){
+    if(finished)return;finished=true;const pts=score*15;
+    if(score>=7)recordWin('quiz',pts);else{addScore(pts,'quiz');recordLoss(pts,'quiz');}
+    el.innerHTML=`<div class="game-header"><h2>❓ クイズ結果</h2></div><div class="result-box"><div class="result-score">${score} / 10</div><p>スコア ${pts}点 ・ ${score>=7?'🎉 勝利！':'7問以上正解で勝利'}</p>${score>=7?xpResultHtml(pts,'quiz'):''}<button class="btn mt" onclick="startGame('quiz')">新しい10問に挑戦</button></div>`;
   }
   render();
 };
+function quizShuffle(items){
+  const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;
+}
+
 
 // GAME 4: BLACKJACK  ── 所持ポイントを賭ける
 games.blackjack = function(el) {
@@ -2392,105 +3362,8 @@ games.breakout = function(el) {
   draw();
 };
 
-// ================================================================
-// GAME 11: TIME ATTACK QUIZ (タイムアタッククイズ)
-// ================================================================
-const TRIVIA_Q = [
-  {q:'日本で最も面積が大きい都道府県は？',opts:['岩手県','長野県','北海道','福島県'],a:2},
-  {q:'元素記号「Fe」が表す元素は？',opts:['鉄','フッ素','鉛','銀'],a:0},
-  {q:'正十二面体の面の数は？',opts:['8','10','12','20'],a:2},
-  {q:'「枕草子」の作者は？',opts:['紫式部','清少納言','与謝野晶子','樋口一葉'],a:1},
-  {q:'世界で最も深い海溝は？',opts:['日本海溝','トンガ海溝','マリアナ海溝','ペルー・チリ海溝'],a:2},
-  {q:'HTTPのステータスコード404が示すものは？',opts:['成功','認証が必要','見つからない','サーバー内部エラー'],a:2},
-  {q:'血液中で酸素を運ぶ主な成分は？',opts:['ヘモグロビン','インスリン','コラーゲン','ケラチン'],a:0},
-  {q:'地球が太陽を1周するのにかかる期間は約何日？',opts:['30日','180日','365日','730日'],a:2},
-  {q:'点字を考案した人物は？',opts:['エジソン','ベル','ルイ・ブライユ','ニュートン'],a:2},
-  {q:'オーストラリアの首都は？',opts:['シドニー','メルボルン','キャンベラ','パース'],a:2},
-  {q:'一般的な将棋で使う駒は、両者合わせて何枚？',opts:['32枚','36枚','40枚','44枚'],a:2},
-  {q:'太陽系で自転周期が最も短い惑星は？',opts:['地球','火星','木星','海王星'],a:2},
-  {q:'国際単位系で電流の単位は？',opts:['ボルト','ワット','アンペア','オーム'],a:2},
-  {q:'「モナ・リザ」を描いた人物は？',opts:['ミケランジェロ','ラファエロ','ゴッホ','レオナルド・ダ・ヴィンチ'],a:3},
-  {q:'日本で最初に新幹線が開業した年は？',opts:['1954年','1964年','1974年','1984年'],a:1},
-];
-let triviaTimerInterval = null;
-games.trivia = function(el) {
-  const questions = [...TRIVIA_Q].sort(()=>Math.random()-0.5).slice(0,10);
-  let idx=0, score=0, combo=0, maxCombo=0, timeLeft=15, answered=false, gameEnded=false;
-  const TIME=15;
-  function startTimer(){
-    clearInterval(triviaTimerInterval);
-    timeLeft=TIME; updateTimer();
-    triviaTimerInterval=setInterval(()=>{
-      timeLeft--;updateTimer();
-      if(timeLeft<=0){clearInterval(triviaTimerInterval);if(!answered&&!gameEnded)timeOut();}
-    },1000);
-  }
-  function updateTimer(){
-    const t=document.getElementById('tv-timer');if(!t)return;
-    t.textContent=timeLeft+'s';
-    t.style.color=timeLeft<=5?'var(--accent1)':timeLeft<=9?'var(--accent2)':'var(--accent3)';
-    const bar=document.getElementById('tv-tbar');if(bar)bar.style.width=(timeLeft/TIME*100)+'%';
-  }
-  function timeOut(){
-    answered=true;combo=0;
-    const opts=document.querySelectorAll('.quiz-opt');
-    if(opts[questions[idx].a])opts[questions[idx].a].classList.add('correct');
-    document.getElementById('tv-msg').innerHTML='⏰ 時間切れ！';
-    gameDelay(next,1200);
-  }
-  function answer(i){
-    if(answered||gameEnded)return; answered=true;
-    clearInterval(triviaTimerInterval);
-    const q=questions[idx]; const correct=i===q.a;
-    document.querySelectorAll('.quiz-opt')[q.a].classList.add('correct');
-    if(!correct){document.querySelectorAll('.quiz-opt')[i].classList.add('wrong');combo=0;document.getElementById('tv-msg').innerHTML='❌ 不正解';}
-    else{
-      combo++; maxCombo=Math.max(maxCombo,combo);
-      const pts=10*combo+(timeLeft>=10?5:timeLeft>=5?3:1);
-      score+=pts;
-      document.getElementById('tv-msg').innerHTML=`✅ スコア +${pts} ${combo>=2?'🔥コンボ×'+combo:''}`;
-    }
-    gameDelay(next,1100);
-  }
-  function next(){idx++;answered=false;if(idx<questions.length)render();else showEnd();}
-  function showEnd(){
-    clearInterval(triviaTimerInterval); gameEnded=true;
-    const bonus=maxCombo>=3?maxCombo*20:0;
-    const total=score+bonus;
-    if(total>=80)recordWin('trivia',total);else{addScore(total,'trivia');recordLoss(total,'trivia');}
-    el.innerHTML=`<div class="game-header"><h2>🎓 タイムアタッククイズ 結果</h2></div>
-      <div class="result-box">
-        <div class="result-score">${total}</div>
-        <p>スコア: ${score} + コンボボーナス: ${bonus}</p>
-        <p>最大コンボ: ${maxCombo}連続</p>
-        ${total>=80?xpResultHtml(total,'trivia'):'<div class="xp-gain">80点以上で勝利・XP獲得</div>'}
-        <button class="btn mt" onclick="startGame('trivia')">もう一度</button>
-      </div>`;
-  }
-  function render(){
-    const q=questions[idx];
-    el.innerHTML=`
-      <div class="game-header"><h2>🎓 タイムアタッククイズ</h2><p>早く答えるほど高得点！コンボで倍増</p></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-        <div style="display:flex;gap:10px">
-          <div class="info-box" style="min-width:70px"><div class="ib-val">${score}</div><div class="ib-label">スコア</div></div>
-          <div class="info-box" style="min-width:70px"><div class="ib-val">${idx+1}/10</div><div class="ib-label">問題</div></div>
-          <div class="info-box" style="min-width:70px"><div class="ib-val" style="color:var(--accent1)">${combo>=2?'🔥×'+combo:combo||'-'}</div><div class="ib-label">コンボ</div></div>
-        </div>
-        <div style="text-align:center">
-          <div id="tv-timer" style="font-size:28px;font-weight:900;color:var(--accent3)">${timeLeft}s</div>
-        </div>
-      </div>
-      <div style="height:6px;background:var(--surface2);border-radius:999px;margin-bottom:14px;overflow:hidden"><div id="tv-tbar" style="height:100%;background:var(--accent3);border-radius:999px;transition:width 0.9s linear;width:${timeLeft/TIME*100}%"></div></div>
-      <div class="quiz-q">${q.q}</div>
-      <div class="quiz-options" id="tv-opts"></div>
-      <div id="tv-msg" style="margin-top:12px;text-align:center;font-size:14px;font-weight:700;min-height:22px"></div>`;
-    const opts=document.getElementById('tv-opts');
-    q.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='quiz-opt';b.textContent=o;b.onclick=()=>answer(i);opts.appendChild(b);});
-    startTimer();
-  }
-  render();
-};
+
+
 
 // ================================================================
 // GAME 12: MONSTER BATTLE (オンゲー風RPGミニゲーム)
@@ -3162,163 +4035,9 @@ games.shooting = function(el) {
   el._cleanup=()=>{gameOver=true;cancelAnimationFrame(shootRAF);for(const k in shootKeys)shootKeys[k]=false;};
 };
 
-// ================================================================
-// GAME: ANIME & GAME QUIZ (アニメ・ゲームクイズ)
-// ================================================================
-const ANIME_QUIZ = [
-  {
-    q: '「不可逆圧縮」に分類される画像形式はどれ？',
-    opts: ['PNG', 'BMP', 'JPEG', 'TIFF'],
-    a: 2,
-    exp: 'JPEGはデータの一部を省いて容量を減らす不可逆圧縮を主に使用します。'
-  },
-  {
-    q: '古代エジプトの文字を解読する手掛かりとなった石碑は？',
-    opts: ['ロゼッタ・ストーン', 'ハンムラビ法典碑', 'モアイ像', 'オベリスク'],
-    a: 0,
-    exp: 'ロゼッタ・ストーンには同じ内容が複数の文字で刻まれ、ヒエログリフ解読の鍵になりました。'
-  },
-  {
-    q: '人間の体で最も小さい骨「アブミ骨」がある場所は？',
-    opts: ['耳','手首','足首','鼻'],
-    a: 0,
-    exp: 'アブミ骨は中耳にあり、音の振動を内耳へ伝えます。'
-  },
-  {
-    q: 'IPv6アドレスの長さは何ビット？',
-    opts: ['32ビット','64ビット','128ビット','256ビット'],
-    a: 2,
-    exp: 'IPv6アドレスは128ビットで、IPv4の32ビットより非常に広いアドレス空間を持ちます。'
-  },
-  {
-    q: '日本の標準時子午線が通る市は？',
-    opts: ['明石市','神戸市','京都市','奈良市'],
-    a: 0,
-    exp: '東経135度の日本標準時子午線は兵庫県明石市を通ります。'
-  },
-  {
-    q: '音楽用語「ア・カペラ」の語源に最も近い意味は？',
-    opts: ['舞台風に','礼拝堂風に','行進曲風に','即興風に'],
-    a: 1,
-    exp: 'イタリア語の「a cappella」は「礼拝堂風に」という意味に由来します。'
-  },
-  {
-    q: '数学で「0!（0の階乗）」の値はいくつ？',
-    opts: ['0','1','定義されない','無限大'],
-    a: 1,
-    exp: '階乗の定義や組合せの整合性から、0!は1と定められています。'
-  },
-  {
-    q: '地球の大気で2番目に多い気体は？',
-    opts: ['酸素','窒素','アルゴン','二酸化炭素'],
-    a: 0,
-    exp: '地球の大気は窒素が約78%、酸素が約21%を占めます。'
-  },
-  {
-    q: '国際連合の本部が置かれている都市は？',
-    opts: ['ジュネーブ','パリ','ニューヨーク','ハーグ'],
-    a: 2,
-    exp: '国際連合本部はアメリカ合衆国のニューヨークに置かれています。'
-  },
-  {
-    q: 'コンピューターで二進数「1010」を十進数に直すと？',
-    opts: ['8','10','12','14'],
-    a: 1,
-    exp: '1010は8＋2なので、十進数では10です。'
-  },
-];
 
-games.animequiz = function(el) {
-  const questions = [...ANIME_QUIZ].sort(() => Math.random() - 0.5);
-  let idx = 0, score = 0, answered = false;
 
-  function render() {
-    const q = questions[idx];
-    el.innerHTML = `
-      <div class="game-header">
-        <h2>🎮 クイズ難</h2>
-        <p>問${idx + 1}/${questions.length}　正解: ${score}</p>
-      </div>
-      <div class="quiz-progress">
-        <div class="quiz-bar" style="width:${idx / questions.length * 100}%"></div>
-      </div>
-      <div class="quiz-q">${q.q}</div>
-      <div class="quiz-options" id="aq-opts"></div>
-      <div id="aq-exp" style="margin-top:12px;background:var(--surface2);border-radius:var(--radius);
-        padding:12px;font-size:13px;color:var(--text2);display:none;line-height:1.6"></div>
-      <div id="aq-msg" style="margin-top:10px;text-align:center;font-size:14px;font-weight:700;min-height:20px"></div>`;
 
-    const opts = document.getElementById('aq-opts');
-    q.opts.forEach((o, i) => {
-      const b = document.createElement('button');
-      b.className = 'quiz-opt';
-      b.textContent = o;
-      b.onclick = () => answer(i);
-      opts.appendChild(b);
-    });
-  }
-
-  function answer(i) {
-    if (answered) return;
-    answered = true;
-    const q = questions[idx];
-    const optEls = document.querySelectorAll('.quiz-opt');
-
-    // 全ボタンを無効化
-    optEls.forEach(b => b.style.pointerEvents = 'none');
-    optEls[q.a].classList.add('correct');
-
-    const msgEl = document.getElementById('aq-msg');
-    const expEl = document.getElementById('aq-exp');
-
-    if (i === q.a) {
-      score++;
-      msgEl.innerHTML = '✅ 正解！';
-      msgEl.style.color = 'var(--accent3)';
-    } else {
-      optEls[i].classList.add('wrong');
-      msgEl.innerHTML = `❌ 不正解　正解は「${q.opts[q.a]}」`;
-      msgEl.style.color = 'var(--accent1)';
-    }
-
-    // 解説を表示
-    expEl.style.display = 'block';
-    expEl.innerHTML = `💡 ${q.exp}`;
-
-    gameDelay(() => {
-      idx++;
-      answered = false;
-      if (idx < questions.length) {
-        render();
-      } else {
-        showResult();
-      }
-    }, 1800);
-  }
-
-  function showResult() {
-    const pts = score * 20;
-    const perfect = score === questions.length;
-    if (score >= 7) recordWin('animequiz', pts);
-    else { addScore(pts, 'animequiz'); recordLoss(pts,'animequiz'); }
-
-    el.innerHTML = `
-      <div class="game-header"><h2>🎮 クイズ難 結果</h2></div>
-      <div class="result-box">
-        <div style="font-size:48px;margin-bottom:8px">${perfect ? '🏆' : score >= 7 ? '🎉' : '😢'}</div>
-        <div class="result-score">${score} / ${questions.length}</div>
-        <p>${perfect ? '全問正解！完璧です！' : score >= 7 ? '合格！よくできました！' : 'もう少し！7問以上で勝利'}</p>
-        <div style="font-size:20px;font-weight:900;color:var(--accent2);margin-top:8px">スコア ${pts}</div>
-        ${xpResultHtml(pts, 'animequiz')}
-        <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-warn" onclick="startGame('animequiz')">もう一度</button>
-          <button class="btn btn-sm" style="background:var(--surface2)" onclick="goHome()">ホームへ</button>
-        </div>
-      </div>`;
-  }
-
-  render();
-};
 
 // ================================================================
 // GAME: SLOT (スロット) ── リールを1つずつ手動で止める
@@ -3862,45 +4581,105 @@ games.pachinko = function(el) {
 // GAME: PINBALL (操作型ピンボール)
 // ================================================================
 games.pinball = function(el) {
-  const W=360,H=500,R=8, bumpers=[{x:110,y:150,r:25,c:'#ff6b6b'},{x:250,y:150,r:25,c:'#4d96ff'},{x:180,y:245,r:29,c:'#ffd93d'},{x:82,y:285,r:19,c:'#6bcb77'},{x:278,y:285,r:19,c:'#c77dff'}];
-  let canvas,ctx,raf,ball,lives=3,score=0,combo=0,running=true,left=false,right=false,lastHit=0;
-  const keys=e=>{if(e.code==='ArrowLeft')left=e.type==='keydown';if(e.code==='ArrowRight')right=e.type==='keydown';if(e.code==='Space'&&e.type==='keydown'){e.preventDefault();launch();}};
-  const release=()=>{left=false;right=false;};
-  function resetBall(){ball={x:325,y:430,vx:0,vy:0,ready:true};combo=0;updateHud();}
-  function launch(){if(!running||!ball.ready)return;ball.ready=false;ball.vx=-2.8-Math.random()*1.7;ball.vy=-10.5;}
-  function updateHud(){
-    const s=document.getElementById('pin-score'),l=document.getElementById('pin-lives'),c=document.getElementById('pin-combo');
-    if(s)s.textContent=score.toLocaleString();if(l)l.textContent='●'.repeat(lives)+'○'.repeat(3-lives);if(c)c.textContent=combo>1?'×'+combo:'-';
+  const W=420,H=640,R=8,STEP=1/120;
+  let ball,score=0,lives=3,running=true,raf,last=0,acc=0,time=0,saveUntil=0,launchTime=0,servedScore=0,mission=0;
+  const held={left:false,right:false},pointers=new Map();
+  const bumpers=[{x:145,y:170,r:25},{x:255,y:170,r:25},{x:200,y:245,r:28}];
+  const targets=[{x:45,y:280,r:13,lit:false},{x:355,y:280,r:13,lit:false},{x:80,y:350,r:13,lit:false},{x:320,y:350,r:13,lit:false}];
+  const rails=[[25,110,25,445],[375,110,375,445],[25,110,80,55],[80,55,320,55],[320,55,375,110],
+    [25,445,105,545],[375,445,295,545], [60,425,110,500],[340,425,290,500]];
+  const flippers=[{x:105,y:545,side:1,angle:.28,omega:0,key:'left'},{x:295,y:545,side:-1,angle:.28,omega:0,key:'right'}];
+  el.innerHTML=`<div class="game-header"><h2>🚀 スペース・ピンボール</h2><p>← → / Z・Mでフリッパー。先端で打つと反対側、根元で打つと同じ側を狙えます。</p></div>
+    <div class="info-row"><div class="info-box"><div class="ib-val" id="pin-score">0</div><div class="ib-label">スコア</div></div><div class="info-box"><div class="ib-val" id="pin-lives">●●●</div><div class="ib-label">残りボール</div></div><div class="info-box"><div class="ib-val" id="pin-mission">0 / 4</div><div class="ib-label">点灯ターゲット</div></div></div>
+    <canvas id="pin-canvas" width="420" height="640" aria-label="宇宙をテーマにしたピンボール盤面" style="display:block;margin:auto;max-width:100%;border-radius:18px;touch-action:none"></canvas>
+    <p id="pin-status" role="status" style="text-align:center;min-height:1.5em">発射後12秒・無得点の落下はボールを救済</p>
+    <div class="flex-center mt"><button class="btn" id="pin-left" style="touch-action:none;user-select:none">◀ 左</button><button class="btn btn-warn" id="pin-launch">● 発射</button><button class="btn" id="pin-right" style="touch-action:none;user-select:none">右 ▶</button></div>
+    <p class="meta-sub" style="text-align:center">4つのターゲット点灯で1,000点。上部レーン通過で250点。<br>発射後12秒、またはその球が無得点なら落ちても残球は減りません。</p><div id="pin-msg"></div>`;
+  const canvas=el.querySelector('#pin-canvas'),ctx=canvas.getContext('2d');
+  function hud(){el.querySelector('#pin-score').textContent=score.toLocaleString();el.querySelector('#pin-lives').textContent='●'.repeat(lives)+'○'.repeat(3-lives);el.querySelector('#pin-mission').textContent=targets.filter(t=>t.lit).length+' / 4';}
+  function say(text){el.querySelector('#pin-status').textContent=text;}
+  function reset(){ball={x:397,y:575,vx:0,vy:0,ready:true,launching:false,lane:false};held.left=held.right=false;hud();}
+  function launch(){if(!running||!ball.ready)return;ball.ready=false;ball.launching=true;launchTime=0;saveUntil=time+12;servedScore=score;say('発射！12秒間ボールセーブ');}
+  function award(n){score+=n;hud();}
+  function segment(ax,ay,bx,by,r=4,restitution=.78){
+    const dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((ball.x-ax)*dx+(ball.y-ay)*dy)/(dx*dx+dy*dy)));
+    let nx=ball.x-ax-t*dx,ny=ball.y-ay-t*dy,d=Math.hypot(nx,ny);
+    if(d>=R+r)return null;
+    if(d<.001){nx=-dy;ny=dx;d=Math.hypot(nx,ny);}nx/=d;ny/=d;
+    ball.x=ax+t*dx+nx*(R+r+.1);ball.y=ay+t*dy+ny*(R+r+.1);
+    const dot=ball.vx*nx+ball.vy*ny;if(dot<0){ball.vx-=(1+restitution)*dot*nx;ball.vy-=(1+restitution)*dot*ny;}
+    return t;
   }
-  function hitSegment(flipLeft){
-    const active=flipLeft?left:right, ax=flipLeft?72:288, ay=420, bx=flipLeft?(active?166:158):(active?194:202), by=active?385:433;
-    const dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((ball.x-ax)*dx+(ball.y-ay)*dy)/(dx*dx+dy*dy))),px=ax+t*dx,py=ay+t*dy;
-    const ox=ball.x-px,oy=ball.y-py,d=Math.hypot(ox,oy);
-    if(d<R+8&&ball.vy>0&&ball.y<ay+12){ball.y=py-(R+9);ball.vy=active?-11:-7.5;ball.vx+=(flipLeft?1:-1)*(active?3.2:1.1);combo=Math.max(1,combo);}
+  function circle(b,target){
+    let dx=ball.x-b.x,dy=ball.y-b.y,d=Math.hypot(dx,dy);if(d>=R+b.r)return;
+    const nx=d?dx/d:0,ny=d?dy/d:-1;ball.x=b.x+nx*(R+b.r+.2);ball.y=b.y+ny*(R+b.r+.2);
+    const dot=ball.vx*nx+ball.vy*ny;
+    if(dot<0){ball.vx-=2*dot*nx;ball.vy-=2*dot*ny;ball.vx+=nx*90;ball.vy+=ny*90;
+      if(!b.hit||time-b.hit>.12){b.hit=time;award(target?150:100);
+        if(target&&!b.lit){b.lit=true;if(targets.every(t=>t.lit)){mission++;award(1000);targets.forEach(t=>t.lit=false);say('ミッション達成！ +1,000');}hud();}
+      }
+    }
   }
-  function physics(){
+  function step(dt){
+    time+=dt;
+    for(const f of flippers){const goal=held[f.key]?-.5:.28,old=f.angle;f.angle+=Math.max(-dt*11,Math.min(dt*11,goal-f.angle));f.omega=(f.angle-old)/dt;}
     if(ball.ready)return;
-    ball.vy+=.19;ball.x+=ball.vx;ball.y+=ball.vy;ball.vx*=.998;
-    if(ball.x<R){ball.x=R;ball.vx=Math.abs(ball.vx)*.9;}if(ball.x>W-R){ball.x=W-R;ball.vx=-Math.abs(ball.vx)*.9;}if(ball.y<R){ball.y=R;ball.vy=Math.abs(ball.vy)*.9;}
-    bumpers.forEach(b=>{const dx=ball.x-b.x,dy=ball.y-b.y,d=Math.hypot(dx,dy),min=R+b.r;if(d<min){const nx=dx/(d||1),ny=dy/(d||1),speed=Math.max(6,Math.hypot(ball.vx,ball.vy)*1.08);ball.x=b.x+nx*(min+1);ball.y=b.y+ny*(min+1);ball.vx=nx*speed;ball.vy=ny*speed;combo=Date.now()-lastHit<1800?Math.min(8,combo+1):1;lastHit=Date.now();score+=100*combo;updateHud();}});
-    hitSegment(true);hitSegment(false);
-    if(ball.y>H+20){lives--;updateHud();if(lives<=0)end();else gameDelay(resetBall,450);ball.ready=true;}
+    if(ball.launching){
+      launchTime+=dt;
+      // The shooter lane delivers the ball along a repeatable path into the playfield.
+      if(launchTime<.85){ball.y=575-510*launchTime/.85;ball.x=397;}
+      else{const t=Math.min(1,(launchTime-.85)/.45);ball.x=397-147*t;ball.y=65-25*Math.sin(t*Math.PI);if(t===1){ball.launching=false;ball.vx=-145;ball.vy=170;}}
+      return;
+    }
+    ball.vy+=410*dt;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
+    rails.forEach(r=>segment(...r));
+    bumpers.forEach(b=>circle(b,false));targets.forEach(b=>circle(b,true));
+    // Gate rewards an upward shot once, then rearms when the ball leaves the upper table.
+    if(ball.y<105&&!ball.lane){ball.lane=true;award(250);say('オービット通過 +250');}if(ball.y>150)ball.lane=false;
+    for(const f of flippers){
+      const bx=f.x+f.side*82*Math.cos(f.angle),by=f.y+82*Math.sin(f.angle);
+      const falling=ball.vy>0,t=segment(f.x,f.y,bx,by,9,.35);
+      if(t!==null&&held[f.key]&&(f.omega<-.1||falling)&&ball.y<f.y+8){
+        // Contact location controls aim. A raised flipper is less powerful than a timed stroke.
+        const power=f.omega<-.1?690:450;ball.vy=-power;ball.vx=f.side*(t-.38)*470;
+      }
+    }
+    const speed=Math.hypot(ball.vx,ball.vy);if(speed>850){ball.vx*=850/speed;ball.vy*=850/speed;}
+    if(ball.y>H+R){
+      if(time<saveUntil||score===servedScore){reset();say('ボールセーブ！ 残球そのままで再発射');}
+      else{lives--;hud();if(lives===0)end();else{reset();say('次のボールを発射しよう');}}
+    }
   }
-  function drawFlipper(flipLeft){const active=flipLeft?left:right,ax=flipLeft?72:288,ay=420,bx=flipLeft?(active?166:158):(active?194:202),by=active?385:433;ctx.strokeStyle=active?'#ffd93d':'#ff9de2';ctx.lineWidth=16;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();}
+  function line(ax,ay,bx,by,color,width){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();}
+  function disc(x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+  function label(text,x,y,color='#b6d5ff',size=12){ctx.fillStyle=color;ctx.font=`bold ${size}px sans-serif`;ctx.textAlign='center';ctx.fillText(text,x,y);}
   function draw(){
-    ctx.fillStyle='#0b0b18';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#4d96ff';ctx.lineWidth=3;ctx.strokeRect(5,5,W-10,H-10);
-    ctx.fillStyle='rgba(77,150,255,.08)';for(let y=30;y<H;y+=35)ctx.fillRect(7,y,W-14,1);
-    bumpers.forEach(b=>{ctx.shadowBlur=18;ctx.shadowColor=b.c;ctx.fillStyle=b.c;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#111';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('100',b.x,b.y+4);});
-    drawFlipper(true);drawFlipper(false);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x,ball.y,R,0,Math.PI*2);ctx.fill();
-    if(ball.ready){ctx.fillStyle='#ffd93d';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText('SPACE / 発射ボタン',W/2,470);}
+    const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#16284c');bg.addColorStop(1,'#070d20');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    for(let i=0;i<65;i++)disc(18+(i*73)%380,20+(i*113)%520,i%3===0?1.4:.6,'#6585b2');
+    ctx.strokeStyle='#233b65';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(200,270,130,180,-.25,0,Math.PI*2);ctx.stroke();
+    label('SPACE  PATROL',200,325,'#47709e',22);label('ORBIT  +250',200,93,'#72e8ff',13);
+    rails.forEach(r=>{line(...r,'#284777',11);line(...r,'#8abadd',3);});
+    line(385,110,385,620,'#486080',3);label('↑',398,490,'#ffd875',20);
+    bumpers.forEach(b=>{disc(b.x,b.y,b.r+6,'#304d71');disc(b.x,b.y,b.r,time-b.hit<.12?'#fff':'#53d9ed');disc(b.x,b.y,b.r-8,'#193253');label('100',b.x,b.y+5,'#dcfbff',14);});
+    targets.forEach((b,i)=>{disc(b.x,b.y,b.r+3,b.lit?'#ffe494':'#496383');disc(b.x,b.y,b.r-2,b.lit?'#ebae39':'#26344f');label(String(i+1),b.x,b.y+4,b.lit?'#172136':'#a9c0dc');});
+    label('4 TARGETS = 1,000',200,380,'#e6bf73',13);
+    for(const f of flippers){const bx=f.x+f.side*82*Math.cos(f.angle),by=f.y+82*Math.sin(f.angle);line(f.x,f.y,bx,by,'#314063',24);line(f.x,f.y,bx,by,held[f.key]?'#ffe39a':'#dceafa',17);disc(f.x,f.y,5,'#659bc9');}
+    label('BALL SAVE',200,480,!ball.ready&&time<saveUntil?'#70efbd':'#3d5570',15);
+    label(ball.ready?'SPACE / 発射':time<saveUntil?`${Math.ceil(saveUntil-time)}秒`:'',200,501,'#e5f1ff',13);
+    disc(ball.x+2,ball.y+3,R+1,'#050a16');const shine=ctx.createRadialGradient(ball.x-3,ball.y-3,1,ball.x,ball.y,R);shine.addColorStop(0,'#fff');shine.addColorStop(.45,'#dce5ef');shine.addColorStop(1,'#667b98');disc(ball.x,ball.y,R,shine);
+    label('MISSION '+(mission+1),200,615,'#7097c4');
   }
-  function loop(){if(!running)return;physics();draw();raf=requestAnimationFrame(loop);}
-  function end(){running=false;cancelAnimationFrame(raf);if(score>0)recordWin('pinball',score);else recordLoss(0,'pinball');document.getElementById('pin-msg').innerHTML=`<div class="result-box"><div class="result-score">${score.toLocaleString()}</div><p>ピンボール終了</p><button class="btn mt" onclick="startGame('pinball')">もう一度</button></div>`;}
-  el.innerHTML=`<div class="game-header"><h2>🟣 ピンボール</h2><p>← → でフリッパー操作。連続ヒットでコンボ倍率アップ！</p></div><div class="info-row"><div class="info-box"><div class="ib-val" id="pin-score">0</div><div class="ib-label">スコア</div></div><div class="info-box"><div class="ib-val" id="pin-lives">●●●</div><div class="ib-label">ボール</div></div><div class="info-box"><div class="ib-val" id="pin-combo">-</div><div class="ib-label">コンボ</div></div></div><canvas id="pin-canvas" width="${W}" height="${H}" style="display:block;margin:auto;max-width:100%;border-radius:14px;touch-action:none"></canvas><div class="flex-center mt"><button class="btn btn-sm" onpointerdown="pinFlipL(true)" onpointerup="pinFlipL(false)" onpointercancel="pinFlipL(false)">◀ 左</button><button class="btn btn-warn" onclick="pinLaunch()">● 発射</button><button class="btn btn-sm" onpointerdown="pinFlipR(true)" onpointerup="pinFlipR(false)" onpointercancel="pinFlipR(false)">右 ▶</button></div><div id="pin-msg"></div>`;
-  canvas=document.getElementById('pin-canvas');ctx=canvas.getContext('2d');resetBall();
-  window.pinLaunch=launch;window.pinFlipL=v=>left=v;window.pinFlipR=v=>right=v;
-  document.addEventListener('keydown',keys);document.addEventListener('keyup',keys);document.addEventListener('pointerup',release);raf=requestAnimationFrame(loop);
-  el._cleanup=()=>{running=false;cancelAnimationFrame(raf);document.removeEventListener('keydown',keys);document.removeEventListener('keyup',keys);document.removeEventListener('pointerup',release);};
+  function loop(stamp){if(!running)return;if(!last)last=stamp;acc+=Math.min((stamp-last)/1000,.05);last=stamp;while(acc>=STEP&&running){step(STEP);acc-=STEP;}draw();if(running)raf=requestAnimationFrame(loop);}
+  function end(){running=false;cancelAnimationFrame(raf);if(score>0)recordWin('pinball',score);else recordLoss(0,'pinball');el.querySelector('#pin-msg').innerHTML=`<div class="result-box"><div class="result-score">${score.toLocaleString()}</div><p>ミッション達成 ${mission}回</p><button class="btn mt" onclick="startGame('pinball')">もう一度</button></div>`;}
+  const keyState={};
+  function sync(){held.left=!!(keyState.ArrowLeft||keyState.KeyZ||[...pointers.values()].includes('left'));held.right=!!(keyState.ArrowRight||keyState.KeyM||[...pointers.values()].includes('right'));}
+  function keys(e){if(['ArrowLeft','ArrowRight','KeyZ','KeyM','Space'].includes(e.code)){e.preventDefault();keyState[e.code]=e.type==='keydown';sync();if(e.code==='Space'&&e.type==='keydown'&&!e.repeat)launch();}}
+  function release(){Object.keys(keyState).forEach(k=>delete keyState[k]);pointers.clear();sync();last=0;acc=0;}
+  for(const side of ['left','right']){const button=el.querySelector('#pin-'+side);button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);pointers.set(e.pointerId,side);sync();};button.onpointerup=button.onpointercancel=button.onlostpointercapture=e=>{pointers.delete(e.pointerId);sync();};}
+  el.querySelector('#pin-launch').onclick=launch;
+  document.addEventListener('keydown',keys);document.addEventListener('keyup',keys);window.addEventListener('blur',release);document.addEventListener('visibilitychange',release);
+  reset();raf=requestAnimationFrame(loop);
+  el._cleanup=()=>{running=false;cancelAnimationFrame(raf);release();document.removeEventListener('keydown',keys);document.removeEventListener('keyup',keys);window.removeEventListener('blur',release);document.removeEventListener('visibilitychange',release);};
 };
 
 // ================================================================
@@ -4830,7 +5609,7 @@ games.simon = function(el) {
     try{
       audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
       const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),now=audioCtx.currentTime;
-      osc.frequency.value=tones[i];osc.type='sine';gain.gain.setValueAtTime(.14,now);gain.gain.exponentialRampToValueAtTime(.001,now+duration/1000);
+      osc.frequency.value=tones[i];osc.type='sine';gain.gain.setValueAtTime(Math.max(.0001,.4*sound.volume),now);gain.gain.exponentialRampToValueAtTime(.001,now+duration/1000);
       osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+duration/1000);
     }catch(e){}
   }
