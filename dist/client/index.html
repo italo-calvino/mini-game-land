@@ -767,12 +767,14 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 </section>
 
 <section id="gacha-page" class="app-page" aria-labelledby="gacha-title">
+  <button class="btn btn-sm" onclick="openShop()">← ショップ一覧へ</button>
   <div class="page-hero"><h2 id="gacha-title">🎁 コレクションガチャ</h2><p>ガチャ、メダル交換、コレクションの確認ができます。</p></div>
   <h2 class="shop-section-title">🎁 コレクションガチャ</h2>
   <div id="gacha-area"></div>
 </section>
 
 <section id="items-page" class="app-page" aria-labelledby="items-title">
+  <button class="btn btn-sm" onclick="openShop()">← ショップ一覧へ</button>
   <div class="page-hero"><h2 id="items-title">🎨 アイテムショップ</h2><p>好きなテーマやアイコンを購入・設定できます。</p></div>
   <h2 class="shop-section-title">🎨 カラーテーマ</h2>
   <div class="shop-grid" id="shop-grid"></div>
@@ -1393,6 +1395,12 @@ function renderShopPage(gachaResults=[]){
 }
 function openShop(){
   goHome();document.getElementById('home').style.display='none';document.getElementById('shop-page').style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive('shop');renderShopPage();window.scrollTo({top:0,behavior:'smooth'});
+}
+function openStorePage(name){
+  if(!['gacha','items'].includes(name))return;
+  openShop();
+  document.getElementById('shop-page').style.display='none';
+  document.getElementById(`${name}-page`).style.display='block';
 }
 
 function loadSave() {
