@@ -39,7 +39,7 @@ body.playing-game .app-taskbar { display:none; }
 .tb-save-btn { background: var(--accent3); color: #111; border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .tb-save-btn:hover { opacity: 0.85; }
 .tb-load-btn { background: var(--accent4); color: #fff; border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
-.tb-profile-btn { width:38px; height:38px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:none; border-radius:50%; padding:0; font-family:inherit; font-size:20px; cursor:pointer; }
+.tb-profile-btn { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; overflow:hidden; white-space:nowrap; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:none; border-radius:50%; padding:0; font-family:inherit; font-size:20px; line-height:1; cursor:pointer; }
 .tb-rules-btn { background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
 .tb-install-btn { display:none; background:linear-gradient(135deg,var(--accent4),var(--accent5)); color:#fff; border:0; border-radius:999px; padding:6px 14px; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .tb-install-btn.visible { display:inline-block; }
@@ -1380,7 +1380,13 @@ function updateUI() {
   document.getElementById('tb-pt').textContent = saveData.totalScore.toLocaleString() + ' pt';
   document.getElementById('stat-wins').textContent = saveData.wins;
   document.getElementById('stat-total').textContent = saveData.totalScore.toLocaleString();
-  const profileBtn=document.getElementById('profile-btn');if(profileBtn)profileBtn.textContent=`${saveData.profile?.avatar||'🎮'} ${saveData.profile?.username||'プレイヤー'}${activeTitleText()?`・${activeTitleText()}`:''}`;
+  const profileBtn=document.getElementById('profile-btn');
+  if(profileBtn){
+    const profileName=saveData.profile?.username||'プレイヤー';
+    profileBtn.textContent=saveData.profile?.avatar||'🎮';
+    profileBtn.setAttribute('aria-label',`${profileName}のプロフィールを開く`);
+    profileBtn.title=`${profileName}${activeTitleText()?`・${activeTitleText()}`:''}`;
+  }
 
   const lvName = getLvName(saveData.level);
   document.getElementById('lv-name').textContent = lvName + (saveData.streak >= 3 ? ` 🔥×${saveData.streak}` : '');
@@ -1661,7 +1667,7 @@ function gameDelay(fn,ms){const id=setTimeout(()=>{gameTimeouts.delete(id);fn();
 function clearGameTimeouts(){gameTimeouts.forEach(clearTimeout);gameTimeouts.clear();}
 function setTaskbarActive(name){document.querySelectorAll('.taskbar-item').forEach(button=>button.classList.toggle('active',button.dataset.taskbar===name));}
 function openFeaturePage(name){
-  if(!['daily','achievements','ranking','challenge'].includes(name))return;
+  if(!['daily','achievements','ranking','challenge','more'].includes(name))return;
   goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
