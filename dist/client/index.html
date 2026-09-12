@@ -355,18 +355,20 @@ body.playing-game .app-taskbar { display:none; }
 .fighter-controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
 .fighter-control-group { display:flex; justify-content:center; gap:7px; padding:9px; background:var(--surface2); border:1px solid var(--border); border-radius:14px; }
 .fighter-key { min-width:58px; min-height:52px; padding:8px !important; font-size:16px; touch-action:none; user-select:none; }
-.sol-top,.sol-board { width:min(100%,524px); display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; margin-left:auto; margin-right:auto; }
+.sol-top,.sol-board { width:min(94%,448px); display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-left:auto; margin-right:auto; align-items:start; }
 .sol-top { align-items:start; margin-top:14px; margin-bottom:14px; }
-.sol-board { min-height:350px; }
+.sol-board { min-height:260px; }
 .sol-pile { min-width:0; min-height:0; aspect-ratio:.7; border:2px dashed var(--border); border-radius:10px; position:relative; }
 .sol-card { width:100%; aspect-ratio:.7; min-height:0; border:2px solid #d8d8df; border-radius:9px; background:#fff; color:#20202b; padding:5px; font:900 clamp(11px,2.4vw,17px)/1 sans-serif; cursor:pointer; position:relative; text-align:left; box-shadow:0 3px 8px rgba(0,0,0,.22); user-select:none; touch-action:manipulation; }
 .sol-card.red { color:#d92f43; }
+.sol-card > span { position:absolute; top:4px; left:4px; white-space:nowrap; line-height:1; }
 .sol-card.back { color:transparent; border-color:#8585b8; background:repeating-linear-gradient(45deg,#343477 0 7px,#4d4da0 7px 14px); }
 .sol-card.selected { outline:4px solid var(--accent2); transform:translateY(-3px); z-index:20; }
-.sol-tableau .sol-card + .sol-card { margin-top:-100%; }
-.sol-tableau .sol-card.back + .sol-card { margin-top:-116%; }
+.sol-tableau .sol-card + .sol-card { margin-top:calc(26px - 100% / .7); }
+.sol-tableau .sol-card.back + .sol-card { margin-top:calc(12px - 100% / .7); }
 .sol-slot-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text2); font-size:23px; pointer-events:none; }
-.sol-tableau { min-width:0; }
+.sol-tableau { min-width:0; display:flex; flex-direction:column; }
+.sol-tableau .sol-card { flex-shrink:0; }
 .sol-status { min-height:38px; padding:9px 12px; text-align:center; color:var(--text2); font-size:13px; }
 #game-screen[data-game="simon"] .simon-board { display:grid; grid-template-columns:repeat(2,minmax(110px,180px)); gap:12px; justify-content:center; margin:18px auto; }
 #game-screen[data-game="simon"] .simon-pad { aspect-ratio:1; border:0; border-radius:24px; cursor:pointer; opacity:.68; box-shadow:inset 0 -8px 0 rgba(0,0,0,.2),0 8px 20px rgba(0,0,0,.18); transition:transform .08s,opacity .08s,filter .08s; touch-action:manipulation; }
@@ -506,9 +508,12 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   .fighter-control-group { padding:7px; }
   .fighter-key { min-width:54px; min-height:54px; flex:1; }
   .sol-top,.sol-board { gap:3px; }
-  .sol-board { min-height:300px; }
+  .sol-board { min-height:230px; }
   .sol-pile { border-radius:7px; }
   .sol-card { padding:3px; font-size:11px; border-radius:6px; }
+  .sol-card > span { top:3px; left:3px; }
+  .sol-tableau .sol-card + .sol-card { margin-top:calc(22px - 100% / .7); }
+  .sol-tableau .sol-card.back + .sol-card { margin-top:calc(10px - 100% / .7); }
   .sol-slot-label { font-size:16px; }
   #tetris-wrap { flex-wrap:nowrap; gap:9px; }
   #tetris-side { min-width:104px; }
@@ -569,6 +574,60 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .tb-bgm-btn { background: var(--surface2); color: var(--text); border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .tb-bgm-btn:hover { background: #333; }
 .tb-bgm-btn.playing { background: var(--accent3); color: #111; }
+/* Readable browsing: fewer competing details, larger type and calmer surfaces. */
+:root { --text2:#bec0d0; }
+#home { max-width:1100px; margin:0 auto; padding:28px 24px; }
+.home-banner { gap:20px; padding:20px 24px; margin-bottom:24px; border:1px solid var(--border); }
+.lv-xp-text, .stat-card .s-label { font-size:13px; line-height:1.6; }
+.stat-card { background:transparent; padding:8px 16px; }
+.stat-card .s-val { color:var(--text); }
+.games-grid { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
+.game-card { display:flex; flex-direction:column; padding:24px 20px; border-radius:20px; box-shadow:none; }
+.game-card::before { display:none; }
+.game-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.18); }
+.game-icon { margin-bottom:18px; padding-right:36px; }
+.game-title { font-size:18px; line-height:1.5; margin-bottom:8px; overflow-wrap:anywhere; }
+.game-desc { display:block; font-size:14px; line-height:1.7; margin-bottom:20px; }
+.game-meta { margin-top:auto; gap:10px; flex-wrap:wrap; }
+.game-tag { background:var(--surface2); color:var(--text2); font-size:13px; font-weight:500; padding:5px 10px; }
+.game-hs { font-size:13px; }
+.game-hs span { color:var(--text); }
+.favorite-btn { width:44px; height:44px; background:var(--surface2); }
+.game-browser { padding:18px; margin-bottom:24px; }
+.game-search { font-size:16px; min-height:44px; }
+.game-filter-row { gap:8px; margin-top:14px; }
+.filter-chip { min-height:44px; padding:10px 14px; font-size:13px; }
+.page-hero { background:var(--surface); }
+.page-hero p, .menu-card small, .shop-card p { font-size:14px; line-height:1.7; }
+.menu-card { padding:20px; box-shadow:none; }
+.menu-card strong { font-size:17px; margin-bottom:6px; }
+.meta-sub, .profile-stat span, .privacy-note, .achievement-badge { font-size:13px; line-height:1.6; }
+.taskbar-item { font-size:13px; gap:6px; }
+.taskbar-item.active { background:var(--surface2); color:#a9cdff; }
+.game-card:focus-visible, button:focus-visible, select:focus-visible { outline:3px solid var(--accent4); outline-offset:3px; }
+@media (max-width:520px) {
+  #home { padding:20px 16px; }
+  #topbar { flex-wrap:wrap; }
+  #topbar-right { flex-wrap:wrap; }
+  .home-banner { padding:16px; gap:12px; }
+  .home-stats { gap:16px; }
+  .stat-card { text-align:left; padding:4px 0; }
+  .stat-card .s-val { font-size:18px; }
+  .games-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .game-card { padding:16px 14px; }
+  .game-icon { font-size:30px; margin-bottom:16px; }
+  .game-title { font-size:16px; }
+  .game-desc { display:block; font-size:13px; line-height:1.65; margin-bottom:16px; }
+  .game-meta { align-items:flex-start; gap:8px; }
+  .game-browser-top { flex-wrap:wrap; }
+  .game-search { flex-basis:100%; }
+  .taskbar-item { font-size:12px; }
+  .app-page { padding:20px 16px; }
+}
+@media (max-width:359px) {
+  .games-grid { grid-template-columns:1fr; }
+  .taskbar-item { font-size:11px; }
+}
 </style>
 </head>
 <body>
@@ -594,8 +653,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
     </label>
     <label style="display:block;margin-bottom:14px"><input id="sound-auto" type="checkbox" onchange="sound.auto=this.checked;saveSound();if(!this.checked)bgmStop()"> ゲーム開始時にBGMを再生</label>
     <p style="color:var(--text2);font-size:12px;margin-bottom:14px;line-height:1.6">
-      内蔵のオリジナルBGMを選んですぐ再生できます。<br>好きな音楽ファイルも追加できます。<br>
-      ファイルはブラウザのメモリに読み込まれ、ページを閉じると消えます。
+      内蔵のオリジナルBGMを選んですぐ再生できます。
     </p>
 
     <!-- 今流れてる曲 -->
@@ -618,14 +676,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 
     <!-- トラックリスト -->
     <div id="bgm-tracklist"></div>
-
-    <!-- ファイル追加 -->
-    <div style="margin-top:12px">
-      <label style="display:block;background:var(--surface2);border:2px dashed var(--accent4);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;font-size:14px;color:var(--accent4);font-weight:700">
-        ＋ MP3 / WAV / OGG ファイルを追加
-        <input type="file" accept="audio/*" multiple id="bgm-file-input" style="display:none" onchange="bgmAddFiles(this.files)">
-      </label>
-    </div>
 
     <div class="modal-btns" style="margin-top:14px">
       <button class="btn btn-sm" style="background:var(--surface2)" onclick="closeBgm()">閉じる</button>
@@ -678,9 +728,15 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
       <div class="stat-card"><div class="s-val" id="stat-total">0</div><div class="s-label">総得点</div></div>
     </div>
   </div>
-  <div class="game-browser"><div class="game-browser-top"><input id="game-search" class="game-search" type="text" placeholder="ゲームを検索…" oninput="setGameSearch(this.value)"><button class="filter-chip" id="favorite-filter" onclick="toggleFavoriteFilter()">☆ お気に入り</button></div><div class="game-filter-row" id="game-filters"></div></div>
-  <div class="games-grid" id="games-grid"></div>
+  <div class="flex-center" style="flex-wrap:wrap;margin-bottom:24px"><button class="btn" onclick="openGameLibrary()">🎮 すべてのゲーム</button><button class="btn btn-warn" onclick="playRandomGame()">🎲 ランダムで遊ぶ</button></div>
+  <section aria-labelledby="recent-games-title"><h2 id="recent-games-title" style="font-size:20px;margin-bottom:14px">まずはこの4本</h2><div class="games-grid" id="recent-games-grid"></div></section>
+  <section aria-labelledby="favorite-games-title" style="margin-top:28px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px"><h2 id="favorite-games-title" style="font-size:20px">★ お気に入り</h2><button class="filter-chip" onclick="openGameLibrary(true)">お気に入りをすべて見る</button></div><div class="games-grid" id="favorite-games-grid"></div></section>
 </div>
+
+<section id="library-page" class="app-page" aria-labelledby="library-title">
+  <div class="page-hero"><h2 id="library-title">🎮 すべてのゲーム</h2><p>名前やジャンルで探して、気に入ったゲームは★で登録。</p></div>
+  <div class="page-content"><div class="game-browser"><div class="game-browser-top"><input id="game-search" class="game-search" type="search" aria-label="ゲームを検索" placeholder="ゲームを検索…" oninput="setGameSearch(this.value)"><button class="filter-chip" id="favorite-filter" onclick="toggleFavoriteFilter()">☆ お気に入り</button></div><div class="game-filter-row" id="game-filters"></div></div><div class="games-grid" id="games-grid"></div></div>
+</section>
 
 <section id="daily-page" class="app-page" aria-labelledby="daily-title">
   <div class="page-hero"><h2 id="daily-title">📅 デイリーミッション</h2><p>毎日の目標を確認して、ゲーム内ポイントを獲得しよう。</p></div>
@@ -774,7 +830,7 @@ function playSfx(kind='click'){
   try{
     sound.ctx ||= new (window.AudioContext||window.webkitAudioContext)();
     if(sound.ctx.state==='suspended')sound.ctx.resume().catch(()=>{});
-    const notes={click:[660],start:[392,523,784],win:[523,659,784,1047],loss:[330,277,220],level:[523,659,784,1047,1319]}[kind]||[660];
+    const notes={startup:[523,659,784,1047],click:[660],start:[392,523,784],win:[523,659,784,1047],loss:[330,277,220],level:[523,659,784,1047,1319]}[kind]||[660];
     notes.forEach((freq,i)=>{const osc=sound.ctx.createOscillator(),gain=sound.ctx.createGain(),at=sound.ctx.currentTime+i*.09;
       osc.type='triangle';osc.frequency.value=freq;gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(sound.volume*.22,at+.005);gain.gain.exponentialRampToValueAtTime(.0001,at+.13);
       osc.connect(gain);gain.connect(sound.ctx.destination);osc.start(at);osc.stop(at+.14);osc.onended=()=>{osc.disconnect();gain.disconnect();};
@@ -797,7 +853,18 @@ function makeBgm(track){
   }
   return URL.createObjectURL(new Blob([data],{type:'audio/wav'}));
 }
+let startupSoundPlayed=false;
+function playStartupSound(){
+  if(startupSoundPlayed||document.hidden)return false;
+  startupSoundPlayed=true;
+  playSfx('startup');
+  return true;
+}
+document.addEventListener('keydown',event=>{
+  if(!event.repeat&&!event.ctrlKey&&!event.altKey&&!event.metaKey&&['Enter',' '].includes(event.key))playStartupSound();
+});
 document.addEventListener('click',event=>{
+  if(playStartupSound())return;
   if(event.target.closest('button,.game-card,.bgm-track')&&!event.target.closest('#bgm-modal'))playSfx();
 });
 let resumeBgmOnVisible=false;
@@ -817,9 +884,6 @@ function closeBgm() {
 
 function bgmRenderTracks() {
   const list = document.getElementById('bgm-tracklist');
-  if (bgm.tracks.length === 0) {
-    list.innerHTML = '<p style="color:var(--text2);font-size:13px;text-align:center;padding:12px">まだトラックがありません。下からMP3を追加してください。</p>';
-  } else {
     list.innerHTML = bgm.tracks.map((t, i) => `
       <div class="bgm-track ${bgm.current===i?'active':''}" onclick="bgmPlay(${i})">
         <div class="track-icon">${bgm.current===i ? '▶️' : '🎵'}</div>
@@ -828,9 +892,7 @@ function bgmRenderTracks() {
           <div class="track-file">クリックで再生</div>
         </div>
         <div class="track-status">${bgm.current===i ? (bgm.audio&&!bgm.audio.paused?'再生中':'一時停止') : ''}</div>
-        ${t.builtin===undefined?`<button aria-label="曲を削除" onclick="event.stopPropagation();bgmRemove(${i})" style="background:none;border:none;color:var(--accent1);cursor:pointer;font-size:16px;padding:4px">✕</button>`:''}
       </div>`).join('');
-  }
   // 再生中パネル
   const nowPanel = document.getElementById('bgm-now');
   if (bgm.current >= 0 && bgm.audio) {
@@ -852,21 +914,6 @@ function bgmRenderTracks() {
   } else {
     btn.textContent = '🎵 BGM';
     btn.classList.remove('playing');
-  }
-}
-
-function bgmAddFiles(files) {
-  const firstAdded=bgm.tracks.length;
-  Array.from(files).forEach(file => {
-    const url = URL.createObjectURL(file);
-    const name = file.name.replace(/\.[^.]+$/, '');
-    bgm.tracks.push({ name, url, file });
-  });
-  // 最初のファイル追加時に自動再生
-  if (bgm.current < 0 && bgm.tracks.length > 0) {
-    bgmPlay(firstAdded);
-  } else {
-    bgmRenderTracks();
   }
 }
 
@@ -914,15 +961,6 @@ function bgmSetVol(v) {
 function bgmSetLoop(v) {
   bgm.loop = v;
   if (bgm.audio) bgm.audio.loop = v;
-}
-
-function bgmRemove(idx) {
-  if(!bgm.tracks[idx]||bgm.tracks[idx].builtin!==undefined)return;
-  URL.revokeObjectURL(bgm.tracks[idx].url);
-  bgm.tracks.splice(idx, 1);
-  if (bgm.current === idx) { bgmStop(); }
-  else if (bgm.current > idx) bgm.current--;
-  bgmRenderTracks();
 }
 
 // ================================================================
@@ -1141,6 +1179,7 @@ function normalizeSave(){
   if(!saveData.daily||saveData.daily.date!==localDateKey())saveData.daily={date:localDateKey(),plays:0,wins:0,score:0,claimed:[]};
   saveData.daily.claimed=Array.isArray(saveData.daily.claimed)?saveData.daily.claimed:[];
   saveData.scoreHistory=Array.isArray(saveData.scoreHistory)?saveData.scoreHistory:[];
+  saveData.recentGames=[...new Set((Array.isArray(saveData.recentGames)?saveData.recentGames:saveData.scoreHistory.map(entry=>entry.gameId)).map(id=>['trivia','animequiz'].includes(id)?'quiz':id))].filter(id=>GAME_DEFS.some(g=>g.id===id)).slice(0,4);
   saveData.challengeClears=Number(saveData.challengeClears)||0;
   if(['trivia','animequiz'].includes(saveData.activeChallenge?.gameId))saveData.activeChallenge=null;
   if(Array.isArray(saveData.favoriteGames))saveData.favoriteGames=[...new Set(saveData.favoriteGames.map(id=>['trivia','animequiz'].includes(id)?'quiz':id))];
@@ -1189,6 +1228,7 @@ function checkMetaProgress(){
 }
 function trackGameStart(gameId){
   normalizeSave(); saveData.daily.plays++;
+  saveData.recentGames=[gameId,...saveData.recentGames.filter(id=>id!==gameId)].slice(0,4);
   const stat=saveData.gameStats[gameId]||(saveData.gameStats[gameId]={plays:0,wins:0,masteryXp:0});stat.masteryXp=stat.masteryXp||0;stat.plays++;
   checkMetaProgress();
 }
@@ -1246,6 +1286,7 @@ function openProfile(required=false){
     ${required?'<p style="color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:14px">最初にランキングで使うユーザーネームとアイコンを決めてください。本名やメールアドレスは入力しないでください。</p>':''}
     <div class="player-card"><div class="player-card-main"><div class="profile-avatar ${activeFrameClass()}" id="profile-avatar-preview">${selectedProfileAvatar}</div><div><strong style="font-size:18px">${escapeHtml(saveData.profile.username)}</strong>${activeTitleText()?`<div style="color:var(--accent2);font-size:11px;font-weight:900">✦ ${escapeHtml(activeTitleText())}</div>`:''}<div style="color:var(--accent2);font-weight:700">Lv.${saveData.level} ${escapeHtml(getLvName(saveData.level))}</div><div class="meta-sub">得意：${escapeHtml(favoriteName)} ／ ID: ${escapeHtml(saveData.profile.id.slice(0,8))}</div></div></div></div>
     <div class="profile-stats"><div class="profile-stat"><strong>${plays}</strong><span>プレイ</span></div><div class="profile-stat"><strong>${saveData.wins}</strong><span>勝利</span></div><div class="profile-stat"><strong>${masteryTotal}</strong><span>マスタリー合計</span></div></div>
+    ${required?'':`<details style="margin-bottom:20px"><summary style="cursor:pointer;font-size:14px;padding:12px 0">ゲームごとのマスタリー</summary>${GAME_DEFS.map(g=>`<div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px"><span>${g.icon} ${escapeHtml(g.title)}</span><span style="white-space:nowrap;color:var(--text2)">Lv.${getMastery(g.id).level} / 5</span></div>`).join('')}</details>`}
     <button class="btn btn-purple btn-sm" style="width:100%;margin-bottom:14px" onclick="copyPlayerCard()">📋 カード情報をコピー</button>
     <label class="meta-sub" for="profile-name">ユーザーネーム（1〜16文字）</label><input id="profile-name" maxlength="16" value="${escapeHtml(saveData.profile.username)}" style="width:100%;margin:5px 0 10px">
     <div class="meta-sub">所有しているアイコン</div><div class="avatar-picker">${saveData.ownedAvatars.map(a=>`<button class="avatar-option ${a===selectedProfileAvatar?'selected':''}" onclick="selectProfileAvatar('${a}')" aria-label="${escapeHtml(AVATAR_ITEMS.find(x=>x.icon===a)?.name||'アイコン')}">${a}</button>`).join('')}</div>
@@ -1449,36 +1490,52 @@ function renderGameFilters(){
   if(row)row.innerHTML=tags.map(t=>`<button class="filter-chip ${gameTagFilter===t?'active':''}" onclick="setGameTag('${t}')">${escapeHtml(t)}</button>`).join('');
   const fav=document.getElementById('favorite-filter');if(fav){fav.classList.toggle('active',favoriteOnly);fav.textContent=`${favoriteOnly?'★':'☆'} お気に入り (${saveData.favoriteGames.length})`;}
 }
-function renderGameGrid(){
-  const grid = document.getElementById('games-grid');
+function renderGameGrid(gridId='games-grid',gamesList=null){
+  const grid = document.getElementById(gridId);
   grid.innerHTML = '';
   const query=gameSearchText.trim().toLocaleLowerCase('ja');
-  const list=GAME_DEFS.filter(g=>(gameTagFilter==='すべて'||g.tag===gameTagFilter)&&(!favoriteOnly||saveData.favoriteGames.includes(g.id))&&`${g.title} ${g.desc} ${g.tag}`.toLocaleLowerCase('ja').includes(query));
+  const list=gamesList||GAME_DEFS.filter(g=>(gameTagFilter==='すべて'||g.tag===gameTagFilter)&&(!favoriteOnly||saveData.favoriteGames.includes(g.id))&&`${g.title} ${g.desc} ${g.tag}`.toLocaleLowerCase('ja').includes(query));
   list.forEach(g => {
     const hs = saveData.highscores[g.id] || 0;
-    const mastery=getMastery(g.id);
+
     const card = document.createElement('div');
     card.className = 'game-card';card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',`${g.title}を遊ぶ`);
     card.style.cssText = `--card-color:${g.color}`;
     const favorite=saveData.favoriteGames.includes(g.id);
-    card.innerHTML = `<button class="favorite-btn ${favorite?'active':''}" aria-label="${favorite?'お気に入りから外す':'お気に入りに追加'}" onclick="event.stopPropagation();toggleFavorite('${g.id}')">${favorite?'★':'☆'}</button><span class="game-icon">${g.icon}</span><div class="game-title">${g.title}</div><div class="game-desc">${g.desc}</div><div class="game-meta"><span class="game-tag">${g.tag}</span><span class="game-hs">最高: <span>${hs.toLocaleString()}</span></span></div><div class="mastery-line"><span>マスタリー Lv.${mastery.level}</span><span class="mastery-stars">${'★'.repeat(mastery.level)}${'☆'.repeat(5-mastery.level)}</span></div>`;
+    card.innerHTML = `<button class="favorite-btn ${favorite?'active':''}" aria-label="${favorite?'お気に入りから外す':'お気に入りに追加'}" onclick="event.stopPropagation();toggleFavorite('${g.id}')">${favorite?'★':'☆'}</button><span class="game-icon">${g.icon}</span><div class="game-title">${g.title}</div><div class="game-desc">${g.desc}</div><div class="game-meta"><span class="game-tag">${g.tag}</span><span class="game-hs">最高: <span>${hs.toLocaleString()}</span></span></div>`;
     card.onclick = () => startGame(g.id);
     card.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target===card){e.preventDefault();startGame(g.id);}};
     grid.appendChild(card);
   });
-  if(!list.length)grid.innerHTML='<div class="games-empty">条件に合うゲームがありません。検索や絞り込みを変更してください。</div>';
-  renderGameFilters();
+  if(!list.length)grid.innerHTML=gridId==='favorite-games-grid'?'<div class="games-empty">ゲームの★を押すと、ここからすぐ遊べます。<br><button class="btn btn-sm mt" onclick="openGameLibrary()">お気に入りを探す</button></div>':'<div class="games-empty">条件に合うゲームがありません。検索や絞り込みを変更してください。</div>';
+  if(gridId==='games-grid')renderGameFilters();
 }
+function renderHomeGames(){
+  const recent=(saveData.recentGames||[]).map(id=>GAME_DEFS.find(g=>g.id===id)).filter(Boolean).slice(0,4);
+  document.getElementById('recent-games-title').textContent=recent.length?'最近遊んだゲーム':'まずはこの4本';
+  renderGameGrid('recent-games-grid',recent.length?recent:['memory','quiz','pinball','slide'].map(id=>GAME_DEFS.find(g=>g.id===id)).filter(Boolean));
+  renderGameGrid('favorite-games-grid',saveData.favoriteGames.map(id=>GAME_DEFS.find(g=>g.id===id)).filter(Boolean).slice(0,6));
+}
+function openGameLibrary(onlyFavorites=false){
+  goHome();favoriteOnly=onlyFavorites;gameSearchText='';gameTagFilter='すべて';
+  document.getElementById('game-search').value='';
+  document.getElementById('home').style.display='none';
+  document.getElementById('library-page').style.display='block';
+  document.getElementById('back-btn').style.display='inline-block';
+  setTaskbarActive('');renderGameGrid();window.scrollTo({top:0,behavior:'smooth'});
+}
+function playRandomGame(){startGame(GAME_DEFS[Math.floor(Math.random()*GAME_DEFS.length)].id);}
 function setGameSearch(value){gameSearchText=value;renderGameGrid();}
 function setGameTag(tag){gameTagFilter=tag;renderGameGrid();}
 function toggleFavoriteFilter(){favoriteOnly=!favoriteOnly;renderGameGrid();}
 function toggleFavorite(gameId){
   const i=saveData.favoriteGames.indexOf(gameId);if(i>=0)saveData.favoriteGames.splice(i,1);else saveData.favoriteGames.push(gameId);
-  persistSave();renderGameGrid();showToast(i>=0?'お気に入りから外しました':'お気に入りに追加しました',i>=0?'#a7a9be':'#ffd93d');
+  persistSave();renderGameGrid();renderHomeGames();showToast(i>=0?'お気に入りから外しました':'お気に入りに追加しました',i>=0?'#a7a9be':'#ffd93d');
 }
 function renderHome() {
   const search=document.getElementById('game-search');if(search)search.value=gameSearchText;
   renderGameGrid();
+  renderHomeGames();
   renderMetaDashboard();
   updateUI();
 }
@@ -1762,17 +1819,25 @@ const games = {};
 
 // GAME 1: MEMORY
 games.memory = function(el) {
-  let cards = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS].sort(() => Math.random()-0.5);
+  const modes={easy:{name:'かんたん',pairs:4},normal:{name:'ふつう',pairs:8},hard:{name:'むずかしい',pairs:12}};
+  el.innerHTML=`<div class="game-header"><h2>🧠 神経衰弱</h2><p>同じ絵柄のペアを見つけよう！</p></div>
+    <div class="result-box"><h3>難易度を選択</h3><div class="flex-center mt">${Object.entries(modes).map(([id,m])=>`<button class="btn" data-memory-mode="${id}">${m.name}（${m.pairs*2}枚）</button>`).join('')}</div></div>`;
+  el.querySelectorAll('[data-memory-mode]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.memoryMode)));
+  function start(id){
+  const mode=modes[id],pairs=mode.pairs;
+  const symbols=[...MEMORY_EMOJIS,'🐼','🐬','🐸','🐙'].slice(0,pairs);
+  let cards = [...symbols, ...symbols];
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
   let flipped = [], matched = 0, moves = 0, locked = false;
   let matched_ids = new Set();
 
   // 骨格を一度だけ作る（innerHTML の上書きをしない）
   el.innerHTML = `
     <div class="game-header"><h2>🧠 神経衰弱</h2>
-      <p id="mem-status">手数: 0 | ペア: 0/8</p>
+      <p>${mode.name}・${pairs*2}枚</p><p id="mem-status">手数: 0 | ペア: 0/${pairs}</p>
     </div>
     <div class="memory-grid" id="mem-grid"></div>
-    <div class="center mt"><button class="btn btn-sm" onclick="startGame('memory')">リセット</button></div>
+    <div class="center mt"><button class="btn btn-sm" onclick="startGame('memory')">難易度選択へ</button></div>
     <div id="mem-result"></div>`;
 
   // カードDOMを生成して保持
@@ -1802,7 +1867,7 @@ games.memory = function(el) {
 
     if (flipped.length === 2) {
       moves++;
-      document.getElementById('mem-status').textContent = `手数: ${moves} | ペア: ${matched}/8`;
+      document.getElementById('mem-status').textContent = `手数: ${moves} | ペア: ${matched}/${pairs}`;
       locked = true;
       gameDelay(() => {
         if (cards[flipped[0]] === cards[flipped[1]]) {
@@ -1811,11 +1876,11 @@ games.memory = function(el) {
           matched++;
           updateCardEl(flipped[0]);
           updateCardEl(flipped[1]);
-          document.getElementById('mem-status').textContent = `手数: ${moves} | ペア: ${matched}/8`;
+          document.getElementById('mem-status').textContent = `手数: ${moves} | ペア: ${matched}/${pairs}`;
 
-          if (matched === 8) {
+          if (matched === pairs) {
             locked = true; // 以降の操作を止める
-            const score = Math.max(50, 300 - moves * 10);
+            const score = Math.max(50, pairs * 40 - 20 - moves * 10);
             recordWin('memory', score);
             document.getElementById('mem-result').innerHTML = `
               <div class="result-box" style="margin-top:16px">
@@ -1838,6 +1903,7 @@ games.memory = function(el) {
         locked = false;
       }, 700);
     }
+  }
   }
 };
 
@@ -5212,12 +5278,12 @@ games.pong = function(el) {
     el.innerHTML=`<div class="game-header"><h2>🏓 Pong</h2><p>CPUより先に7点取ろう！</p></div>
       <div class="result-box"><h3>CPUの強さ</h3><div class="flex-center mt">
       ${Object.entries(MODES).map(([id,m])=>`<button class="btn" data-pong-mode="${id}" style="background:${m.color}">${m.name}</button>`).join('')}
-      </div><div class="meta-sub mt">W／S・↑／↓、またはキャンバス上でマウスや指を動かして操作します。</div></div>`;
+      </div><div class="meta-sub mt">難しいほどCPUの移動とボールが速くなります。<br>W／S・↑／↓、またはキャンバス上でマウスや指を動かして操作します。</div></div>`;
     el.querySelectorAll('[data-pong-mode]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.pongMode)));
   }
   function start(id){
     mode=MODES[id];running=true;ended=false;playerY=cpuY=(H-PH)/2;playerPoints=cpuPoints=score=rally=maxRally=0;keys={};
-    el.innerHTML=`<div class="game-header"><h2>🏓 Pong</h2><p id="pong-status">${mode.name}CPUと対戦中</p></div>
+    el.innerHTML=`<div class="game-header"><h2>🏓 Pong</h2><p>難易度：${mode.name}</p><p id="pong-status">${mode.name}CPUと対戦中</p></div>
       <div class="info-row">
         <div class="info-box"><div class="ib-val" id="pong-player">0</div><div class="ib-label">あなた</div></div>
         <div class="info-box"><div class="ib-val" id="pong-rally">0</div><div class="ib-label">ラリー</div></div>
@@ -5225,7 +5291,7 @@ games.pong = function(el) {
         <div class="info-box"><div class="ib-val" id="pong-score">0</div><div class="ib-label">スコア</div></div>
       </div>
       <canvas id="pong-canvas" width="640" height="400" aria-label="Pongゲーム画面"></canvas>
-      <div class="meta-sub center">操作：W／S・↑／↓・マウス・タッチ</div><div id="pong-result"></div>`;
+      <div class="meta-sub center">操作：W／S・↑／↓・マウス・タッチ</div><div class="center mt"><button class="btn btn-sm" onclick="startGame('pong')">難易度選択へ</button></div><div id="pong-result"></div>`;
     canvas=el.querySelector('#pong-canvas');ctx=canvas.getContext('2d');
     canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerdown',pointerMove);
     document.addEventListener('keydown',keyDown);document.addEventListener('keyup',keyUp);
@@ -5352,20 +5418,21 @@ games.lightsout = function(el) {
 // GAME 25: REVERSI
 games.reversi = function(el) {
   const DIRS=[[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
-  let board=[],turn=1,mode='cpu',locked=false,ended=false,passes=0;
+  const difficulties={easy:'かんたん',normal:'ふつう',hard:'むずかしい'};
+  let board=[],turn=1,mode='cpu',difficulty='normal',locked=false,ended=false,passes=0;
 
   function menu(){
     el.innerHTML=`<div class="game-header"><h2>🟢 リバーシ</h2><p>挟んだ石をひっくり返して、盤面を支配しよう</p></div>
       <div class="result-box"><h3>対戦モード</h3><div class="flex-center mt">
-        <button class="btn btn-success" data-mode="cpu">🤖 CPUと対戦</button>
+        ${Object.entries(difficulties).map(([id,name])=>`<button class="btn btn-success" data-mode="cpu" data-difficulty="${id}">🤖 ${name}</button>`).join('')}
         <button class="btn btn-purple" data-mode="two">👥 2人で対戦</button>
-      </div><div class="meta-sub mt">黒が先手です。CPU戦ではあなたが黒を担当します。</div></div>`;
-    el.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>start(b.dataset.mode)));
+      </div><div class="meta-sub mt">CPUの強さ：かんたん＝ランダム、ふつう＝角を優先、むずかしい＝3手先を読む。<br>黒が先手です。CPU戦ではあなたが黒を担当します。</div></div>`;
+    el.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{difficulty=b.dataset.difficulty||'normal';start(b.dataset.mode);}));
   }
   function start(selected){
     mode=selected;board=Array.from({length:8},()=>Array(8).fill(0));
     board[3][3]=2;board[4][4]=2;board[3][4]=1;board[4][3]=1;turn=1;locked=false;ended=false;passes=0;
-    el.innerHTML=`<div class="game-header"><h2>🟢 リバーシ</h2><p id="rev-status"></p></div>
+    el.innerHTML=`<div class="game-header"><h2>🟢 リバーシ</h2><p>${mode==='cpu'?'CPU：'+difficulties[difficulty]:'2人で対戦'}</p><p id="rev-status"></p></div>
       <div class="info-row">
         <div class="info-box"><div class="ib-val" id="rev-black">2</div><div class="ib-label">⚫ 黒${mode==='cpu'?'（あなた）':''}</div></div>
         <div class="info-box"><div class="ib-val" id="rev-white">2</div><div class="ib-label">⚪ 白${mode==='cpu'?'（CPU）':''}</div></div>
@@ -5422,9 +5489,39 @@ games.reversi = function(el) {
   }
   function cpuMove(){
     if(ended)return;const moves=legalMoves(2);if(!moves.length){locked=false;advance();return;}
+    if(difficulty==='easy'){locked=false;applyMove(moves[Math.floor(Math.random()*moves.length)]);return;}
     const corners=new Set(['0,0','7,0','0,7','7,7']),danger=new Set(['1,1','6,1','1,6','6,6']);
     moves.forEach(m=>{const k=`${m.x},${m.y}`;m.value=m.flips.length+(corners.has(k)?100:0)+(m.x===0||m.x===7||m.y===0||m.y===7?12:0)-(danger.has(k)?20:0)+Math.random()*3;});
+    if(difficulty==='hard')moves.forEach(m=>{m.value=withMove(m,2,()=>search(1,2,-Infinity,Infinity));});
     moves.sort((a,b)=>b.value-a.value);locked=false;applyMove(moves[0]);
+  }
+  function withMove(move,player,evaluate){
+    const saved=board;board=board.map(row=>row.slice());board[move.y][move.x]=player;
+    move.flips.forEach(([x,y])=>board[y][x]=player);
+    try{return evaluate();}finally{board=saved;}
+  }
+  function search(player,depth,alpha,beta){
+    const moves=legalMoves(player),other=legalMoves(3-player);
+    if(!moves.length&&!other.length){const c=countDiscs();return Math.sign(c.white-c.black)*100000+c.white-c.black;}
+    if(!depth){
+      let value=(legalMoves(2).length-legalMoves(1).length)*8;
+      for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+        if(!board[y][x])continue;
+        const edge=(x===0||x===7||y===0||y===7),corner=(x===0||x===7)&&(y===0||y===7);
+        const cx=x<4?0:7,cy=y<4?0:7;
+        const danger=!board[cy][cx]&&Math.abs(x-cx)<=1&&Math.abs(y-cy)<=1&&!corner;
+        value+=(board[y][x]===2?1:-1)*(corner?120:danger?-35:edge?12:1);
+      }
+      return value;
+    }
+    if(!moves.length)return search(3-player,depth-1,alpha,beta);
+    let best=player===2?-Infinity:Infinity;
+    for(const move of moves){
+      const value=withMove(move,player,()=>search(3-player,depth-1,alpha,beta));
+      if(player===2){best=Math.max(best,value);alpha=Math.max(alpha,best);}else{best=Math.min(best,value);beta=Math.min(beta,best);}
+      if(beta<=alpha)break;
+    }
+    return best;
   }
   function finish(){
     if(ended)return;ended=true;locked=true;const c=countDiscs(),draw=c.black===c.white,won=c.black>c.white,score=won?600+(c.black-c.white)*30:0;
