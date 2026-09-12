@@ -1531,6 +1531,7 @@ function addScore(n, gameId, won=false) {
   const raw = Math.max(0, Number(n) || 0);
   if (raw <= 0 && !won) return 0;
   const reward = DIRECT_POINT_GAMES.has(gameId) ? raw : gamePointReward(raw, won);
+  if(resultSession?.gameId===gameId)resultSession.points+=reward;
   saveData.totalScore += reward;
   normalizeSave(); saveData.daily.score += reward;
   if (gameId && raw > (saveData.highscores[gameId] || 0)) { saveData.highscores[gameId] = raw; }
@@ -1540,6 +1541,27 @@ function addScore(n, gameId, won=false) {
   return reward;
 }
 
+let resultSession=null;
+let resultTimer=null;
+function presentGameResult(gameId,score,won){
+  const session=resultSession;
+  if(!session||session.gameId!==gameId||(gameId==='monster'&&won))return;
+  clearTimeout(resultTimer);
+  resultTimer=setTimeout(()=>{
+    if(resultSession!==session||!document.body.classList.contains('playing-game'))return;
+    const betting=DIRECT_POINT_GAMES.has(gameId),game=GAME_DEFS.find(g=>g.id===gameId);
+    document.getElementById('unified-result')?.remove();
+    const panel=document.createElement('section');panel.id='unified-result';panel.className='result-box';
+    panel.style.cssText='max-width:640px;margin:24px auto;padding:24px;';
+    const net=saveData.totalScore-session.wallet;
+    const achievements=saveData.achievements.filter(id=>!session.achievements.includes(id)).length;
+    const missions=saveData.daily.claimed.filter(id=>!session.missions.includes(id)).length;
+    panel.innerHTML=`<p>${escapeHtml(game?.title||gameId)}</p><h2 tabindex="-1">${betting?'今回の結果':won?'🎉 プレイ完了！':'プレイ終了'}</h2><p>${betting?'今回の収支':'今回のスコア'}</p><div class="result-score">${betting?(net>=0?'+':'')+net.toLocaleString()+'pt':Number(score).toLocaleString()}</div>${betting?'':`<p>${score>session.best?'🏆 自己ベスト更新！':'自己ベスト '+session.best.toLocaleString()}${score>session.best&&session.best>0?'（前回 '+session.best.toLocaleString()+'）':''}</p>`}<div class="profile-stats" style="margin-top:20px;grid-template-columns:1fr 1fr"><div class="profile-stat"><strong>+${session.points.toLocaleString()}pt</strong><span>${betting?'払戻し':'ゲーム報酬'}</span></div><div class="profile-stat"><strong>+${session.xp.toLocaleString()} XP</strong><span>獲得経験値</span></div></div>${achievements||missions?`<p>🏅 実績 ${achievements}件 ／ 📅 デイリー ${missions}件 達成</p>`:''}<div class="modal-btns"><button class="btn" onclick="startGame('${gameId}')">もう一度</button><button class="btn" style="background:var(--surface)" onclick="goHome()">ホームへ</button></div>`;
+    const screen=document.getElementById('game-screen');
+    if(betting){screen.appendChild(panel);session.wallet=saveData.totalScore;session.points=0;session.xp=0;}
+    else{screen.style.display='none';screen.after(panel);window.scrollTo({top:0});panel.querySelector('h2').focus();}
+  },400);
+}
 function recordWin(gameId, score) {
   playSfx('win');
   normalizeSave();
@@ -1550,13 +1572,15 @@ function recordWin(gameId, score) {
   document.getElementById('stat-wins').textContent = saveData.wins;
   const points = addScore(score, gameId, true);
   const gained = addXP(score);
+  if(resultSession?.gameId===gameId)resultSession.xp+=gained;
   recordGameResult(gameId,score,true);
   checkMetaProgress();
   if (!DIRECT_POINT_GAMES.has(gameId) && points > 0) showToast(`🎮 ゲーム報酬 +${points}pt`);
+  presentGameResult(gameId,score,true);
   return gained;
 }
 
-function recordLoss(score=0,gameId=activeGameId) { playSfx('loss'); saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress(); }
+function recordLoss(score=0,gameId=activeGameId) { playSfx('loss'); saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress();presentGameResult(gameId,score,false); }
 
 function showLvUp() {
   playSfx('level');
@@ -1671,6 +1695,7 @@ function openFeaturePage(name){
   goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
+  clearTimeout(resultTimer);resultSession=null;document.getElementById('unified-result')?.remove();
   document.body.classList.remove('playing-game');
   setTaskbarActive('home');
   document.getElementById('home').style.display = 'block';
@@ -1695,6 +1720,8 @@ function goHome() {
   renderHome();
 }
 function startGame(name) {
+  clearTimeout(resultTimer);document.getElementById('unified-result')?.remove();
+  resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed]};
   playSfx('start');
   if(sound.auto&&bgm.current<0)bgmPlay(0);
   if(name==='trivia'||name==='animequiz')name='quiz';
@@ -2944,7 +2971,7 @@ games.slide = function(el) {
       if(JSON.stringify(nb)!==JSON.stringify(board))moved=true; board=nb;
     }
     if(moved){addRandom();render();}
-    if(board.includes(2048)){ended=true;gameDelay(()=>{recordWin('slide',score);alert('🎉 2048達成！ スコア '+score);startGame('slide');},100);return;}
+    if(board.includes(2048)){ended=true;recordWin('slide',score);return;}
     const canMove=board.includes(0)||board.some((v,i)=>(i%4<3&&v===board[i+1])||(i<12&&v===board[i+4]));
     if(!canMove){ended=true;addScore(score,'slide');recordLoss(score,'slide');el.insertAdjacentHTML('beforeend',`<div class="result-box"><div class="result-score">${score}</div><p>動かせるマスがありません</p><button class="btn mt" onclick="startGame('slide')">もう一度</button></div>`);}
   }
