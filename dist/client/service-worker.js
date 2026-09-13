@@ -1,10 +1,11 @@
-const CACHE_NAME = 'mini-game-land-v5';
+const CACHE_NAME = 'mini-game-land-v6';
 const APP_SHELL = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  '/audio/ten-coins-left.mp3'
 ];
 
 self.addEventListener('install', (event) => {

@@ -842,13 +842,17 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 // ================================================================
 const bgm = {
   audio: null,
-  tracks: [{name:'ピクセル・パレード',builtin:0},{name:'星空チル',builtin:1}],
+  tracks: [
+    {name:'Ten Coins Left',url:'/audio/ten-coins-left.mp3'},
+    {name:'ピクセル・パレード',builtin:0},
+    {name:'星空チル',builtin:1}
+  ],
   current: -1,
   vol: 0.5,
   loop: true,
 };
 
-// Original melodies, synthesized locally; no downloads or external audio service.
+// The default MP3 is bundled with the app. The other tracks are synthesized locally.
 const sound = { ctx:null, volume:0.35, auto:true };
 try { const saved=JSON.parse(localStorage.getItem('mini-game-sound')||'{}');
   if(Number.isFinite(saved.volume))sound.volume=Math.max(0,Math.min(1,saved.volume));
