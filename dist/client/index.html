@@ -213,7 +213,6 @@ body.playing-game #lvup-toast { bottom:calc(8px + env(safe-area-inset-bottom)); 
 /* Avoid accidental long-press selection on game controls while keeping text entry and copying available. */
 #game-screen, #game-screen *, button, button *, .game-card, .game-card *, .app-taskbar, #lvup-toast { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 input, textarea, [contenteditable="true"], #game-screen input, #game-screen textarea, #game-screen [contenteditable="true"] { -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
-.cloud-save-code { -webkit-user-select:all; user-select:all; -webkit-touch-callout:default; }
 
 /* BUTTONS */
 .btn { background: var(--accent4); color: #fff; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 11px 26px; min-height: 42px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.15s, transform 0.1s, filter .15s, box-shadow .15s; box-shadow: 0 5px 12px rgba(0,0,0,.18); }
@@ -563,10 +562,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .modal-textarea { width: 100%; height: 120px; background: var(--surface2); border: 2px solid var(--surface2); border-radius: var(--radius); color: var(--text); font-family: monospace; font-size: 12px; padding: 10px; resize: none; outline: none; }
 .modal-textarea:focus { border-color: var(--accent4); }
 .modal-btns { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-.cloud-save-panel { background:linear-gradient(135deg,rgba(77,150,255,.14),rgba(199,125,255,.12)); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:14px; }
-.cloud-save-code { display:block; margin:9px 0; padding:10px; border:1px dashed var(--accent4); border-radius:10px; background:var(--bg); color:var(--accent2); font:900 clamp(15px,4vw,20px)/1.3 monospace; letter-spacing:1px; text-align:center; user-select:all; }
-.cloud-save-input { width:100%; margin:8px 0; text-transform:uppercase; font-family:monospace; letter-spacing:1px; }
-.cloud-save-status { min-height:17px; margin-top:8px; color:var(--text2); font-size:10px; line-height:1.5; }
 .manual-backup-label { display:block; color:var(--text2); font-size:11px; font-weight:800; margin:4px 0 7px; }
 
 /* BGM PANEL */
@@ -755,22 +750,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   </div>
 </div>
 
-<!-- SAVE MODAL -->
-<div id="save-modal">
-  <div class="modal-box">
-    <h3 id="modal-title">💾 セーブデータ</h3>
-    <p id="modal-desc" style="color:var(--text2);font-size:13px;margin-bottom:12px"></p>
-    <div id="cloud-save-panel" class="cloud-save-panel"></div>
-    <label class="manual-backup-label" for="modal-ta">予備：コピー／ファイルによる手動バックアップ</label>
-    <textarea class="modal-textarea" id="modal-ta" readonly></textarea>
-    <div class="modal-btns">
-      <button class="btn btn-success" id="modal-copy-btn">コピー</button>
-      <button class="btn btn-warn" id="modal-action-btn"></button>
-      <button class="btn btn-sm" style="background:var(--surface2)" onclick="closeModal()">閉じる</button>
-    </div>
-  </div>
-</div>
-
 <div id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" onclick="if(event.target===this)closeProfile()" onkeydown="handleProfileKey(event)">
   <div class="modal-box" style="max-width:500px">
     <div class="profile-dialog-header"><h3 id="profile-modal-title">👤 プレイヤープロフィール</h3><button class="profile-dialog-close" id="profile-top-close" aria-label="プロフィールを閉じる" onclick="closeProfile()">×</button></div>
@@ -875,8 +854,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
     <button class="menu-card" onclick="openProfile()"><span class="menu-card-icon">👤</span><span><strong>プロフィール</strong><small>名前・アイコン・プレイヤーカード</small></span></button>
     <button class="menu-card" onclick="openRules()"><span class="menu-card-icon">📖</span><span><strong>ゲームの遊び方</strong><small>目的・操作・クリア条件を検索</small></span></button>
     <button class="menu-card" id="bgm-btn" onclick="openBgm()"><span class="menu-card-icon">🎵</span><span><strong>BGM</strong><small>効果音・内蔵BGM・音量の設定</small></span></button>
-    <button class="menu-card" onclick="openSave()"><span class="menu-card-icon">☁️</span><span><strong>セーブ</strong><small>クラウド保存とバックアップ</small></span></button>
-    <button class="menu-card" onclick="openLoad()"><span class="menu-card-icon">📥</span><span><strong>データ復元</strong><small>別の端末へプレイデータを引き継ぐ</small></span></button>
     <button class="menu-card tb-install-btn" id="install-btn" type="button"><span class="menu-card-icon">📲</span><span><strong>アプリをインストール</strong><small>ホーム画面からすぐ遊べるようにする</small></span></button>
   </div>
 </section>
@@ -1149,7 +1126,7 @@ function renderRules(query=''){
   const list=GAME_DEFS.filter(g=>`${g.title} ${g.tag} ${g.desc} ${Object.values(GAME_RULES[g.id]||{}).join(' ')}`.toLocaleLowerCase('ja').includes(q));
   grid.innerHTML=list.length?list.map(g=>{const r=GAME_RULES[g.id]||{goal:g.desc,controls:'画面の案内に従って操作します。',score:'結果画面で確認できます。'};return `<article class="rule-card" id="rule-${g.id}"><div class="rule-card-head"><span class="rule-card-icon">${g.icon}</span><div><h3>${escapeHtml(g.title)}</h3><div class="rule-tag">${escapeHtml(g.tag)}</div></div></div><div class="rule-section"><strong>目的：</strong>${escapeHtml(r.goal)}</div><div class="rule-section"><strong>操作：</strong>${escapeHtml(r.controls)}</div><div class="rule-section"><strong>勝敗・得点：</strong>${escapeHtml(r.score)}</div><button class="btn btn-sm mt" onclick="closeRules();startGame('${g.id}')">このゲームを遊ぶ</button></article>`;}).join(''):'<div class="rules-empty">該当するゲームがありません</div>';
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRules();closeProfile();closeModal();closeBgm();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRules();closeProfile();closeBgm();}});
 // === ここから差し替え ===(gemini2回目)
 const BASE_NAMES = ['ビギナー', 'アマチュア', 'プレイヤー', 'にゃんこ', 'プロ', 'マスター', 'グランドマスター', 'レジェンド', '神', 'ゲーム神'];
 // 11〜99レベル用の接頭辞（10レベルごとに切り替わる）
@@ -1284,17 +1261,11 @@ let saveData = {
   gameStats:{}, achievements:[], ownedThemes:['default'], ownedAvatars:[...FREE_AVATARS], activeTheme:'default',
   daily:{date:'',plays:0,wins:0,score:0,claimed:[]},
   profile:{id:'',username:'プレイヤー',avatar:'🎮',createdAt:'',onboardingComplete:false}, scoreHistory:[], activeChallenge:null, challengeClears:0, favoriteGames:[],
-  gachaInventory:[],gachaMedals:0,gachaDraws:0,gachaFreeUsed:false,ownedBgm:[],bgmGachaDraws:0,activeFrame:'',activeTitle:'',cloudCode:''
+  gachaInventory:[],gachaMedals:0,gachaDraws:0,gachaFreeUsed:false,ownedBgm:[],bgmGachaDraws:0,activeFrame:'',activeTitle:''
 };
 
 function localDateKey(){
   const d=new Date(); return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-}
-function normalizeCloudCode(value){return String(value||'').toUpperCase().replace(/[^A-Z2-9]/g,'').slice(0,20);}
-function formatCloudCode(value){return normalizeCloudCode(value).replace(/(.{4})(?=.)/g,'$1-');}
-function generateCloudCode(){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',bytes=new Uint8Array(20);crypto.getRandomValues(bytes);
-  return Array.from(bytes,b=>chars[b%chars.length]).join('');
 }
 function normalizeSave(){
   saveData.level=Math.max(1,Math.min(MAX_LEVEL,Math.floor(Number(saveData.level)||1)));
@@ -1318,7 +1289,7 @@ function normalizeSave(){
   saveData.gachaFreeUsed=!!saveData.gachaFreeUsed;
   saveData.ownedBgm=Array.isArray(saveData.ownedBgm)?[...new Set(saveData.ownedBgm)].filter(id=>BGM_GACHA_ITEMS.some(item=>item.id===id)):[];
   saveData.bgmGachaDraws=Math.max(0,Math.floor(Number(saveData.bgmGachaDraws)||0));
-  saveData.cloudCode=normalizeCloudCode(saveData.cloudCode||'');if(saveData.cloudCode.length!==20)saveData.cloudCode='';
+  delete saveData.cloudCode;
   if(!saveData.gachaInventory.includes(saveData.activeFrame))saveData.activeFrame='';
   if(!saveData.gachaInventory.includes(saveData.activeTitle))saveData.activeTitle='';
   saveData.profile=saveData.profile||{};
@@ -1455,9 +1426,9 @@ function buyTheme(id){
 }
 function buyAvatar(icon){
   const item=AVATAR_ITEMS.find(a=>a.icon===icon);if(!item)return;
-  if(saveData.ownedAvatars.includes(icon)){saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();syncOnlineProfile();updateUI();renderShopPage();showToast(`${icon} ${item.name}を設定しました`,'#6bcb77');return;}
+  if(saveData.ownedAvatars.includes(icon)){saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();updateUI();renderShopPage();syncOnlineProfile().then(()=>renderLocalRanking(rankingGame));showToast(`${icon} ${item.name}を設定しました`,'#6bcb77');return;}
   if(saveData.totalScore<item.price){showToast('ポイントが足りません','#ff6b6b');return;}
-  saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();syncOnlineProfile();updateUI();renderShopPage();showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
+  saveData.totalScore-=item.price;saveData.ownedAvatars.push(icon);saveData.profile.avatar=icon;selectedProfileAvatar=icon;persistSave();checkMetaProgress();updateUI();renderShopPage();syncOnlineProfile().then(()=>renderLocalRanking(rankingGame));showToast(`${icon} ${item.name}を購入！`,'#ffd93d');
 }
 function rollGachaRarity(rPlusOnly=false){
   const entries=Object.entries(GACHA_RATES).filter(([rarity])=>!rPlusOnly||rarity!=='N');
@@ -1497,7 +1468,7 @@ function equipGachaItem(id){
   if(item.type==='title')saveData.activeTitle=id;
   if(item.type==='theme'){saveData.activeTheme=item.themeId;applyTheme();}
   if(item.type==='bundle'){saveData.profile.avatar=item.avatar;selectedProfileAvatar=item.avatar;saveData.activeFrame=id;saveData.activeTitle=id;saveData.activeTheme=item.themeId;applyTheme();}
-  persistSave();updateUI();syncOnlineProfile();renderShopPage();showToast(`${item.icon} ${item.name}を使用中`,'#6bcb77');
+  persistSave();updateUI();renderShopPage();syncOnlineProfile().then(()=>renderLocalRanking(rankingGame));showToast(`${item.icon} ${item.name}を使用中`,'#6bcb77');
 }
 function exchangeGachaItem(id){
   normalizeSave();const item=GACHA_ITEMS.find(x=>x.id===id),cost=item&&GACHA_EXCHANGE_COST[item.rarity];
@@ -1586,7 +1557,6 @@ function loadSave() {
 }
 function persistSave() {
   try { localStorage.setItem('minigameland_save', JSON.stringify(saveData)); } catch(e) {}
-  scheduleCloudSave();
 }
 
 function updateUI() {
@@ -1855,83 +1825,6 @@ function xpResultHtml(score, gameId) {
   return `<div class="xp-gain">+${xp} XP${bonusTxt}</div>`;
 }
 // === ここまで差し替え ===(gemini)
-
-// SAVE/LOAD MODAL
-let cloudSaveTimer=0,cloudSaveBusy=false,lastCloudSavedAt='';
-function applyLoadedSave(data){
-  if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Invalid save data');
-  Object.keys(saveData).forEach(key=>{if(Object.prototype.hasOwnProperty.call(data,key))saveData[key]=data[key];});
-}
-function scheduleCloudSave(){
-  clearTimeout(cloudSaveTimer);
-  if(!saveData.cloudCode||!saveData.profile?.onboardingComplete)return;
-  cloudSaveTimer=setTimeout(()=>cloudSaveNow(false),6000);
-}
-async function cloudSaveNow(showFeedback=true){
-  if(cloudSaveBusy||!saveData.cloudCode)return false;
-  clearTimeout(cloudSaveTimer);cloudSaveBusy=true;
-  const status=document.getElementById('cloud-save-status');if(status)status.textContent='クラウドへ保存中…';
-  try{
-    const cloudData={...saveData,cloudCode:''};
-    const response=await fetch('/api/cloud-save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:saveData.cloudCode,saveData:cloudData})});
-    if(!response.ok)throw new Error('save failed');
-    const result=await response.json();lastCloudSavedAt=result.updatedAt||new Date().toISOString();
-    if(status)status.textContent=`✅ 保存しました（${new Date(lastCloudSavedAt).toLocaleString('ja-JP')}）`;
-    if(showFeedback)showToast('☁️ クラウドへ保存しました','#6bcb77');return true;
-  }catch(error){
-    if(status)status.textContent='⚠️ 保存できませんでした。通信を確認して再試行してください。';
-    if(showFeedback)showToast('クラウド保存に失敗しました','#ff6b6b');return false;
-  }finally{cloudSaveBusy=false;}
-}
-async function createCloudSave(){
-  if(!saveData.profile?.onboardingComplete){showToast('先にユーザーネームを設定してください','#ff6b6b');return;}
-  if(!saveData.cloudCode)saveData.cloudCode=generateCloudCode();
-  persistSave();renderCloudSavePanel('save');await cloudSaveNow(true);renderCloudSavePanel('save');
-}
-function copyCloudCode(){
-  const code=formatCloudCode(saveData.cloudCode);if(!code)return;
-  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(code).then(()=>showToast('引き継ぎコードをコピーしました','#6bcb77'));
-  else{const ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('引き継ぎコードをコピーしました','#6bcb77');}
-}
-async function restoreCloudSave(){
-  const input=document.getElementById('cloud-restore-code'),code=normalizeCloudCode(input?.value);
-  if(code.length!==20){showToast('20文字の引き継ぎコードを入力してください','#ff6b6b');return;}
-  const status=document.getElementById('cloud-save-status');if(status)status.textContent='クラウドデータを確認中…';
-  try{
-    const response=await fetch(`/api/cloud-save?code=${encodeURIComponent(code)}`,{cache:'no-store'});
-    if(response.status===404)throw new Error('not-found');if(!response.ok)throw new Error('load-failed');
-    const result=await response.json();applyLoadedSave(result.saveData);saveData.cloudCode=code;
-    normalizeSave();applyTheme();persistSave();updateUI();renderHome();syncOnlineProfile();closeModal();showToast('☁️ クラウドデータを復元しました','#6bcb77');
-  }catch(error){
-    if(status)status.textContent=error.message==='not-found'?'⚠️ このコードのデータは見つかりません。':'⚠️ 復元できませんでした。通信を確認してください。';
-  }
-}
-function renderCloudSavePanel(mode){
-  const panel=document.getElementById('cloud-save-panel');if(!panel)return;
-  if(mode==='load'){
-    panel.innerHTML=`<strong>☁️ クラウドから復元</strong><div class="meta-sub" style="margin-top:5px">別の端末で発行した20文字のコードを入力してください。</div><input id="cloud-restore-code" class="cloud-save-input" maxlength="24" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off"><button class="btn btn-success btn-sm" style="width:100%" onclick="restoreCloudSave()">クラウドデータを復元</button><div id="cloud-save-status" class="cloud-save-status"></div>`;
-    return;
-  }
-  if(!saveData.cloudCode){
-    panel.innerHTML=`<strong>☁️ オンライン保存</strong><div class="meta-sub" style="margin:5px 0 10px">引き継ぎコードを作ると、この端末のデータがクラウドへ保存されます。</div><button class="btn btn-success btn-sm" style="width:100%" onclick="createCloudSave()">コードを作って保存</button><div id="cloud-save-status" class="cloud-save-status">メールアドレスやパスワードは不要です。</div>`;
-    return;
-  }
-  panel.innerHTML=`<strong>☁️ オンライン保存中</strong><code class="cloud-save-code">${formatCloudCode(saveData.cloudCode)}</code><div class="modal-btns"><button class="btn btn-success btn-sm" onclick="cloudSaveNow(true)">今すぐ保存</button><button class="btn btn-purple btn-sm" onclick="copyCloudCode()">コードをコピー</button></div><div id="cloud-save-status" class="cloud-save-status">${lastCloudSavedAt?`最終保存：${new Date(lastCloudSavedAt).toLocaleString('ja-JP')}`:'変更内容は自動保存されます。'}<br>このコードを知っている人はデータを復元・上書きできます。公開しないでください。</div>`;
-}
-function openSave() {
-  const modal=document.getElementById('save-modal'),ta=document.getElementById('modal-ta');
-  document.getElementById('modal-title').textContent='☁️ セーブ';document.getElementById('modal-desc').textContent='オンライン保存または手動バックアップを利用できます。';
-  renderCloudSavePanel('save');const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(saveData))));ta.value=encoded;ta.readOnly=true;
-  document.getElementById('modal-copy-btn').style.display='inline-block';document.getElementById('modal-copy-btn').onclick=()=>{ta.select();document.execCommand('copy');showToast('手動バックアップをコピーしました','#6bcb77');};
-  document.getElementById('modal-action-btn').textContent='ファイル保存';document.getElementById('modal-action-btn').onclick=()=>{const blob=new Blob([encoded],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='minigameland_save.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};modal.classList.add('open');
-}
-function openLoad() {
-  const modal=document.getElementById('save-modal'),ta=document.getElementById('modal-ta');
-  document.getElementById('modal-title').textContent='📥 データ復元';document.getElementById('modal-desc').textContent='引き継ぎコードか、以前保存した手動バックアップを使用できます。';renderCloudSavePanel('load');
-  ta.value='';ta.readOnly=false;document.getElementById('modal-copy-btn').style.display='none';document.getElementById('modal-action-btn').textContent='手動バックアップを復元';
-  document.getElementById('modal-action-btn').onclick=()=>{try{const raw=decodeURIComponent(escape(atob(ta.value.trim()))),data=JSON.parse(raw);applyLoadedSave(data);normalizeSave();applyTheme();persistSave();updateUI();renderHome();syncOnlineProfile();closeModal();showToast('手動バックアップを復元しました','#6bcb77');}catch(e){showToast('データが正しくありません','#ff6b6b');}};modal.classList.add('open');
-}
-function closeModal() { document.getElementById('save-modal').classList.remove('open'); }
 
 // NAVIGATION
 const gameTimeouts=new Set();
