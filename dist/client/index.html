@@ -574,6 +574,18 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .tb-bgm-btn { background: var(--surface2); color: var(--text); border: none; border-radius: 999px; padding: 6px 14px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .tb-bgm-btn:hover { background: #333; }
 .tb-bgm-btn.playing { background: var(--accent3); color: #111; }
+.home-view-bar { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; padding:6px; margin-bottom:28px; background:var(--surface); border:1px solid var(--border); border-radius:16px; }
+.home-view-bar button { min-height:52px; padding:10px 8px; border:0; border-radius:11px; background:transparent; color:var(--text2); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+.home-view-bar button:hover { background:var(--surface2); }
+.home-view-bar button[aria-selected="true"] { background:var(--accent4); color:#fff; }
+.home-view-panel[hidden], #home-simple[hidden] { display:none; }
+.home-view-title { font-size:20px; margin-bottom:18px; }
+#library-page > .page-content { max-width:none; padding:0; background:transparent; border:0; box-shadow:none; }
+.random-home { padding:40px 20px; text-align:center; background:var(--surface); border:1px solid var(--border); border-radius:20px; }
+.random-home-icon { display:block; font-size:56px; margin-bottom:20px; }
+.random-home h2 { font-size:24px; }
+.random-home p { color:var(--text2); line-height:1.8; margin:16px 0 28px; }
+@media (max-width:520px) { .home-view-bar { gap:3px; padding:4px; } .home-view-bar button { font-size:13px; padding:10px 4px; } }
 /* Readable browsing: fewer competing details, larger type and calmer surfaces. */
 :root { --text2:#bec0d0; }
 #home { max-width:1100px; margin:0 auto; padding:28px 24px; }
@@ -728,16 +740,26 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
       <div class="stat-card"><div class="s-val" id="stat-total">0</div><div class="s-label">総得点</div></div>
     </div>
   </div>
-  <div class="flex-center" style="flex-wrap:wrap;margin-bottom:24px"><button class="btn" onclick="openGameLibrary()">🎮 すべてのゲーム</button><button class="btn btn-warn" onclick="playRandomGame()">🎲 ランダムで遊ぶ</button></div>
+  <div class="home-view-bar" role="tablist" aria-label="ホームの表示" onkeydown="handleHomeTabKey(event)">
+    <button id="home-tab-simple" role="tab" aria-selected="true" aria-controls="home-simple" data-home-view="simple" onclick="setHomeView('simple')">簡易型</button>
+    <button id="home-tab-all" role="tab" aria-selected="false" aria-controls="library-page" tabindex="-1" data-home-view="all" onclick="setHomeView('all')">すべてのゲーム</button>
+    <button id="home-tab-random" role="tab" aria-selected="false" aria-controls="home-random" tabindex="-1" data-home-view="random" onclick="setHomeView('random')">ランダムで遊ぶ</button>
+  </div>
+  <div id="home-simple" role="tabpanel" aria-labelledby="home-tab-simple">
   <section aria-labelledby="recent-games-title"><h2 id="recent-games-title" style="font-size:20px;margin-bottom:14px">まずはこの4本</h2><div class="games-grid" id="recent-games-grid"></div></section>
   <section aria-labelledby="favorite-games-title" style="margin-top:28px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px"><h2 id="favorite-games-title" style="font-size:20px">★ お気に入り</h2><button class="filter-chip" onclick="openGameLibrary(true)">お気に入りをすべて見る</button></div><div class="games-grid" id="favorite-games-grid"></div></section>
-</div>
-
-<section id="library-page" class="app-page" aria-labelledby="library-title">
-  <div class="page-hero"><h2 id="library-title">🎮 すべてのゲーム</h2><p>名前やジャンルで探して、気に入ったゲームは★で登録。</p></div>
+  </div>
+<section id="library-page" class="home-view-panel" role="tabpanel" aria-labelledby="home-tab-all" hidden>
+  <h2 class="home-view-title">すべてのゲーム</h2>
   <div class="page-content"><div class="game-browser"><div class="game-browser-top"><input id="game-search" class="game-search" type="search" aria-label="ゲームを検索" placeholder="ゲームを検索…" oninput="setGameSearch(this.value)"><button class="filter-chip" id="favorite-filter" onclick="toggleFavoriteFilter()">☆ お気に入り</button></div><div class="game-filter-row" id="game-filters"></div></div><div class="games-grid" id="games-grid"></div></div>
 </section>
-
+<section id="home-random" class="home-view-panel random-home" role="tabpanel" aria-labelledby="home-tab-random" hidden>
+  <span class="random-home-icon" aria-hidden="true">🎲</span>
+  <h2>何を遊ぶか、おまかせ！</h2>
+  <p>すべてのゲームからランダムに1本選んでスタートします。</p>
+  <button class="btn" onclick="playRandomGame()">ランダムでゲームをはじめる</button>
+</section>
+</div>
 <section id="daily-page" class="app-page" aria-labelledby="daily-title">
   <div class="page-hero"><h2 id="daily-title">📅 デイリーミッション</h2><p>毎日の目標を確認して、ゲーム内ポイントを獲得しよう。</p></div>
   <div class="page-content" id="hub-daily"><div class="privacy-note" style="margin-bottom:12px">💡 ログイン50pt＋ミッション350pt＋ゲーム報酬で、毎日ガチャ1回分（500pt）が目安です。ゲームの記録はスコア、買い物に使う通貨はポイントとして別々に計算されます。</div><div id="daily-missions"></div></div>
@@ -1524,13 +1546,28 @@ function renderHomeGames(){
   renderGameGrid('recent-games-grid',recent.length?recent:['memory','quiz','pinball','slide'].map(id=>GAME_DEFS.find(g=>g.id===id)).filter(Boolean));
   renderGameGrid('favorite-games-grid',saveData.favoriteGames.map(id=>GAME_DEFS.find(g=>g.id===id)).filter(Boolean).slice(0,6));
 }
+let homeView='simple';
+function setHomeView(view){
+  if(!['simple','all','random'].includes(view))return;
+  homeView=view;
+  document.querySelectorAll('[data-home-view]').forEach(tab=>{
+    const selected=tab.dataset.homeView===view;
+    tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;
+  });
+  for(const [mode,id] of [['simple','home-simple'],['all','library-page'],['random','home-random']])document.getElementById(id).hidden=mode!==view;
+  if(view==='all')renderGameGrid();
+}
+function handleHomeTabKey(event){
+  const modes=['simple','all','random'];
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const index=modes.indexOf(homeView);
+  const next=event.key==='Home'?0:event.key==='End'?2:(index+(event.key==='ArrowRight'?1:2))%3;
+  setHomeView(modes[next]);document.getElementById(`home-tab-${modes[next]}`).focus();
+}
 function openGameLibrary(onlyFavorites=false){
-  goHome();favoriteOnly=onlyFavorites;gameSearchText='';gameTagFilter='すべて';
-  document.getElementById('game-search').value='';
-  document.getElementById('home').style.display='none';
-  document.getElementById('library-page').style.display='block';
-  document.getElementById('back-btn').style.display='inline-block';
-  setTaskbarActive('');renderGameGrid();window.scrollTo({top:0,behavior:'smooth'});
+  favoriteOnly=onlyFavorites;gameSearchText='';gameTagFilter='すべて';
+  goHome();setHomeView('all');window.scrollTo({top:0,behavior:'smooth'});
 }
 function playRandomGame(){startGame(GAME_DEFS[Math.floor(Math.random()*GAME_DEFS.length)].id);}
 function setGameSearch(value){gameSearchText=value;renderGameGrid();}
@@ -1541,6 +1578,7 @@ function toggleFavorite(gameId){
   persistSave();renderGameGrid();renderHomeGames();showToast(i>=0?'お気に入りから外しました':'お気に入りに追加しました',i>=0?'#a7a9be':'#ffd93d');
 }
 function renderHome() {
+  setHomeView(homeView);
   const search=document.getElementById('game-search');if(search)search.value=gameSearchText;
   renderGameGrid();
   renderHomeGames();

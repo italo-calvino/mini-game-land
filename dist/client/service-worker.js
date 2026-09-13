@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mini-game-land-v3';
+const CACHE_NAME = 'mini-game-land-v4';
 const APP_SHELL = [
   '/',
   '/index.html',
