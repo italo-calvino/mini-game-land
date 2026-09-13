@@ -619,6 +619,38 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .game-browser { padding:18px; margin-bottom:24px; }
 .game-search { font-size:16px; min-height:44px; }
 .game-filter-row { gap:8px; margin-top:14px; }
+.app-booting { overflow:hidden; }
+#splash-screen {
+  position:fixed; inset:0; z-index:3000; display:grid; place-items:center;
+  min-height:100dvh; padding:24px; overflow:auto;
+  background:
+    radial-gradient(circle at 20% 15%,rgba(124,92,255,.35),transparent 32%),
+    radial-gradient(circle at 85% 80%,rgba(0,207,255,.22),transparent 34%),
+    #070713;
+  transition:opacity .42s ease,visibility .42s ease;
+}
+#splash-screen.dismissed { opacity:0; visibility:hidden; pointer-events:none; }
+.splash-card { width:min(520px,100%); text-align:center; }
+.splash-logo {
+  display:grid; place-items:center; width:112px; height:112px; margin:0 auto 24px;
+  border:1px solid rgba(255,255,255,.18); border-radius:32px; font-size:58px;
+  background:linear-gradient(145deg,rgba(124,92,255,.85),rgba(190,28,180,.8));
+  box-shadow:0 24px 70px rgba(87,51,220,.4),inset 0 1px rgba(255,255,255,.28);
+  transform:rotate(-3deg);
+}
+.splash-eyebrow { color:#83ddff; font-size:13px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
+.splash-card h1 { margin:9px 0 10px; font-size:clamp(34px,8vw,54px); line-height:1.08; letter-spacing:-.04em; }
+.splash-card h1 span { color:#61d9ff; }
+.splash-copy { margin:0 auto 28px; color:var(--text2); font-size:15px; line-height:1.8; }
+.splash-start {
+  width:min(360px,100%); min-height:62px; border:0; border-radius:20px; color:#fff;
+  background:linear-gradient(100deg,#6557ef,#c019b2); font:inherit; font-size:18px; font-weight:900;
+  box-shadow:0 16px 44px rgba(132,55,225,.36); cursor:pointer;
+  transition:transform .16s ease,filter .16s ease;
+}
+.splash-start:hover { filter:brightness(1.1); transform:translateY(-2px); }
+.splash-start:active { transform:translateY(1px) scale(.99); }
+.splash-music { margin-top:15px; color:#aaa8c3; font-size:12px; }
 .filter-chip { min-height:44px; padding:10px 14px; font-size:13px; }
 .page-hero { background:var(--surface); }
 .page-hero p, .menu-card small, .shop-card p { font-size:14px; line-height:1.7; }
@@ -653,7 +685,18 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 }
 </style>
 </head>
-<body>
+<body class="app-booting">
+
+<div id="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title">
+  <div class="splash-card">
+    <div class="splash-logo" aria-hidden="true">🎮</div>
+    <div class="splash-eyebrow">Welcome to</div>
+    <h1 id="splash-title">ミニゲーム<span>ランド</span></h1>
+    <p class="splash-copy">遊んで、集めて、ランキングに挑戦しよう。</p>
+    <button class="splash-start" id="splash-start" type="button" onclick="enterGameLand()">ゲームをはじめる</button>
+    <p class="splash-music">🎵 Ten Coins Left が流れます</p>
+  </div>
+</div>
 
 <div id="topbar">
   <button class="back-btn" id="back-btn" onclick="goHome()">← ホームへ</button>
@@ -941,13 +984,14 @@ function bgmRenderTracks() {
   } else {
     nowPanel.style.display = 'none';
   }
-  // topbar button
+  // BGM menu card: keep its icon and description intact while updating the title.
   const btn = document.getElementById('bgm-btn');
+  const btnLabel = btn?.querySelector('strong');
   if (bgm.audio && !bgm.audio.paused) {
-    btn.textContent = '🎵 BGM ▶';
+    if(btnLabel)btnLabel.textContent = 'BGM ▶ 再生中';
     btn.classList.add('playing');
   } else {
-    btn.textContent = '🎵 BGM';
+    if(btnLabel)btnLabel.textContent = 'BGM';
     btn.classList.remove('playing');
   }
 }
@@ -967,6 +1011,19 @@ function bgmPlay(idx) {
     if (!bgm.loop) bgmNext();
   });
   bgmRenderTracks();
+}
+
+let appEntered=false;
+function enterGameLand() {
+  if(appEntered)return;
+  appEntered=true;
+  startupSoundPlayed=true;
+  bgmPlay(0);
+  const splash=document.getElementById('splash-screen');
+  splash?.classList.add('dismissed');
+  document.body.classList.remove('app-booting');
+  splash?.addEventListener('transitionend',()=>splash.remove(),{once:true});
+  if(!saveData.profile.onboardingComplete)gameDelay(()=>openProfile(true),480);
 }
 
 function bgmNext() {
@@ -6064,7 +6121,6 @@ if ('serviceWorker' in navigator) {
 
 loadSave();
 renderHome();
-if(!saveData.profile.onboardingComplete)gameDelay(()=>openProfile(true),120);
 </script>
 </body>
 </html>
