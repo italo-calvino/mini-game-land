@@ -1,5 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const html=fs.readFileSync('dist/client/index.html','utf8');
+assert.match(html,/id="bgm-modal"[^>]+onclick="if\(event\.target===this\)closeBgm\(\)"/);
+assert.match(html,/id="bgm-modal-close"[^>]+onclick="closeBgm\(\)"/);
+assert.match(html,/#bgm-modal \.modal-box \{[^}]*max-height:[^}]*overflow-y:auto/);
 const source=html.slice(html.indexOf('const bgm = {'),html.indexOf('const DIRECT_POINT_GAMES'));
 let blob,plays=0,splashDismissed=false,splashRemoved=false;const listeners={};const nodes=new Proxy({}, {get:(o,k)=>o[k]??=( {value:0,checked:false,style:{},classList:{add(v){if(k==='splash-screen'&&v==='dismissed')splashDismissed=true;},remove(){}},addEventListener(event,fn){if(event==='transitionend')fn();},remove(){if(k==='splash-screen')splashRemoved=true;},focus(){},querySelector(){return {};}})});
 const ctx={localStorage:{getItem:()=>null,setItem(){}},document:{hidden:false,body:{classList:{remove(){}}},addEventListener:(k,v)=>listeners[k]=v,getElementById:k=>nodes[k]},URL:{createObjectURL:b=>(blob=b,'blob:test'),revokeObjectURL(){}},Blob,DataView,ArrayBuffer,Math,Number,JSON,window:{},setTimeout:f=>f(),escapeHtml:s=>s,showToast(){},saveData:{profile:{onboardingComplete:true}},gameDelay:f=>f(),openProfile(){},Audio:class{constructor(src){this.src=src;this.paused=true;this.events={};}addEventListener(k,v){this.events[k]=v;}play(){this.paused=false;plays++;this.events.play?.();return Promise.resolve();}pause(){this.paused=true;this.events.pause?.();}}};

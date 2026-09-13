@@ -570,8 +570,11 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .manual-backup-label { display:block; color:var(--text2); font-size:11px; font-weight:800; margin:4px 0 7px; }
 
 /* BGM PANEL */
-#bgm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; }
+#bgm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; padding:16px; }
 #bgm-modal.open { display: flex; }
+#bgm-modal .modal-box { position:relative; max-height:calc(100dvh - 32px); overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; }
+.bgm-modal-close { position:sticky; top:0; z-index:3; float:right; width:42px; height:42px; display:grid; place-items:center; margin:-12px -12px 4px 10px; border:1px solid var(--border); border-radius:50%; background:var(--surface2); color:var(--text); font-size:25px; line-height:1; cursor:pointer; box-shadow:0 5px 18px rgba(0,0,0,.3); }
+.bgm-modal-close:hover { background:var(--accent1); }
 .bgm-track { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
 .bgm-track:hover { border-color: var(--accent4); }
 .bgm-track.active { border-color: var(--accent3); background: #1a3a2a; }
@@ -713,9 +716,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 <div id="lvup-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <!-- BGM MODAL -->
-<div id="bgm-modal">
+<div id="bgm-modal" role="dialog" aria-modal="true" aria-labelledby="bgm-modal-title" onclick="if(event.target===this)closeBgm()" onkeydown="if(event.key==='Escape')closeBgm()">
   <div class="modal-box" style="max-width:520px">
-    <h3>🎵 サウンド設定</h3>
+    <button class="bgm-modal-close" id="bgm-modal-close" type="button" aria-label="サウンド設定を閉じる" onclick="closeBgm()">×</button>
+    <h3 id="bgm-modal-title">🎵 サウンド設定</h3>
     <label style="display:block;margin:14px 0">効果音の音量（0でミュート）
       <input aria-label="効果音の音量" class="bgm-vol" id="sfx-vol" type="range" min="0" max="1" step="0.05" oninput="sound.volume=Number(this.value);saveSound()" onchange="playSfx()">
     </label>
@@ -973,6 +977,7 @@ function openBgm() {
   document.getElementById('sound-auto').checked=sound.auto;
   document.getElementById('bgm-modal').classList.add('open');
   bgmRenderTracks();
+  gameDelay(()=>document.getElementById('bgm-modal-close')?.focus(),50);
 }
 function closeBgm() {
   document.getElementById('bgm-modal').classList.remove('open');
