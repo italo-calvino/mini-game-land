@@ -761,13 +761,15 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 </section>
 </div>
 <section id="daily-page" class="app-page" aria-labelledby="daily-title">
-  <div class="page-hero"><h2 id="daily-title">📅 デイリーミッション</h2><p>毎日の目標を確認して、ゲーム内ポイントを獲得しよう。</p></div>
+  <div class="page-hero"><h2 id="daily-title">🎯 ミッション</h2><p>毎日の目標、ランダム挑戦、実績をここで確認できます。</p></div>
+  <div class="home-view-bar" aria-label="ミッションの種類">
+    <button data-mission-tab="daily" aria-pressed="true" onclick="setMissionView('daily')">📅 デイリー</button>
+    <button data-mission-tab="challenge" aria-pressed="false" onclick="setMissionView('challenge')">🎲 挑戦</button>
+    <button data-mission-tab="achievements" aria-pressed="false" onclick="setMissionView('achievements')">🏅 実績</button>
+  </div>
   <div class="page-content" id="hub-daily"><div class="privacy-note" style="margin-bottom:12px">💡 ログイン50pt＋ミッション350pt＋ゲーム報酬で、毎日ガチャ1回分（500pt）が目安です。ゲームの記録はスコア、買い物に使う通貨はポイントとして別々に計算されます。</div><div id="daily-missions"></div></div>
-</section>
-
-<section id="achievements-page" class="app-page" aria-labelledby="achievements-title">
-  <div class="page-hero"><h2 id="achievements-title">🏅 実績</h2><p>プレイの記録と、まだ達成していない目標を一覧で確認できます。</p></div>
-  <div class="page-content" id="hub-achievements"><div class="meta-sub" id="achievement-count" style="margin-bottom:12px">0/0</div><div id="achievement-list" class="achievement-list"></div></div>
+  <div class="page-content" id="hub-challenge" hidden><h3>ランダム挑戦</h3><div id="random-challenge"></div></div>
+  <div class="page-content" id="hub-achievements" hidden><h3>実績</h3><div class="meta-sub" id="achievement-count" style="margin-bottom:12px">0/0</div><div id="achievement-list" class="achievement-list"></div></div>
 </section>
 
 <section id="ranking-page" class="app-page" aria-labelledby="ranking-title">
@@ -775,10 +777,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   <div class="page-content" id="hub-ranking"><div id="local-ranking"></div></div>
 </section>
 
-<section id="challenge-page" class="app-page" aria-labelledby="challenge-title">
-  <div class="page-hero"><h2 id="challenge-title">🎲 ランダム挑戦</h2><p>ランダムに選ばれたゲームと目標を達成して、報酬を獲得しよう。</p></div>
-  <div class="page-content" id="hub-challenge"><div id="random-challenge"></div></div>
-</section>
 
 <section id="shop-page" class="app-page" aria-labelledby="shop-title">
   <div class="page-hero"><h2 id="shop-title">🛍️ ショップ</h2><p>目的に合わせて売り場を選んでください。</p><div class="privacy-note">購入に使うのはゲーム内ポイントだけです。現実のお金や決済情報は使用しません。</div></div>
@@ -808,8 +806,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   <div class="page-hero"><h2 id="more-title">☰ その他</h2><p>プロフィールや設定、記録などをまとめています。</p></div>
   <div class="menu-grid">
     <button class="menu-card" onclick="openProfile()"><span class="menu-card-icon">👤</span><span><strong>プロフィール</strong><small>名前・アイコン・プレイヤーカード</small></span></button>
-    <button class="menu-card" onclick="openFeaturePage('achievements')"><span class="menu-card-icon">🏅</span><span><strong>実績</strong><small>達成状況と獲得報酬を確認</small></span></button>
-    <button class="menu-card" onclick="openFeaturePage('challenge')"><span class="menu-card-icon">🎲</span><span><strong>ランダム挑戦</strong><small>ランダムなゲームと目標に挑戦</small></span></button>
     <button class="menu-card" onclick="openRules()"><span class="menu-card-icon">📖</span><span><strong>ゲームの遊び方</strong><small>目的・操作・クリア条件を検索</small></span></button>
     <button class="menu-card" id="bgm-btn" onclick="openBgm()"><span class="menu-card-icon">🎵</span><span><strong>BGM</strong><small>効果音・内蔵BGM・音量の設定</small></span></button>
     <button class="menu-card" onclick="openSave()"><span class="menu-card-icon">☁️</span><span><strong>セーブ</strong><small>クラウド保存とバックアップ</small></span></button>
@@ -823,7 +819,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 
 <nav class="app-taskbar" aria-label="メインメニュー">
   <button class="taskbar-item active" data-taskbar="home" onclick="goHome()"><span class="taskbar-icon">🏠</span><span class="taskbar-label">ホーム</span></button>
-  <button class="taskbar-item" data-taskbar="daily" onclick="openFeaturePage('daily')"><span class="taskbar-icon">📅</span><span class="taskbar-label">デイリー</span></button>
+  <button class="taskbar-item" data-taskbar="daily" onclick="openFeaturePage('daily')"><span class="taskbar-icon">🎯</span><span class="taskbar-label">ミッション</span></button>
   <button class="taskbar-item" data-taskbar="shop" onclick="openShop()"><span class="taskbar-icon">🛍️</span><span class="taskbar-label">ショップ</span></button>
   <button class="taskbar-item" data-taskbar="ranking" onclick="openFeaturePage('ranking')"><span class="taskbar-icon">🌐</span><span class="taskbar-label">ランキング</span></button>
   <button class="taskbar-item" data-taskbar="more" onclick="openFeaturePage('more')"><span class="taskbar-icon">☰</span><span class="taskbar-label">その他</span></button>
@@ -1793,8 +1789,19 @@ const gameTimeouts=new Set();
 function gameDelay(fn,ms){const id=setTimeout(()=>{gameTimeouts.delete(id);fn();},ms);gameTimeouts.add(id);return id;}
 function clearGameTimeouts(){gameTimeouts.forEach(clearTimeout);gameTimeouts.clear();}
 function setTaskbarActive(name){document.querySelectorAll('.taskbar-item').forEach(button=>button.classList.toggle('active',button.dataset.taskbar===name));}
+function setMissionView(name){
+  if(!['daily','challenge','achievements'].includes(name))return;
+  for(const kind of ['daily','challenge','achievements'])document.getElementById(`hub-${kind}`).hidden=kind!==name;
+  document.querySelectorAll('[data-mission-tab]').forEach(button=>{
+    const selected=button.dataset.missionTab===name;
+    button.setAttribute('aria-pressed',String(selected));
+    button.style.background=selected?'var(--accent4)':'';
+    button.style.color=selected?'#fff':'';
+  });
+}
 function openFeaturePage(name){
   if(!['daily','achievements','ranking','challenge','more'].includes(name))return;
+  if(['daily','achievements','challenge'].includes(name)){setMissionView(name);name='daily';}
   goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
