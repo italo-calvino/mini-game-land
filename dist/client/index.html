@@ -529,6 +529,12 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 #save-modal.open { display: flex; }
 #profile-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:510; align-items:center; justify-content:center; }
 #profile-modal.open { display:flex; }
+#profile-modal .modal-box { display:flex; flex-direction:column; max-height:calc(100dvh - 32px); overflow:hidden; padding:0; }
+.profile-dialog-header { display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+#profile-modal .profile-dialog-header h3 { flex:1; margin:0; font-size:18px; }
+.profile-dialog-close { flex-shrink:0; width:44px; height:44px; border:0; border-radius:12px; background:var(--surface2); color:var(--text); font-size:26px; cursor:pointer; }
+#profile-modal-content { overflow-y:auto; min-height:0; padding:20px; overscroll-behavior:contain; }
+#profile-modal .modal-btns { margin:0; padding:14px 20px; border-top:1px solid var(--border); flex-shrink:0; background:var(--surface); }
 #rules-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.78); z-index:520; align-items:center; justify-content:center; padding:18px; }
 #rules-modal.open { display:flex; }
 .rules-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); width:min(920px,100%); max-height:88vh; display:flex; flex-direction:column; box-shadow:var(--shadow); }
@@ -711,9 +717,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   </div>
 </div>
 
-<div id="profile-modal" onclick="if(event.target===this)closeProfile()">
+<div id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" onclick="if(event.target===this)closeProfile()" onkeydown="handleProfileKey(event)">
   <div class="modal-box" style="max-width:500px">
-    <h3 id="profile-modal-title">👤 プレイヤープロフィール</h3>
+    <div class="profile-dialog-header"><h3 id="profile-modal-title">👤 プレイヤープロフィール</h3><button class="profile-dialog-close" id="profile-top-close" aria-label="プロフィールを閉じる" onclick="closeProfile()">×</button></div>
     <div id="profile-modal-content"></div>
     <div class="modal-btns"><button class="btn btn-success" id="profile-save-btn" onclick="saveProfile()">保存</button><button class="btn btn-sm" id="profile-close-btn" style="background:var(--surface2)" onclick="closeProfile()">閉じる</button></div>
   </div>
@@ -1292,7 +1298,19 @@ function copyPlayerCard(){
   const text=`${saveData.profile.avatar} ${saveData.profile.username}\nLv.${saveData.level} ${getLvName(saveData.level)}\n勝利 ${saveData.wins}回 / ${saveData.totalScore.toLocaleString()}pt\n得意ゲーム: ${game?.title||'未設定'}\n#ミニゲームランド`;
   if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>showToast('プレイヤーカードをコピーしました','#6bcb77'));else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('プレイヤーカードをコピーしました','#6bcb77');}
 }
+let profileReturnFocus=null;
+function handleProfileKey(event){
+  if(event.key==='Escape'){event.stopPropagation();closeProfile();}
+  if(event.key==='Tab'){
+    const controls=[...document.getElementById('profile-modal').querySelectorAll('button,input,summary,[tabindex="0"]')].filter(el=>!el.disabled&&el.getClientRects().length);
+    const first=controls[0],last=controls.at(-1);
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+  }
+}
 function openProfile(required=false){
+  profileReturnFocus=document.activeElement;
+  document.getElementById('profile-top-close').hidden=required;
   onboardingMode=required;
   normalizeSave();selectedProfileAvatar=saveData.profile.avatar;
   const stats=Object.values(saveData.gameStats),plays=stats.reduce((n,s)=>n+(s.plays||0),0);
@@ -1313,6 +1331,7 @@ function openProfile(required=false){
     ${required?'':'<button class="btn btn-warn btn-sm" style="width:100%;margin-bottom:12px" onclick="closeProfile();openShop()">🛍️ アイコンをショップで見る</button>'}
     <div class="privacy-note">世界ランキングには、入力した名前・アイコン・ランダム生成ID・ゲーム名・得点・プレイ日時・プレイ時間が送信されます。メールアドレスや住所は収集しません。</div>`;
   document.getElementById('profile-modal').classList.add('open');
+  document.getElementById('profile-modal-content').scrollTop=0;
   gameDelay(()=>document.getElementById('profile-name')?.focus(),100);
 }
 function selectProfileAvatar(avatar){selectedProfileAvatar=avatar;document.getElementById('profile-avatar-preview').textContent=avatar;document.querySelectorAll('.avatar-option').forEach(b=>b.classList.toggle('selected',b.textContent===avatar));}
@@ -1322,7 +1341,7 @@ function saveProfile(){
   if(onboardingMode&&name==='プレイヤー'){showToast('自分のユーザーネームを入力してください', '#ff6b6b');input.focus();return;}
   saveData.profile.username=name;saveData.profile.avatar=selectedProfileAvatar;saveData.profile.onboardingComplete=true;onboardingMode=false;persistSave();updateUI();renderHome();syncOnlineProfile();closeProfile();showToast('プロフィールを保存しました', '#6bcb77');
 }
-function closeProfile(){if(onboardingMode)return;document.getElementById('profile-modal').classList.remove('open');}
+function closeProfile(){if(onboardingMode)return;document.getElementById('profile-modal').classList.remove('open');profileReturnFocus?.focus();}
 function buyTheme(id){
   const theme=THEMES[id]; if(!theme)return;
   if(saveData.ownedThemes.includes(id)){saveData.activeTheme=id;applyTheme();persistSave();renderHome();renderShopPage();return;}
