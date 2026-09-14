@@ -8,9 +8,12 @@ assert.match(html,/レベル・ポイント・アイテムなどは復元でき�
 
 assert.match(
   html,
-  /\['daily','achievements','ranking','challenge','more'\]\.includes\(name\)/,
+  /\['daily','achievements','ranking','challenge','more','collection'\]\.includes\(name\)/,
   '「その他」ページがページ切替の許可リストに含まれていること'
 );
+assert.match(html,/id="collection-page"/);
+assert.match(html,/function renderCollectionPage\(\)/);
+assert.match(html,/アイコン・称号・フレーム・BGM/);
 assert.match(
   html,
   /profileBtn\.textContent=saveData\.profile\?\.avatar\|\|'🎮'/,

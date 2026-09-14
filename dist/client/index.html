@@ -150,6 +150,15 @@ body.playing-game .app-taskbar { display:none; }
 .shop-card .theme-dots i { width:22px; height:22px; }
 .shop-card .btn { width:100%; margin-top:14px; }
 .shop-section-title { font-size:20px; margin:24px 0 12px; }
+.collection-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:18px 0; }
+.collection-summary-card { padding:16px; border:1px solid var(--border); border-radius:16px; background:var(--surface); text-align:center; }
+.collection-summary-card strong { display:block; color:var(--accent2); font-size:24px; }
+.collection-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+.collection-card { min-height:190px; display:flex; flex-direction:column; align-items:center; padding:16px; border:1px solid var(--border); border-radius:18px; background:var(--surface); text-align:center; }
+.collection-card.locked { opacity:.58; }
+.collection-card-icon { width:68px; height:68px; display:grid; place-items:center; margin-bottom:9px; border-radius:50%; background:var(--surface2); font-size:36px; }
+.collection-card.locked .collection-card-icon { filter:grayscale(1); }
+.collection-card strong { font-size:13px; }.collection-card small { color:var(--text2); font-size:10px; margin:4px 0 10px; }.collection-card .btn { width:100%; margin-top:auto; padding:6px; font-size:11px; }
 .avatar-shop-card { text-align:center; }
 .avatar-shop-icon { width:70px; height:70px; margin:0 auto 10px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,var(--surface2),var(--surface)); border:1px solid var(--border); font-size:38px; }
 .privacy-note { margin-top:12px; padding:10px; border-radius:10px; background:var(--surface2); color:var(--text2); font-size:10px; line-height:1.6; }
@@ -896,11 +905,23 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
   <div class="page-hero"><h2 id="more-title">☰ その他</h2><p>プロフィールや設定、記録などをまとめています。</p></div>
   <div class="privacy-note" role="note" style="max-width:850px;margin:0 auto 16px;font-size:12px">⚠️ ゲームデータは、この端末の現在のブラウザ内に保存されます。ブラウザの閲覧データを削除した場合や別の端末へ変更した場合、レベル・ポイント・アイテムなどは復元できません。</div>
   <div class="menu-grid">
+    <button class="menu-card" onclick="openFeaturePage('collection')"><span class="menu-card-icon">📚</span><span><strong>コレクション図鑑</strong><small>アイコン・称号・フレーム・BGM</small></span></button>
     <button class="menu-card" onclick="openProfile()"><span class="menu-card-icon">👤</span><span><strong>プロフィール</strong><small>名前・アイコン・プレイヤーカード</small></span></button>
     <button class="menu-card" onclick="openRules()"><span class="menu-card-icon">📖</span><span><strong>ゲームの遊び方</strong><small>目的・操作・クリア条件を検索</small></span></button>
     <button class="menu-card" id="bgm-btn" onclick="openBgm()"><span class="menu-card-icon">🎵</span><span><strong>BGM</strong><small>効果音・内蔵BGM・音量の設定</small></span></button>
     <button class="menu-card tb-install-btn" id="install-btn" type="button"><span class="menu-card-icon">📲</span><span><strong>アプリをインストール</strong><small>ホーム画面からすぐ遊べるようにする</small></span></button>
   </div>
+</section>
+
+<section id="collection-page" class="app-page" aria-labelledby="collection-title">
+  <div class="page-hero"><h2 id="collection-title">📚 コレクション図鑑</h2><p>集めたアイコン・称号・フレーム・BGMを確認できます。</p><div id="collection-summary" class="collection-summary"></div></div>
+  <div class="home-view-bar" role="tablist" aria-label="コレクションの種類">
+    <button data-collection-tab="avatars" aria-pressed="true" onclick="setCollectionView('avatars')">👤 アイコン</button>
+    <button data-collection-tab="titles" aria-pressed="false" onclick="setCollectionView('titles')">🏷️ 称号</button>
+    <button data-collection-tab="frames" aria-pressed="false" onclick="setCollectionView('frames')">🖼️ フレーム</button>
+    <button data-collection-tab="bgm" aria-pressed="false" onclick="setCollectionView('bgm')">🎵 BGM</button>
+  </div>
+  <div class="page-content"><div id="collection-grid" class="collection-grid"></div></div>
 </section>
 
 <!-- GAME SCREEN -->
@@ -1666,6 +1687,32 @@ function updateUI() {
   }
 }
 
+let collectionView='avatars';
+function collectionCatalog(){
+  return {
+    avatars:AVATAR_ITEMS.map(item=>({...item,id:item.icon,owned:saveData.ownedAvatars.includes(item.icon),source:item.gachaOnly?'gacha':'items'})),
+    titles:GACHA_ITEMS.filter(item=>item.type==='title'||item.type==='bundle').map(item=>({...item,owned:saveData.gachaInventory.includes(item.id),source:'gacha'})),
+    frames:GACHA_ITEMS.filter(item=>item.type==='frame'||item.type==='bundle').map(item=>({...item,owned:saveData.gachaInventory.includes(item.id),source:'gacha'})),
+    bgm:BGM_GACHA_ITEMS.map(item=>({...item,owned:saveData.ownedBgm.includes(item.id),source:'bgm-gacha'}))
+  };
+}
+function setCollectionView(name){if(!['avatars','titles','frames','bgm'].includes(name))return;collectionView=name;renderCollectionPage();}
+function equipCollectionAvatar(icon){if(!saveData.ownedAvatars.includes(icon))return;buyAvatar(icon);renderCollectionPage();}
+function equipCollectionItem(id){equipGachaItem(id);renderCollectionPage();}
+function renderCollectionPage(){
+  const grid=document.getElementById('collection-grid'),summary=document.getElementById('collection-summary');if(!grid||!summary)return;
+  const catalog=collectionCatalog(),all=Object.values(catalog).flat(),owned=all.filter(item=>item.owned).length,current=catalog[collectionView];
+  summary.innerHTML=`<div class="collection-summary-card"><strong>${owned} / ${all.length}</strong><span>全体の収集数</span></div><div class="collection-summary-card"><strong>${Math.round(owned/all.length*100)}%</strong><span>図鑑達成率</span></div>`;
+  document.querySelectorAll('[data-collection-tab]').forEach(button=>{const selected=button.dataset.collectionTab===collectionView;button.setAttribute('aria-pressed',String(selected));button.style.background=selected?'var(--accent4)':'';button.style.color=selected?'#fff':'';});
+  grid.innerHTML=current.map(item=>{
+    const active=collectionView==='avatars'?saveData.profile.avatar===item.icon:collectionView==='titles'?saveData.activeTitle===item.id:collectionView==='frames'?saveData.activeFrame===item.id:collectionView==='bgm'&&bgm.current>=0&&bgm.tracks[bgm.current]?.unlockId===item.id;
+    const icon=item.owned?item.icon:'❔',source=item.source==='items'?'ショップ':item.source==='bgm-gacha'?'BGMガチャ':'コレクションガチャ';
+    const action=item.owned?(collectionView==='avatars'?`onclick="equipCollectionAvatar('${item.icon}')"`:collectionView==='bgm'?`onclick="playBgmReward('${item.id}');renderCollectionPage()"`:`onclick="equipCollectionItem('${item.id}')"`):`onclick="${item.source==='items'?'openStorePage(\'items\')':item.source==='bgm-gacha'?'openStorePage(\'bgm-gacha\')':'openStorePage(\'gacha\')'}"`;
+    const label=active?'使用中':item.owned?(collectionView==='bgm'?'再生する':'使う'):`${source}へ`;
+    return `<article class="collection-card ${item.owned?'':'locked'}"><div class="collection-card-icon ${collectionView==='frames'&&item.owned?'profile-avatar '+(item.frameClass||'frame-secret'):''}">${icon}</div><strong>${escapeHtml(item.name)}</strong><small>${item.rarity?item.rarity+'・':''}${item.owned?'入手済み':`未入手・${source}`}</small><button class="btn ${active?'btn-success':item.owned?'btn-purple':'btn-warn'}" ${active?'disabled':''} ${action}>${label}</button></article>`;
+  }).join('');
+}
+
 function renderMetaDashboard(){
   normalizeSave();
   const missionEl=document.getElementById('daily-missions');
@@ -1975,9 +2022,9 @@ function setMissionView(name){
   });
 }
 function openFeaturePage(name){
-  if(!['daily','achievements','ranking','challenge','more'].includes(name))return;
+  if(!['daily','achievements','ranking','challenge','more','collection'].includes(name))return;
   if(['daily','achievements','challenge'].includes(name)){setMissionView(name);name='daily';}
-  goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
+  goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name==='collection'?'more':name);renderMetaDashboard();if(name==='collection')renderCollectionPage();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
   clearTimeout(resultTimer);resultSession=null;document.getElementById('unified-result')?.remove();setUnifiedResultMode(false);
