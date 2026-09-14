@@ -22,4 +22,6 @@ assert.match(html,/onclick="continueCasinoGame\('\$\{gameId\}'\)">もう一度/)
 assert.match(html,/onclick="finishCasinoSession\('\$\{gameId\}'\)">終了/);
 assert.match(html,/presentGameResult\(gameId,saveData\.totalScore-session\.initialWallet[^;]+true\)/);
 assert.match(html,/roundDiff=result==='win'\?bet:result==='lose'\?-bet:0/);
+assert.doesNotMatch(html,/>次のゲーム<\/button>/);
+assert.match(html,/nativeResult\.appendChild\(box\)/);
 console.log('PASS: unified result overlay, casino round retry/end flow, stale and duplicate result protection');

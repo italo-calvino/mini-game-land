@@ -237,6 +237,7 @@ input, textarea, [contenteditable="true"], #game-screen input, #game-screen text
 .result-overlay .modal-btns { justify-content:center; margin-top:22px; }
 .result-overlay .modal-btns .btn { min-width:140px; }
 .casino-round-actions { max-width:620px; margin:18px auto 0; padding:18px; text-align:center; background:var(--surface); border:1px solid var(--accent5); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+.result-box .casino-round-buttons { justify-content:center; margin-top:18px; }
 .casino-round-actions strong { display:block; margin-bottom:12px; color:var(--accent2); font-size:18px; }
 .casino-round-actions .modal-btns { justify-content:center; }
 @keyframes resultFade { from { opacity:0; transform:scale(.985); } }
@@ -1797,9 +1798,11 @@ function dismissGameResult(){document.getElementById('unified-result')?.remove()
 function showCasinoRoundActions(gameId,roundNet){
   if(resultSession?.gameId!==gameId||!document.body.classList.contains('playing-game'))return;
   document.getElementById('casino-round-actions')?.remove();
-  const box=document.createElement('section');box.id='casino-round-actions';box.className='casino-round-actions';
-  box.innerHTML=`<strong>今回の収支 ${(roundNet>=0?'+':'')+roundNet.toLocaleString()}pt</strong><div class="modal-btns"><button class="btn" onclick="continueCasinoGame('${gameId}')">もう一度</button><button class="btn btn-danger" onclick="finishCasinoSession('${gameId}')">終了</button></div>`;
-  document.getElementById('game-screen').appendChild(box);
+  const buttons=`<button class="btn" onclick="continueCasinoGame('${gameId}')">もう一度</button><button class="btn btn-danger" onclick="finishCasinoSession('${gameId}')">終了</button>`;
+  const nativeResult=gameId==='blackjack'?document.querySelector('#game-screen .result-box'):null;
+  let box;
+  if(nativeResult){box=document.createElement('div');box.id='casino-round-actions';box.className='modal-btns casino-round-buttons';box.innerHTML=buttons;nativeResult.appendChild(box);}
+  else{box=document.createElement('section');box.id='casino-round-actions';box.className='casino-round-actions';box.innerHTML=`<strong>今回の収支 ${(roundNet>=0?'+':'')+roundNet.toLocaleString()}pt</strong><div class="modal-btns">${buttons}</div>`;document.getElementById('game-screen').appendChild(box);}
   document.getElementById('rl-spin-btn')?.setAttribute('disabled','');
   document.getElementById('slot-spin-btn')?.setAttribute('disabled','');
   box.querySelector('button')?.focus();
@@ -3089,8 +3092,7 @@ games.blackjack = function(el) {
           <div style="font-size:26px;font-weight:900">${resultMsg}</div>
           <div style="font-size:22px;font-weight:900;color:${diffColor};margin-top:6px">${ptDiff}</div>
           <p>残り ${saveData.totalScore} pt</p></div>`;
-        if(saveData.totalScore>0) html += `<button class="btn mt" onclick="bjNext()">次のゲーム</button>`;
-        else html += `<p style="color:var(--accent1);margin-top:10px">ポイント不足！</p><button class="btn mt" onclick="goHome()">ホームへ</button>`;
+        if(saveData.totalScore<=0)html += `<p style="color:var(--accent1);margin-top:10px">ポイントがないため、続けるにはほかのゲームで獲得してください。</p>`;
       }
     }
     el.innerHTML = html;
