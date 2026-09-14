@@ -606,8 +606,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
 .bgm-track { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
 .bgm-track:hover { border-color: var(--accent4); }
 .bgm-track.active { border-color: var(--accent3); background: #1a3a2a; }
+.bgm-track.loading .track-icon { animation:bgmSpin .8s linear infinite; }
 .bgm-track.locked { cursor:not-allowed; opacity:.55; filter:grayscale(.7); }
 .bgm-track.locked:hover { border-color:transparent; }
+@keyframes bgmSpin { to { transform:rotate(360deg); } }
 .bgm-track .track-icon { font-size: 22px; width: 32px; text-align: center; flex-shrink: 0; }
 .bgm-track .track-info { flex: 1; min-width: 0; }
 .bgm-track .track-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -753,7 +755,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.75; }
     </label>
     <label style="display:block;margin-bottom:14px"><input id="sound-auto" type="checkbox" onchange="sound.auto=this.checked;saveSound();if(!this.checked)bgmStop()"> ゲーム開始時にBGMを再生</label>
     <p style="color:var(--text2);font-size:12px;margin-bottom:14px;line-height:1.6">
-      内蔵のオリジナルBGMを選んですぐ再生できます。
+      入手済みのBGMだけを再生できます。追加曲は選んだ時に読み込みます。
     </p>
 
     <!-- 今流れてる曲 -->
@@ -923,6 +925,7 @@ const bgm = {
     {name:'最高速の恋',url:'/audio/saisoku-no-koi.mp3',unlockId:'bgm_saisoku'}
   ],
   current: -1,
+  loading: -1,
   vol: 0.5,
   loop: true,
 };
@@ -995,20 +998,20 @@ function closeBgm() {
 
 function bgmRenderTracks() {
   const list = document.getElementById('bgm-tracklist');
-    list.innerHTML = bgm.tracks.map((t, i) => {const unlocked=!t.unlockId||saveData.ownedBgm.includes(t.unlockId);return `
-      <div class="bgm-track ${bgm.current===i?'active':''} ${unlocked?'':'locked'}" ${unlocked?`onclick="bgmPlay(${i})"`:''} aria-disabled="${!unlocked}">
-        <div class="track-icon">${unlocked?(bgm.current===i ? '▶️' : '🎵'):'🔒'}</div>
+    list.innerHTML = bgm.tracks.map((t, i) => {const unlocked=!t.unlockId||saveData.ownedBgm.includes(t.unlockId),loading=bgm.loading===i;return `
+      <div class="bgm-track ${bgm.current===i?'active':''} ${loading?'loading':''} ${unlocked?'':'locked'}" ${unlocked&&!loading?`onclick="bgmPlay(${i})"`:''} aria-disabled="${!unlocked||loading}">
+        <div class="track-icon">${unlocked?(loading?'◌':bgm.current===i ? '▶️' : '🎵'):'🔒'}</div>
         <div class="track-info">
           <div class="track-name">${escapeHtml(t.name)}</div>
-          <div class="track-file">${unlocked?'クリックで再生':'BGMガチャで入手'}</div>
+          <div class="track-file">${loading?'読み込み中…':unlocked?'クリックで再生':'BGMガチャで入手'}</div>
         </div>
-        <div class="track-status">${bgm.current===i ? (bgm.audio&&!bgm.audio.paused?'再生中':'一時停止') : ''}</div>
+        <div class="track-status">${loading?'準備中':bgm.current===i ? (bgm.audio&&!bgm.audio.paused?'再生中':'一時停止') : ''}</div>
       </div>`;}).join('');
   // 再生中パネル
   const nowPanel = document.getElementById('bgm-now');
   if (bgm.current >= 0 && bgm.audio) {
     nowPanel.style.display = 'block';
-    document.getElementById('bgm-now-name').textContent = bgm.tracks[bgm.current]?.name || '';
+    document.getElementById('bgm-now-name').textContent = `${bgm.tracks[bgm.current]?.name || ''}${bgm.loading===bgm.current?'（読み込み中…）':''}`;
     document.getElementById('bgm-vol').value = bgm.vol;
     const loopChk = document.getElementById('bgm-loop');
     if (loopChk) loopChk.checked = bgm.loop;
@@ -1029,22 +1032,26 @@ function bgmRenderTracks() {
   }
 }
 
+let bgmTransition=0;
+function fadeBgmVolume(audio,target,token,done){
+  const start=audio.volume,steps=10;let step=0;
+  const tick=()=>{if(token!==bgmTransition)return;step++;audio.volume=Math.max(0,Math.min(1,start+(target-start)*step/steps));if(step<steps)setTimeout(tick,24);else done?.();};tick();
+}
 function bgmPlay(idx) {
   if (idx < 0 || idx >= bgm.tracks.length) return;
   if(bgm.tracks[idx].unlockId&&!saveData.ownedBgm.includes(bgm.tracks[idx].unlockId)){showToast('このBGMはまだ入手していません','#ff6b6b');return;}
-  if (bgm.audio) { bgm.audio.pause(); bgm.audio.src = ''; }
+  const previous=bgm.audio,previousIdx=bgm.current,token=++bgmTransition;
   if(bgm.tracks[idx].builtin!==undefined&&!bgm.tracks[idx].url)bgm.tracks[idx].url=makeBgm(bgm.tracks[idx].builtin);
-  bgm.current = idx;
-  bgm.audio = new Audio(bgm.tracks[idx].url);
-  bgm.audio.volume = bgm.vol;
-  bgm.audio.loop = bgm.loop;
-  bgm.audio.addEventListener('play',bgmRenderTracks);
-  bgm.audio.addEventListener('pause',bgmRenderTracks);
-  bgm.audio.play().catch(() => {bgmRenderTracks();});
-  bgm.audio.addEventListener('ended', () => {
+  const next=new Audio(bgm.tracks[idx].url);next.preload='none';next.volume=0;next.loop=bgm.loop;
+  bgm.current=idx;bgm.loading=idx;bgm.audio=next;bgmRenderTracks();
+  next.addEventListener('playing',()=>{if(token!==bgmTransition)return;bgm.loading=-1;fadeBgmVolume(next,bgm.vol,token);bgmRenderTracks();});
+  next.addEventListener('pause',()=>{if(token===bgmTransition)bgmRenderTracks();});
+  const restorePrevious=message=>{if(token!==bgmTransition)return;bgmTransition++;next.pause();bgm.loading=-1;if(previous){bgm.audio=previous;bgm.current=previousIdx;}else{bgm.audio=null;bgm.current=-1;}bgmRenderTracks();showToast(message,'#ff6b6b');};
+  next.addEventListener('error',()=>restorePrevious('BGMを読み込めませんでした。通信を確認してください'));
+  next.play().then(()=>{if(token!==bgmTransition){next.pause();return;}if(previous&&previous!==next&&!previous.paused)fadeBgmVolume(previous,0,token,()=>{previous.pause();previous.src='';});}).catch(()=>restorePrevious('再生ボタンをもう一度押してください'));
+  next.addEventListener('ended', () => {
     if (!bgm.loop) bgmNext();
   });
-  bgmRenderTracks();
 }
 
 let appEntered=false;
@@ -1073,6 +1080,7 @@ function bgmToggle() {
 }
 
 function bgmStop() {
+  bgmTransition++;bgm.loading=-1;
   if (bgm.audio) { bgm.audio.pause(); bgm.audio.currentTime = 0; }
   bgm.current = -1;
   bgmRenderTracks();
