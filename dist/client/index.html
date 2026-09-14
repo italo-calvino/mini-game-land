@@ -230,6 +230,13 @@ input, textarea, [contenteditable="true"], #game-screen input, #game-screen text
 .result-box { background: var(--surface2); border-radius: var(--radius); padding: 20px; text-align: center; margin-top: 20px; }
 .result-box .result-score { font-size: 48px; font-weight: 900; color: var(--accent2); }
 .result-box p { color: var(--text2); margin-top: 8px; font-size: 14px; }
+.result-overlay { position:fixed; inset:0; z-index:1200; display:grid; place-items:center; padding:20px; background:rgba(4,4,12,.82); backdrop-filter:blur(8px); overflow:auto; animation:resultFade .2s ease both; }
+.result-overlay .result-box { width:min(620px,100%); margin:auto; padding:clamp(22px,5vw,34px); border:1px solid var(--border); background:var(--surface); box-shadow:0 24px 80px rgba(0,0,0,.5); }
+.result-overlay .result-game { margin:0 0 8px; color:var(--text2); font-weight:800; }
+.result-overlay h2 { font-size:clamp(25px,7vw,36px); margin-bottom:18px; }
+.result-overlay .modal-btns { justify-content:center; margin-top:22px; }
+.result-overlay .modal-btns .btn { min-width:140px; }
+@keyframes resultFade { from { opacity:0; transform:scale(.985); } }
 .xp-gain { font-size: 14px; color: var(--accent5); font-weight: 700; margin-top: 6px; }
 
 /* MEMORY */
@@ -1765,22 +1772,28 @@ function presentGameResult(gameId,score,won){
   const session=resultSession;
   if(!session||session.gameId!==gameId||(gameId==='monster'&&won))return;
   clearTimeout(resultTimer);
-  resultTimer=setTimeout(()=>{
-    if(resultSession!==session||!document.body.classList.contains('playing-game'))return;
-    const betting=DIRECT_POINT_GAMES.has(gameId),game=GAME_DEFS.find(g=>g.id===gameId);
-    document.getElementById('unified-result')?.remove();
-    const panel=document.createElement('section');panel.id='unified-result';panel.className='result-box';
-    panel.style.cssText='max-width:640px;margin:24px auto;padding:24px;';
-    const net=saveData.totalScore-session.wallet;
-    const achievements=saveData.achievements.filter(id=>!session.achievements.includes(id)).length;
-    const missions=saveData.daily.claimed.filter(id=>!session.missions.includes(id)).length;
-    panel.innerHTML=`<p>${escapeHtml(game?.title||gameId)}</p><h2 tabindex="-1">${betting?'今回の結果':won?'🎉 プレイ完了！':'プレイ終了'}</h2><p>${betting?'今回の収支':'今回のスコア'}</p><div class="result-score">${betting?(net>=0?'+':'')+net.toLocaleString()+'pt':Number(score).toLocaleString()}</div>${betting?'':`<p>${score>session.best?'🏆 自己ベスト更新！':'自己ベスト '+session.best.toLocaleString()}${score>session.best&&session.best>0?'（前回 '+session.best.toLocaleString()+'）':''}</p>`}<div class="profile-stats" style="margin-top:20px;grid-template-columns:1fr 1fr"><div class="profile-stat"><strong>+${session.points.toLocaleString()}pt</strong><span>${betting?'払戻し':'ゲーム報酬'}</span></div><div class="profile-stat"><strong>+${session.xp.toLocaleString()} XP</strong><span>獲得経験値</span></div></div>${achievements||missions?`<p>🏅 実績 ${achievements}件 ／ 📅 デイリー ${missions}件 達成</p>`:''}<div class="modal-btns"><button class="btn" onclick="startGame('${gameId}')">もう一度</button><button class="btn" style="background:var(--surface)" onclick="goHome()">ホームへ</button></div>`;
-    const screen=document.getElementById('game-screen');
-    if(betting){screen.appendChild(panel);session.wallet=saveData.totalScore;session.points=0;session.xp=0;}
-    else{screen.style.display='none';screen.after(panel);window.scrollTo({top:0});panel.querySelector('h2').focus();}
-  },400);
+  if(gameId==='pachinko')return;
+  if(resultSession!==session||!document.body.classList.contains('playing-game'))return;
+  const betting=DIRECT_POINT_GAMES.has(gameId),game=GAME_DEFS.find(g=>g.id===gameId),net=saveData.totalScore-session.wallet;
+  const heading=betting?(net>0?'🎉 勝利！':net<0?'ゲーム終了':'🤝 引き分け'):won?'🎉 クリア！':'ゲームオーバー';
+  const achievements=saveData.achievements.filter(id=>!session.achievements.includes(id)).length;
+  const missions=saveData.daily.claimed.filter(id=>!session.missions.includes(id)).length;
+  document.getElementById('unified-result')?.remove();
+  const overlay=document.createElement('div');overlay.id='unified-result';overlay.className='result-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','unified-result-title');
+  overlay.innerHTML=`<section class="result-box"><p class="result-game">${escapeHtml(game?.title||gameId)}</p><h2 id="unified-result-title" tabindex="-1">${heading}</h2><p>${betting?'今回の収支':'今回のスコア'}</p><div class="result-score">${betting?(net>=0?'+':'')+net.toLocaleString()+'pt':Number(score).toLocaleString()}</div>${betting?'':`<p>${score>session.best?'🏆 自己ベスト更新！':'自己ベスト '+session.best.toLocaleString()}${score>session.best&&session.best>0?'（前回 '+session.best.toLocaleString()+'）':''}</p>`}<div class="profile-stats" style="margin-top:20px;grid-template-columns:1fr 1fr"><div class="profile-stat"><strong>+${session.points.toLocaleString()}pt</strong><span>${betting?'獲得':'ゲーム報酬'}</span></div><div class="profile-stat"><strong>+${session.xp.toLocaleString()} XP</strong><span>獲得経験値</span></div></div>${achievements||missions?`<p>🏅 実績 ${achievements}件 ／ 📅 ミッション ${missions}件達成</p>`:''}<div class="modal-btns">${betting?`<button class="btn" onclick="dismissGameResult()">続ける</button>`:`<button class="btn" onclick="startGame('${gameId}')">もう一度</button>`}<button class="btn" style="background:var(--surface2)" onclick="goHome()">ホームへ</button></div></section>`;
+  document.body.appendChild(overlay);overlay.querySelector('h2').focus();
+  if(betting){session.wallet=saveData.totalScore;session.points=0;session.xp=0;session.achievements=[...saveData.achievements];session.missions=[...saveData.daily.claimed];}
+}
+function dismissGameResult(){document.getElementById('unified-result')?.remove();}
+function claimTerminalResult(gameId,won){
+  const session=resultSession;if(!session||session.gameId!==gameId)return false;
+  const repeatable=DIRECT_POINT_GAMES.has(gameId)||(gameId==='monster'&&won);
+  if(!repeatable&&session.finished)return false;
+  if(!repeatable)session.finished=true;
+  return true;
 }
 function recordWin(gameId, score) {
+  if(!claimTerminalResult(gameId,true))return 0;
   playSfx('win');
   normalizeSave();
   saveData.wins++;
@@ -1798,7 +1811,7 @@ function recordWin(gameId, score) {
   return gained;
 }
 
-function recordLoss(score=0,gameId=activeGameId) { playSfx('loss'); saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress();presentGameResult(gameId,score,false); }
+function recordLoss(score=0,gameId=activeGameId) { if(!claimTerminalResult(gameId,false))return 0;playSfx('loss'); saveData.streak=0;recordGameResult(gameId,score,false);checkMetaProgress();presentGameResult(gameId,score,false);return 0; }
 
 function showLvUp() {
   playSfx('level');
@@ -1873,10 +1886,10 @@ function goHome() {
 }
 function startGame(name) {
   clearTimeout(resultTimer);document.getElementById('unified-result')?.remove();
-  resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed]};
+  if(name==='trivia'||name==='animequiz')name='quiz';
+  resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed],finished:false};
   playSfx('start');
   if(sound.auto&&bgm.current<0)bgmPlay(0);
-  if(name==='trivia'||name==='animequiz')name='quiz';
   document.body.classList.add('playing-game');
   setTaskbarActive('');
   document.getElementById('home').style.display = 'none';
@@ -2996,7 +3009,7 @@ games.blackjack = function(el) {
       saveData.wins = Math.max(0, saveData.wins);
       recordLoss(0,'blackjack'); updateUI();
     } else {
-      recordGameResult('blackjack',0,false,{result:'push'});updateUI();
+      recordGameResult('blackjack',0,false,{result:'push'});updateUI();presentGameResult('blackjack',0,null);
     }
     phase=result; bet=0; render();
   }
