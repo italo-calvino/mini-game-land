@@ -236,6 +236,8 @@ input, textarea, [contenteditable="true"], #game-screen input, #game-screen text
 .result-overlay h2 { font-size:clamp(25px,7vw,36px); margin-bottom:18px; }
 .result-overlay .modal-btns { justify-content:center; margin-top:22px; }
 .result-overlay .modal-btns .btn { min-width:140px; }
+body.result-open #game-screen { visibility:hidden; }
+#game-screen[inert] { pointer-events:none; user-select:none; }
 .casino-round-actions { max-width:620px; margin:18px auto 0; padding:18px; text-align:center; background:var(--surface); border:1px solid var(--accent5); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
 .result-box .casino-round-buttons { justify-content:center; margin-top:18px; }
 .casino-round-actions strong { display:block; margin-bottom:12px; color:var(--accent2); font-size:18px; }
@@ -1792,9 +1794,14 @@ function presentGameResult(gameId,score,won,forceFinal=false){
   document.getElementById('unified-result')?.remove();
   const overlay=document.createElement('div');overlay.id='unified-result';overlay.className='result-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','unified-result-title');
   overlay.innerHTML=`<section class="result-box"><p class="result-game">${escapeHtml(game?.title||gameId)}</p><h2 id="unified-result-title" tabindex="-1">${heading}</h2><p>${betting?'今回の収支':'今回のスコア'}</p><div class="result-score">${betting?(net>=0?'+':'')+net.toLocaleString()+'pt':Number(score).toLocaleString()}</div>${betting?'':`<p>${score>session.best?'🏆 自己ベスト更新！':'自己ベスト '+session.best.toLocaleString()}${score>session.best&&session.best>0?'（前回 '+session.best.toLocaleString()+'）':''}</p>`}<div class="profile-stats" style="margin-top:20px;grid-template-columns:1fr 1fr"><div class="profile-stat"><strong>+${session.points.toLocaleString()}pt</strong><span>${betting?'獲得':'ゲーム報酬'}</span></div><div class="profile-stat"><strong>+${session.xp.toLocaleString()} XP</strong><span>獲得経験値</span></div></div>${achievements||missions?`<p>🏅 実績 ${achievements}件 ／ 📅 ミッション ${missions}件達成</p>`:''}<div class="modal-btns">${betting?`<button class="btn" onclick="dismissGameResult()">続ける</button>`:`<button class="btn" onclick="startGame('${gameId}')">もう一度</button>`}<button class="btn" style="background:var(--surface2)" onclick="goHome()">ホームへ</button></div></section>`;
-  document.body.appendChild(overlay);overlay.querySelector('h2').focus();
+  setUnifiedResultMode(true);document.body.appendChild(overlay);overlay.querySelector('h2').focus();
 }
-function dismissGameResult(){document.getElementById('unified-result')?.remove();}
+function setUnifiedResultMode(open){
+  const screen=document.getElementById('game-screen');document.body.classList.toggle('result-open',open);
+  if(open){screen.setAttribute('inert','');screen.setAttribute('aria-hidden','true');}
+  else{screen.removeAttribute('inert');screen.removeAttribute('aria-hidden');}
+}
+function dismissGameResult(){document.getElementById('unified-result')?.remove();setUnifiedResultMode(false);}
 function showCasinoRoundActions(gameId,roundNet){
   if(resultSession?.gameId!==gameId||!document.body.classList.contains('playing-game'))return;
   document.getElementById('casino-round-actions')?.remove();
@@ -1895,7 +1902,7 @@ function openFeaturePage(name){
   goHome();document.getElementById('home').style.display='none';document.getElementById(`${name}-page`).style.display='block';document.getElementById('back-btn').style.display='inline-block';setTaskbarActive(name);renderMetaDashboard();window.scrollTo({top:0,behavior:'smooth'});
 }
 function goHome() {
-  clearTimeout(resultTimer);resultSession=null;document.getElementById('unified-result')?.remove();
+  clearTimeout(resultTimer);resultSession=null;document.getElementById('unified-result')?.remove();setUnifiedResultMode(false);
   document.body.classList.remove('playing-game');
   setTaskbarActive('home');
   document.getElementById('home').style.display = 'block';
@@ -1920,7 +1927,7 @@ function goHome() {
   renderHome();
 }
 function startGame(name) {
-  clearTimeout(resultTimer);document.getElementById('unified-result')?.remove();
+  clearTimeout(resultTimer);document.getElementById('unified-result')?.remove();setUnifiedResultMode(false);
   if(name==='trivia'||name==='animequiz')name='quiz';
   resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,initialWallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed],finished:false};
   playSfx('start');

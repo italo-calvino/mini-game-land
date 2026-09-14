@@ -24,4 +24,7 @@ assert.match(html,/presentGameResult\(gameId,saveData\.totalScore-session\.initi
 assert.match(html,/roundDiff=result==='win'\?bet:result==='lose'\?-bet:0/);
 assert.doesNotMatch(html,/>次のゲーム<\/button>/);
 assert.match(html,/nativeResult\.appendChild\(box\)/);
+assert.match(html,/setUnifiedResultMode\(true\);document\.body\.appendChild\(overlay\)/);
+assert.match(html,/screen\.setAttribute\('inert',''\);screen\.setAttribute\('aria-hidden','true'\)/);
+assert.match(html,/startGame\(name\) \{[^]*?setUnifiedResultMode\(false\)/);
 console.log('PASS: unified result overlay, casino round retry/end flow, stale and duplicate result protection');
