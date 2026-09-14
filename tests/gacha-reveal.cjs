@@ -1,0 +1,12 @@
+const fs=require('fs'),assert=require('assert');
+const html=fs.readFileSync('dist/client/index.html','utf8');
+assert.match(html,/function showGachaReveal\(results,kind\)/);
+assert.match(html,/抽選中…/);
+assert.match(html,/rarity-UR[^}]*--reveal-color:#ffd93d/);
+assert.match(html,/playSfx\(best\.item\.rarity/);
+assert.match(html,/このアイコンを使う/);
+assert.match(html,/このBGMを再生/);
+assert.match(html,/showGachaReveal\(results,'collection'\)/);
+assert.match(html,/showGachaReveal\(results,'bgm'\)/);
+assert.match(html,/@media \(prefers-reduced-motion:reduce\)/);
+console.log('PASS: animated rarity reveal, sound cues, immediate equip and BGM playback actions');

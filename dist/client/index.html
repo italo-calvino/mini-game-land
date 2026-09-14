@@ -167,6 +167,15 @@ body.playing-game .app-taskbar { display:none; }
 .gacha-result-icon { font-size:34px; line-height:1.2; margin-bottom:5px; }
 .gacha-result strong,.gacha-item-rarity { display:block; font-size:11px; }
 .gacha-result small { color:var(--text2); font-size:9px; }
+.gacha-result .btn { width:100%; min-height:34px; padding:5px 7px; margin-top:8px; font-size:10px; }
+.gacha-reveal { position:fixed; inset:0; z-index:1500; display:grid; place-items:center; padding:18px; background:rgba(3,3,12,.92); backdrop-filter:blur(12px); overflow:auto; }
+.gacha-reveal-box { position:relative; width:min(760px,100%); max-height:calc(100dvh - 36px); overflow:auto; padding:clamp(22px,5vw,38px); border:2px solid var(--reveal-color,#89909d); border-radius:26px; background:radial-gradient(circle at 50% 15%,var(--reveal-glow,rgba(137,144,157,.28)),transparent 42%),var(--surface); box-shadow:0 0 50px var(--reveal-glow,rgba(137,144,157,.28)); text-align:center; animation:revealBoxIn .35s ease both; }
+.gacha-reveal-orb { width:112px; height:112px; display:grid; place-items:center; margin:22px auto; border-radius:50%; background:conic-gradient(from 0deg,#4d96ff,#c77dff,#ffd93d,#4d96ff); font-size:52px; box-shadow:0 0 45px var(--reveal-glow,rgba(199,125,255,.5)); animation:gachaDrawSpin .75s linear infinite,gachaPulse .7s ease-in-out infinite alternate; }
+.gacha-reveal.revealed .gacha-reveal-orb { animation:revealBurst .5s ease both; }
+.gacha-reveal .gacha-results { grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); max-height:55vh; overflow:auto; }
+.gacha-reveal.rarity-R { --reveal-color:#4d96ff; --reveal-glow:rgba(77,150,255,.42); }.gacha-reveal.rarity-SR,.gacha-reveal.rarity-SSR { --reveal-color:#c77dff; --reveal-glow:rgba(199,125,255,.48); }.gacha-reveal.rarity-UR { --reveal-color:#ffd93d; --reveal-glow:rgba(255,217,61,.55); }.gacha-reveal.rarity-SECRET { --reveal-color:#fff; --reveal-glow:rgba(255,112,166,.62); }
+@keyframes gachaDrawSpin { to { transform:rotate(360deg); } } @keyframes gachaPulse { to { scale:1.12; filter:brightness(1.35); } } @keyframes revealBurst { 50%{scale:1.35;filter:brightness(2)} 100%{scale:0;opacity:0;height:0;margin:0 auto} } @keyframes revealBoxIn { from{opacity:0;transform:scale(.88)} }
+@media (prefers-reduced-motion:reduce) { .gacha-reveal-orb,.gacha-reveal-box { animation:none!important; } }
 .rarity-N { border-color:#89909d; }.rarity-R { border-color:#4d96ff; }.rarity-SR { border-color:#c77dff; }.rarity-UR { border-color:#ffd93d; box-shadow:0 0 18px rgba(255,217,61,.25); }.rarity-SECRET { border-color:#fff; box-shadow:0 0 22px rgba(199,125,255,.5); background:linear-gradient(135deg,rgba(255,107,107,.2),rgba(77,150,255,.2),rgba(107,203,119,.2)); }
 .gacha-collection { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
 .gacha-collection-card { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:11px; }
@@ -943,7 +952,7 @@ function playSfx(kind='click'){
   try{
     sound.ctx ||= new (window.AudioContext||window.webkitAudioContext)();
     if(sound.ctx.state==='suspended')sound.ctx.resume().catch(()=>{});
-    const notes={startup:[523,659,784,1047],click:[660],start:[392,523,784],win:[523,659,784,1047],loss:[330,277,220],level:[523,659,784,1047,1319]}[kind]||[660];
+    const notes={startup:[523,659,784,1047],click:[660],start:[392,523,784],win:[523,659,784,1047],loss:[330,277,220],level:[523,659,784,1047,1319],gacha:[294,392,523],rare:[523,659,784],ur:[523,659,784,1047,1319],secret:[523,659,784,1047,1319,1568]}[kind]||[660];
     notes.forEach((freq,i)=>{const osc=sound.ctx.createOscillator(),gain=sound.ctx.createGain(),at=sound.ctx.currentTime+i*.09;
       osc.type='triangle';osc.frequency.value=freq;gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(sound.volume*.22,at+.005);gain.gain.exponentialRampToValueAtTime(.0001,at+.13);
       osc.connect(gain);gain.connect(sound.ctx.destination);osc.start(at);osc.stop(at+.14);osc.onended=()=>{osc.disconnect();gain.disconnect();};
@@ -1494,6 +1503,29 @@ function grantGachaItem(item){
   }
   return {item,isNew:true,medals:0};
 }
+const GACHA_RARITY_ORDER=['N','R','SR','SSR','UR','SECRET'];
+function gachaActionButton(result,kind){
+  if(kind==='bgm')return `<button class="btn btn-purple" onclick="playBgmReward('${result.item.id}')">▶ このBGMを再生</button>`;
+  const labels={avatar:'このアイコンを使う',frame:'このフレームを使う',title:'この称号を使う',theme:'このテーマを使う',bundle:'このセットを使う'};
+  return `<button class="btn btn-purple" onclick="useGachaReward('${result.item.id}')">${labels[result.item.type]||'このアイテムを使う'}</button>`;
+}
+function gachaResultCards(results,kind){
+  return `<div class="gacha-results" aria-live="polite">${results.map((result,i)=>`<div class="gacha-result rarity-${result.item.rarity}" style="animation-delay:${i*.06}s"><span class="gacha-item-rarity">${result.item.rarity}</span><div class="gacha-result-icon">${result.item.icon}</div><strong>${escapeHtml(result.item.name)}</strong><small>${result.isNew?'NEW!':kind==='bgm'?'重複・獲得なし':`重複 +${result.medals}メダル`}</small>${gachaActionButton(result,kind)}</div>`).join('')}</div>`;
+}
+function closeGachaReveal(){document.getElementById('gacha-reveal')?.remove();}
+function showGachaReveal(results,kind){
+  closeGachaReveal();if(!results.length)return;
+  const best=results.reduce((a,b)=>GACHA_RARITY_ORDER.indexOf(a.item.rarity)>GACHA_RARITY_ORDER.indexOf(b.item.rarity)?a:b),overlay=document.createElement('div');
+  overlay.id='gacha-reveal';overlay.className=`gacha-reveal rarity-${best.item.rarity}`;overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','ガチャ結果');
+  overlay.innerHTML=`<section class="gacha-reveal-box"><p class="meta-sub">タップしてスキップできます</p><div class="gacha-reveal-orb">?</div><h2>抽選中…</h2></section>`;
+  document.body.appendChild(overlay);playSfx('gacha');let revealed=false;
+  const reveal=()=>{if(revealed||!overlay.isConnected)return;revealed=true;overlay.classList.add('revealed');playSfx(best.item.rarity==='SECRET'?'secret':['UR','SSR'].includes(best.item.rarity)?'ur':best.item.rarity==='SR'?'rare':'win');overlay.querySelector('.gacha-reveal-box').innerHTML=`<p class="gacha-item-rarity">最高レア度 ${best.item.rarity}</p><h2>${best.item.rarity==='SECRET'?'💠 奇跡の結果！':'🎉 ガチャ結果'}</h2>${gachaResultCards(results,kind)}<div class="modal-btns"><button class="btn" onclick="closeGachaReveal()">結果を閉じる</button></div>`;overlay.querySelector('button')?.focus();};
+  overlay.addEventListener('click',event=>{if(!revealed)reveal();else if(event.target===overlay)closeGachaReveal();});
+  overlay.addEventListener('keydown',event=>{if(event.key==='Escape')closeGachaReveal();});
+  gameDelay(reveal,900);
+}
+function useGachaReward(id){closeGachaReveal();equipGachaItem(id);}
+function playBgmReward(id){const index=bgm.tracks.findIndex(track=>track.unlockId===id);closeGachaReveal();if(index>=0)bgmPlay(index);}
 function drawGacha(count){
   normalizeSave();const isFree=count===1&&!saveData.gachaFreeUsed,cost=isFree?0:count===10?4500:500;
   if(saveData.totalScore<cost){showToast(`ポイントが足りません（必要 ${cost.toLocaleString()}pt）`,'#ff6b6b');return;}
@@ -1501,7 +1533,7 @@ function drawGacha(count){
   const items=Array.from({length:count},()=>rollGachaItem(false));
   if(count===10&&items.every(item=>item.rarity==='N'))items[items.length-1]=rollGachaItem(true);
   const results=items.map(grantGachaItem);saveData.gachaDraws+=count;
-  persistSave();updateUI();syncOnlineProfile();renderShopPage(results);
+  persistSave();updateUI();syncOnlineProfile();renderShopPage(results);showGachaReveal(results,'collection');
   const best=results.reduce((a,b)=>['N','R','SR','UR','SECRET'].indexOf(a.item.rarity)>['N','R','SR','UR','SECRET'].indexOf(b.item.rarity)?a:b);
   showToast(best.item.rarity==='SECRET'?'💠 SECRET！奇跡のプリズムセット獲得！':`🎁 ${count}回ガチャを引きました` ,best.item.rarity==='UR'?'#ffd93d':'#c77dff');
 }
@@ -1532,7 +1564,7 @@ function gachaItemActive(item){
 function renderGacha(results=[]){
   const el=document.getElementById('gacha-area');if(!el)return;
   const rates=Object.entries(GACHA_RATES).map(([rarity,rate])=>`<div class="gacha-rate rarity-${rarity}"><strong>${rarity}</strong>${(rate*100).toFixed(rarity==='SECRET'?1:rarity==='SR'?1:0)}%</div>`).join('');
-  const resultHtml=results.length?`<div class="gacha-results" aria-live="polite">${results.map((result,i)=>`<div class="gacha-result rarity-${result.item.rarity}" style="animation-delay:${i*.04}s"><span class="gacha-item-rarity">${result.item.rarity}</span><div class="gacha-result-icon">${result.item.icon}</div><strong>${escapeHtml(result.item.name)}</strong><small>${result.isNew?'NEW!':`重複 +${result.medals}メダル`}</small></div>`).join('')}</div>`:'';
+  const resultHtml=results.length?gachaResultCards(results,'collection'):'';
   const exchangeItems=GACHA_ITEMS.filter(item=>item.rarity!=='SECRET');
   el.innerHTML=`<div class="gacha-panel"><h3>✨ ミニゲームランド・コレクション</h3><p class="meta-sub">限定アイコン・フレーム・称号・テーマが登場。能力差はなく、見た目を楽しむガチャです。</p><div class="gacha-wallet"><span>💰 ${saveData.totalScore.toLocaleString()}pt</span><span>🪙 ${saveData.gachaMedals.toLocaleString()}メダル</span><span>🎟️ 累計 ${saveData.gachaDraws.toLocaleString()}回</span></div><div class="gacha-actions"><button class="btn btn-purple" onclick="drawGacha(1)">${saveData.gachaFreeUsed?'1回引く　500pt':'初回無料で1回引く'}</button><button class="btn btn-warn" onclick="drawGacha(10)">10連　4,500pt<br><small>R以上1個確定</small></button></div><div class="gacha-rates">${rates}</div><div class="privacy-note">天井・最高レア確定はありません。重複時は N:1／R:3／SR:10／UR:30／SECRET:100 メダルに変換されます。現実のお金は使用しません。</div>${resultHtml}</div><h2 class="shop-section-title">🪙 ガチャメダル交換所</h2><p class="meta-sub" style="margin:-5px 0 12px">重複でもらったメダルで未獲得品を選べます。SECRETはガチャだけの特別景品です。</p><div class="gacha-collection">${exchangeItems.map(item=>{const owned=saveData.gachaInventory.includes(item.id),cost=GACHA_EXCHANGE_COST[item.rarity];return `<article class="gacha-collection-card rarity-${item.rarity}"><div class="gacha-result-icon">${item.icon}</div><div class="gacha-collection-info"><strong>${escapeHtml(item.name)}</strong><small>${item.rarity}・交換 ${cost}メダル</small></div><button class="btn ${owned?'btn-success':'btn-warn'}" ${owned?'disabled':''} onclick="exchangeGachaItem('${item.id}')">${owned?'所持済':cost+'枚'}</button></article>`;}).join('')}</div><h2 class="shop-section-title">📚 ガチャコレクション <span class="meta-sub">${saveData.gachaInventory.length}/${GACHA_ITEMS.length}</span></h2><div class="gacha-collection">${GACHA_ITEMS.map(item=>{const owned=saveData.gachaInventory.includes(item.id),active=gachaItemActive(item);return `<article class="gacha-collection-card rarity-${item.rarity} ${owned?'':'locked'}"><div class="gacha-result-icon">${owned?item.icon:'❔'}</div><div class="gacha-collection-info"><strong>${owned?escapeHtml(item.name):`${item.rarity} 未獲得`}</strong><small>${item.rarity}・${item.type==='avatar'?'アイコン':item.type==='frame'?'フレーム':item.type==='title'?'称号':item.type==='theme'?'テーマ':'限定セット'}</small></div>${owned?`<button class="btn ${active?'btn-success':'btn-purple'}" ${active?'disabled':''} onclick="equipGachaItem('${item.id}')">${active?'使用中':'使う'}</button>`:''}</article>`;}).join('')}</div>`;
 }
@@ -1551,15 +1583,15 @@ function drawBgmGacha(count){
   if(saveData.totalScore<cost){showToast(`ポイントが足りません（必要 ${cost.toLocaleString()}pt）`,'#ff6b6b');return;}
   saveData.totalScore-=cost;
   const results=Array.from({length:count},()=>grantBgmGachaItem(rollBgmGachaItem()));
-  saveData.bgmGachaDraws+=count;persistSave();updateUI();syncOnlineProfile();renderBgmGacha(results);bgmRenderTracks();
+  saveData.bgmGachaDraws+=count;persistSave();updateUI();syncOnlineProfile();renderBgmGacha(results);bgmRenderTracks();showGachaReveal(results,'bgm');
   const newCount=results.filter(result=>result.isNew).length;
   showToast(newCount?`🎧 新しいBGMを${newCount}曲入手！`:'重複しました（獲得アイテムなし）',newCount?'#6bcb77':'#8d8aa5');
 }
 function renderBgmGacha(results=[]){
   const el=document.getElementById('bgm-gacha-area');if(!el)return;
   const rates=Object.entries(BGM_GACHA_RATES).map(([rarity,rate])=>`<div class="gacha-rate rarity-${rarity}"><strong>${rarity}</strong>${rate*100}%</div>`).join('');
-  const resultHtml=results.length?`<div class="gacha-results" aria-live="polite">${results.map((result,i)=>`<div class="gacha-result rarity-${result.item.rarity}" style="animation-delay:${i*.04}s"><span class="gacha-item-rarity">${result.item.rarity}</span><div class="gacha-result-icon">${result.item.icon}</div><strong>${escapeHtml(result.item.name)}</strong><small>${result.isNew?'NEW!':'重複・獲得なし'}</small></div>`).join('')}</div>`:'';
-  el.innerHTML=`<div class="gacha-panel"><h3>🎼 ミュージックコレクション</h3><p class="meta-sub">全9曲のBGM専用ガチャです。入手した曲は「その他 → BGM」から再生できます。</p><div class="gacha-wallet"><span>💰 ${saveData.totalScore.toLocaleString()}pt</span><span>🎧 ${saveData.ownedBgm.length}/${BGM_GACHA_ITEMS.length}曲</span><span>🎟️ 累計 ${saveData.bgmGachaDraws.toLocaleString()}回</span></div><div class="gacha-actions"><button class="btn btn-purple" onclick="drawBgmGacha(1)">1回引く　500pt</button><button class="btn btn-warn" onclick="drawBgmGacha(10)">10回引く　5,000pt<br><small>レア確定なし</small></button></div><div class="gacha-rates">${rates}</div><div class="privacy-note">天井・確定枠はありません。同じ曲が出た場合、ポイント・メダル・アイテムなどの補償はありません。現実のお金は使用しません。</div>${resultHtml}</div><h2 class="shop-section-title">🎵 楽曲一覧 <span class="meta-sub">${saveData.ownedBgm.length}/${BGM_GACHA_ITEMS.length}</span></h2><div class="gacha-collection">${BGM_GACHA_ITEMS.map(item=>{const owned=saveData.ownedBgm.includes(item.id);return `<article class="gacha-collection-card rarity-${item.rarity} ${owned?'':'locked'}"><div class="gacha-result-icon">${owned?item.icon:'🔒'}</div><div class="gacha-collection-info"><strong>${escapeHtml(item.name)}</strong><small>${item.rarity}・${owned?'入手済み':'未入手'}</small></div>${owned?'<button class="btn btn-purple" onclick="openBgm()">再生する</button>':''}</article>`;}).join('')}</div>`;
+  const resultHtml=results.length?gachaResultCards(results,'bgm'):'';
+  el.innerHTML=`<div class="gacha-panel"><h3>🎼 ミュージックコレクション</h3><p class="meta-sub">全9曲のBGM専用ガチャです。入手した曲は「その他 → BGM」から再生できます。</p><div class="gacha-wallet"><span>💰 ${saveData.totalScore.toLocaleString()}pt</span><span>🎧 ${saveData.ownedBgm.length}/${BGM_GACHA_ITEMS.length}曲</span><span>🎟️ 累計 ${saveData.bgmGachaDraws.toLocaleString()}回</span></div><div class="gacha-actions"><button class="btn btn-purple" onclick="drawBgmGacha(1)">1回引く　500pt</button><button class="btn btn-warn" onclick="drawBgmGacha(10)">10回引く　5,000pt<br><small>レア確定なし</small></button></div><div class="gacha-rates">${rates}</div><div class="privacy-note">天井・確定枠はありません。同じ曲が出た場合、ポイント・メダル・アイテムなどの補償はありません。現実のお金は使用しません。</div>${resultHtml}</div><h2 class="shop-section-title">🎵 楽曲一覧 <span class="meta-sub">${saveData.ownedBgm.length}/${BGM_GACHA_ITEMS.length}</span></h2><div class="gacha-collection">${BGM_GACHA_ITEMS.map(item=>{const owned=saveData.ownedBgm.includes(item.id);return `<article class="gacha-collection-card rarity-${item.rarity} ${owned?'':'locked'}"><div class="gacha-result-icon">${owned?item.icon:'🔒'}</div><div class="gacha-collection-info"><strong>${escapeHtml(item.name)}</strong><small>${item.rarity}・${owned?'入手済み':'未入手'}</small></div>${owned?`<button class="btn btn-purple" onclick="playBgmReward('${item.id}')">再生する</button>`:''}</article>`;}).join('')}</div>`;
 }
 function renderShopPage(gachaResults=[]){
   renderGacha(gachaResults);
