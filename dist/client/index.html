@@ -956,6 +956,7 @@ const bgm = {
     {name:'最高速の恋',url:'/audio/saisoku-no-koi.mp3',unlockId:'bgm_saisoku'}
   ],
   current: -1,
+  selected: 0,
   loading: -1,
   vol: 0.5,
   loop: true,
@@ -966,9 +967,10 @@ const sound = { ctx:null, volume:0.35, auto:true };
 try { const saved=JSON.parse(localStorage.getItem('mini-game-sound')||'{}');
   if(Number.isFinite(saved.volume))sound.volume=Math.max(0,Math.min(1,saved.volume));
   if(Number.isFinite(saved.bgm))bgm.vol=Math.max(0,Math.min(1,saved.bgm));
+  if(Number.isInteger(saved.track)&&saved.track>=0&&saved.track<bgm.tracks.length)bgm.selected=saved.track;
   if(typeof saved.auto==='boolean')sound.auto=saved.auto;
 } catch(e) {}
-function saveSound(){try{localStorage.setItem('mini-game-sound',JSON.stringify({volume:sound.volume,bgm:bgm.vol,auto:sound.auto}));}catch(e){}}
+function saveSound(){try{localStorage.setItem('mini-game-sound',JSON.stringify({volume:sound.volume,bgm:bgm.vol,auto:sound.auto,track:bgm.selected}));}catch(e){}}
 function playSfx(kind='click'){
   if(!sound.volume||document.hidden)return;
   try{
@@ -1075,7 +1077,7 @@ function bgmPlay(idx) {
   if(bgm.tracks[idx].builtin!==undefined&&!bgm.tracks[idx].url)bgm.tracks[idx].url=makeBgm(bgm.tracks[idx].builtin);
   const next=new Audio(bgm.tracks[idx].url);next.preload='none';next.volume=0;next.loop=bgm.loop;
   bgm.current=idx;bgm.loading=idx;bgm.audio=next;bgmRenderTracks();
-  next.addEventListener('playing',()=>{if(token!==bgmTransition)return;bgm.loading=-1;fadeBgmVolume(next,bgm.vol,token);bgmRenderTracks();});
+  next.addEventListener('playing',()=>{if(token!==bgmTransition)return;bgm.loading=-1;bgm.selected=idx;saveSound();fadeBgmVolume(next,bgm.vol,token);bgmRenderTracks();});
   next.addEventListener('pause',()=>{if(token===bgmTransition)bgmRenderTracks();});
   const restorePrevious=message=>{if(token!==bgmTransition)return;bgmTransition++;next.pause();bgm.loading=-1;if(previous){bgm.audio=previous;bgm.current=previousIdx;}else{bgm.audio=null;bgm.current=-1;}bgmRenderTracks();showToast(message,'#ff6b6b');};
   next.addEventListener('error',()=>restorePrevious('BGMを読み込めませんでした。通信を確認してください'));
@@ -1086,11 +1088,12 @@ function bgmPlay(idx) {
 }
 
 let appEntered=false;
+function preferredBgmIndex(){const track=bgm.tracks[bgm.selected];return track&&(!track.unlockId||saveData.ownedBgm.includes(track.unlockId))?bgm.selected:0;}
 function enterGameLand() {
   if(appEntered)return;
   appEntered=true;
   startupSoundPlayed=true;
-  bgmPlay(0);
+  if(sound.auto)bgmPlay(preferredBgmIndex());
   const splash=document.getElementById('splash-screen');
   splash?.classList.add('dismissed');
   document.body.classList.remove('app-booting');
@@ -2055,7 +2058,7 @@ function startGame(name) {
   if(name==='trivia'||name==='animequiz')name='quiz';
   resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,initialWallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed],finished:false};
   playSfx('start');
-  if(sound.auto&&bgm.current<0)bgmPlay(0);
+  if(sound.auto&&bgm.current<0)bgmPlay(preferredBgmIndex());
   document.body.classList.add('playing-game');
   setTaskbarActive('');
   document.getElementById('home').style.display = 'none';
