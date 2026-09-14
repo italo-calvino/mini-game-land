@@ -1,0 +1,10 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const html=fs.readFileSync('dist/client/index.html','utf8');
+assert.match(html,/viewport-fit=cover/);
+assert.match(html,/@media \(pointer:coarse\) \{[^}]*min-height:44px/);
+assert.match(html,/@media \(max-height:520px\) and \(orientation:landscape\)/);
+assert.match(html,/class="pin-controls"/);
+assert.match(html,/#game-screen\[data-game="pinball"\] #pin-canvas \{ width:min\(100%,calc\(\(100dvh - 275px\)\*\.65625\)\)/);
+assert.match(html,/\.fighter-controls \{ grid-template-columns:1fr 1fr; gap:6px/);
+assert.match(html,/\.sol-card \{[^}]*touch-action:manipulation/);
+console.log('PASS: mobile safe areas, touch targets, portrait and landscape game controls');
