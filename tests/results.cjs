@@ -23,6 +23,7 @@ assert.match(html,/onclick="finishCasinoSession\('\$\{gameId\}'\)">終了/);
 assert.match(html,/presentGameResult\(gameId,saveData\.totalScore-session\.initialWallet[^;]+true\)/);
 assert.match(html,/roundDiff=result==='win'\?bet:result==='lose'\?-bet:0/);
 assert.doesNotMatch(html,/>次のゲーム<\/button>/);
+assert.doesNotMatch(html,/dismissGameResult\(\)">続ける/);
 assert.match(html,/nativeResult\.appendChild\(box\)/);
 assert.match(html,/setUnifiedResultMode\(true\);document\.body\.appendChild\(overlay\)/);
 assert.match(html,/screen\.setAttribute\('inert',''\);screen\.setAttribute\('aria-hidden','true'\)/);
