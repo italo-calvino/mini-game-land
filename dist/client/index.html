@@ -236,6 +236,9 @@ input, textarea, [contenteditable="true"], #game-screen input, #game-screen text
 .result-overlay h2 { font-size:clamp(25px,7vw,36px); margin-bottom:18px; }
 .result-overlay .modal-btns { justify-content:center; margin-top:22px; }
 .result-overlay .modal-btns .btn { min-width:140px; }
+.casino-round-actions { max-width:620px; margin:18px auto 0; padding:18px; text-align:center; background:var(--surface); border:1px solid var(--accent5); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+.casino-round-actions strong { display:block; margin-bottom:12px; color:var(--accent2); font-size:18px; }
+.casino-round-actions .modal-btns { justify-content:center; }
 @keyframes resultFade { from { opacity:0; transform:scale(.985); } }
 .xp-gain { font-size: 14px; color: var(--accent5); font-weight: 700; margin-top: 6px; }
 
@@ -1768,13 +1771,20 @@ function addScore(n, gameId, won=false) {
 
 let resultSession=null;
 let resultTimer=null;
-function presentGameResult(gameId,score,won){
+function presentGameResult(gameId,score,won,forceFinal=false){
   const session=resultSession;
   if(!session||session.gameId!==gameId||(gameId==='monster'&&won))return;
   clearTimeout(resultTimer);
-  if(gameId==='pachinko')return;
+  const betting=DIRECT_POINT_GAMES.has(gameId);
+  if(betting&&!forceFinal){
+    if(gameId==='pachinko')return;
+    const roundNet=saveData.totalScore-session.wallet;
+    session.wallet=saveData.totalScore;
+    resultTimer=gameDelay(()=>showCasinoRoundActions(gameId,roundNet),0);
+    return;
+  }
   if(resultSession!==session||!document.body.classList.contains('playing-game'))return;
-  const betting=DIRECT_POINT_GAMES.has(gameId),game=GAME_DEFS.find(g=>g.id===gameId),net=saveData.totalScore-session.wallet;
+  const game=GAME_DEFS.find(g=>g.id===gameId),net=saveData.totalScore-(forceFinal?session.initialWallet:session.wallet);
   const heading=betting?(net>0?'🎉 勝利！':net<0?'ゲーム終了':'🤝 引き分け'):won?'🎉 クリア！':'ゲームオーバー';
   const achievements=saveData.achievements.filter(id=>!session.achievements.includes(id)).length;
   const missions=saveData.daily.claimed.filter(id=>!session.missions.includes(id)).length;
@@ -1782,9 +1792,31 @@ function presentGameResult(gameId,score,won){
   const overlay=document.createElement('div');overlay.id='unified-result';overlay.className='result-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','unified-result-title');
   overlay.innerHTML=`<section class="result-box"><p class="result-game">${escapeHtml(game?.title||gameId)}</p><h2 id="unified-result-title" tabindex="-1">${heading}</h2><p>${betting?'今回の収支':'今回のスコア'}</p><div class="result-score">${betting?(net>=0?'+':'')+net.toLocaleString()+'pt':Number(score).toLocaleString()}</div>${betting?'':`<p>${score>session.best?'🏆 自己ベスト更新！':'自己ベスト '+session.best.toLocaleString()}${score>session.best&&session.best>0?'（前回 '+session.best.toLocaleString()+'）':''}</p>`}<div class="profile-stats" style="margin-top:20px;grid-template-columns:1fr 1fr"><div class="profile-stat"><strong>+${session.points.toLocaleString()}pt</strong><span>${betting?'獲得':'ゲーム報酬'}</span></div><div class="profile-stat"><strong>+${session.xp.toLocaleString()} XP</strong><span>獲得経験値</span></div></div>${achievements||missions?`<p>🏅 実績 ${achievements}件 ／ 📅 ミッション ${missions}件達成</p>`:''}<div class="modal-btns">${betting?`<button class="btn" onclick="dismissGameResult()">続ける</button>`:`<button class="btn" onclick="startGame('${gameId}')">もう一度</button>`}<button class="btn" style="background:var(--surface2)" onclick="goHome()">ホームへ</button></div></section>`;
   document.body.appendChild(overlay);overlay.querySelector('h2').focus();
-  if(betting){session.wallet=saveData.totalScore;session.points=0;session.xp=0;session.achievements=[...saveData.achievements];session.missions=[...saveData.daily.claimed];}
 }
 function dismissGameResult(){document.getElementById('unified-result')?.remove();}
+function showCasinoRoundActions(gameId,roundNet){
+  if(resultSession?.gameId!==gameId||!document.body.classList.contains('playing-game'))return;
+  document.getElementById('casino-round-actions')?.remove();
+  const box=document.createElement('section');box.id='casino-round-actions';box.className='casino-round-actions';
+  box.innerHTML=`<strong>今回の収支 ${(roundNet>=0?'+':'')+roundNet.toLocaleString()}pt</strong><div class="modal-btns"><button class="btn" onclick="continueCasinoGame('${gameId}')">もう一度</button><button class="btn btn-danger" onclick="finishCasinoSession('${gameId}')">終了</button></div>`;
+  document.getElementById('game-screen').appendChild(box);
+  document.getElementById('rl-spin-btn')?.setAttribute('disabled','');
+  document.getElementById('slot-spin-btn')?.setAttribute('disabled','');
+  box.querySelector('button')?.focus();
+}
+function continueCasinoGame(gameId){
+  document.getElementById('casino-round-actions')?.remove();
+  if(gameId==='blackjack'&&typeof window.bjNext==='function')window.bjNext();
+  else{
+    const spinId=gameId==='roulette'?'rl-spin-btn':gameId==='slot'?'slot-spin-btn':'';
+    if(spinId)document.getElementById(spinId)?.removeAttribute('disabled');
+  }
+}
+function finishCasinoSession(gameId){
+  document.getElementById('casino-round-actions')?.remove();
+  const session=resultSession;if(!session||session.gameId!==gameId)return;
+  session.finished=true;presentGameResult(gameId,saveData.totalScore-session.initialWallet,saveData.totalScore>=session.initialWallet,true);
+}
 function claimTerminalResult(gameId,won){
   const session=resultSession;if(!session||session.gameId!==gameId)return false;
   const repeatable=DIRECT_POINT_GAMES.has(gameId)||(gameId==='monster'&&won);
@@ -1887,7 +1919,7 @@ function goHome() {
 function startGame(name) {
   clearTimeout(resultTimer);document.getElementById('unified-result')?.remove();
   if(name==='trivia'||name==='animequiz')name='quiz';
-  resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed],finished:false};
+  resultSession={gameId:name,best:saveData.highscores[name]||0,points:0,xp:0,wallet:saveData.totalScore,initialWallet:saveData.totalScore,achievements:[...saveData.achievements],missions:[...saveData.daily.claimed],finished:false};
   playSfx('start');
   if(sound.auto&&bgm.current<0)bgmPlay(0);
   document.body.classList.add('playing-game');
@@ -2981,7 +3013,7 @@ function quizShuffle(items){
 // GAME 4: BLACKJACK  ── 所持ポイントを賭ける
 games.blackjack = function(el) {
   const SUITS=['♠','♥','♦','♣'], VALS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-  let deck, playerHand, dealerHand, bet=0, phase='bet', sessionWins=0;
+  let deck, playerHand, dealerHand, bet=0, phase='bet', sessionWins=0, roundDiff=0;
   function newDeck() { let d=[]; for(let s of SUITS) for(let v of VALS) d.push({s,v}); return d.sort(()=>Math.random()-0.5); }
   function cardVal(v) { if(['J','Q','K'].includes(v)) return 10; if(v==='A') return 11; return +v; }
   function handScore(hand) { let s=hand.reduce((a,c)=>a+cardVal(c.v),0), ac=hand.filter(c=>c.v==='A').length; while(s>21 && ac-- > 0) s-=10; return s; }
@@ -3011,7 +3043,7 @@ games.blackjack = function(el) {
     } else {
       recordGameResult('blackjack',0,false,{result:'push'});updateUI();presentGameResult('blackjack',0,null);
     }
-    phase=result; bet=0; render();
+    roundDiff=result==='win'?bet:result==='lose'?-bet:0;phase=result;bet=0;render();
   }
   // betの刻みは所持ポイントに合わせて動的に
   function betChips() {
@@ -3051,7 +3083,7 @@ games.blackjack = function(el) {
         html += `<div class="bj-btns"><button class="btn" onclick="bjHit()">ヒット</button><button class="btn btn-danger" onclick="bjStand()">スタンド</button></div>`;
       } else {
         const resultMsg={win:'🎉 勝ち！',lose:'😢 負け...',push:'🤝 引き分け',bust:'💥 バスト！'}[phase];
-        const ptDiff = phase==='win'?`+${bet} pt`:phase==='lose'?`-${bet} pt`:`±0 pt`;
+        const ptDiff = `${roundDiff>0?'+':roundDiff===0?'±':''}${roundDiff} pt`;
         const diffColor = phase==='win'?'var(--accent3)':phase==='lose'?'var(--accent1)':'var(--text2)';
         html += `<div class="result-box" style="margin-top:10px">
           <div style="font-size:26px;font-weight:900">${resultMsg}</div>
