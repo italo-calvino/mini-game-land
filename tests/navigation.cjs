@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 
 const html = fs.readFileSync('dist/client/index.html', 'utf8');
 
+assert.match(html,/ゲームデータは、この端末の現在のブラウザ内に保存されます/);
+assert.match(html,/レベル・ポイント・アイテムなどは復元できません/);
+
 assert.match(
   html,
   /\['daily','achievements','ranking','challenge','more'\]\.includes\(name\)/,
