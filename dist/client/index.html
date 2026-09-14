@@ -1210,9 +1210,9 @@ function getXpMult(lv) {
 }
 
 const DAILY_MISSIONS = [
-  {id:'play3', label:'ゲームを3回プレイ', key:'plays', target:3, reward:80},
+  {id:'play3', label:'3種類のゲームをプレイ', key:'uniqueGames', target:3, reward:80},
   {id:'win2', label:'2回勝利する', key:'wins', target:2, reward:120},
-  {id:'score300', label:'ゲーム報酬を合計100pt獲得', key:'score', target:100, reward:150},
+  {id:'score300', label:'ゲーム報酬を合計150pt獲得', key:'score', target:150, reward:150},
 ];
 const ACHIEVEMENTS = [
   {id:'first_play', icon:'🎮', name:'ゲームスタート', desc:'初めてゲームを遊ぶ', reward:30, test:s=>Object.values(s.gameStats||{}).reduce((n,g)=>n+(g.plays||0),0)>=1},
@@ -1300,7 +1300,7 @@ let gameSearchText='',gameTagFilter='すべて',favoriteOnly=false;
 let saveData = {
   level:1, xp:0, totalScore:0, wins:0, streak:0, highscores:{}, dailyBonus:0,
   gameStats:{}, achievements:[], ownedThemes:['default'], ownedAvatars:[...FREE_AVATARS], activeTheme:'default',
-  daily:{date:'',plays:0,wins:0,score:0,claimed:[]},
+  daily:{date:'',plays:0,wins:0,score:0,claimed:[],games:[],uniqueGames:0},
   profile:{id:'',username:'プレイヤー',avatar:'🎮',createdAt:'',onboardingComplete:false}, scoreHistory:[], activeChallenge:null, challengeClears:0, favoriteGames:[],
   gachaInventory:[],gachaMedals:0,gachaDraws:0,gachaFreeUsed:false,ownedBgm:[],bgmGachaDraws:0,activeFrame:'',activeTitle:''
 };
@@ -1316,8 +1316,10 @@ function normalizeSave(){
   saveData.ownedThemes=Array.isArray(saveData.ownedThemes)?saveData.ownedThemes:['default'];
   if(!saveData.ownedThemes.includes('default'))saveData.ownedThemes.unshift('default');
   if(!THEMES[saveData.activeTheme]||!saveData.ownedThemes.includes(saveData.activeTheme))saveData.activeTheme='default';
-  if(!saveData.daily||saveData.daily.date!==localDateKey())saveData.daily={date:localDateKey(),plays:0,wins:0,score:0,claimed:[]};
+  if(!saveData.daily||saveData.daily.date!==localDateKey())saveData.daily={date:localDateKey(),plays:0,wins:0,score:0,claimed:[],games:[],uniqueGames:0};
   saveData.daily.claimed=Array.isArray(saveData.daily.claimed)?saveData.daily.claimed:[];
+  saveData.daily.games=Array.isArray(saveData.daily.games)?[...new Set(saveData.daily.games)].filter(id=>GAME_DEFS.some(game=>game.id===id)):[];
+  saveData.daily.uniqueGames=saveData.daily.games.length;
   saveData.scoreHistory=Array.isArray(saveData.scoreHistory)?saveData.scoreHistory:[];
   saveData.recentGames=[...new Set((Array.isArray(saveData.recentGames)?saveData.recentGames:saveData.scoreHistory.map(entry=>entry.gameId)).map(id=>['trivia','animequiz'].includes(id)?'quiz':id))].filter(id=>GAME_DEFS.some(g=>g.id===id)).slice(0,4);
   saveData.challengeClears=Number(saveData.challengeClears)||0;
@@ -1370,6 +1372,7 @@ function checkMetaProgress(){
 }
 function trackGameStart(gameId){
   normalizeSave(); saveData.daily.plays++;
+  if(!saveData.daily.games.includes(gameId)){saveData.daily.games.push(gameId);saveData.daily.uniqueGames=saveData.daily.games.length;}
   saveData.recentGames=[gameId,...saveData.recentGames.filter(id=>id!==gameId)].slice(0,4);
   const stat=saveData.gameStats[gameId]||(saveData.gameStats[gameId]={plays:0,wins:0,masteryXp:0});stat.masteryXp=stat.masteryXp||0;stat.plays++;
   checkMetaProgress();
@@ -1779,17 +1782,31 @@ function addXP(baseXp) {
 // これによりゲームごとのスコア桁数が違っても、ショップ・ガチャの経済が崩れにくくなる。
 const DIRECT_POINT_GAMES = new Set(['blackjack','roulette','slot','pachinko']);
 
-function gamePointReward(score, won=false) {
+// 長さや難しさが異なるゲームを、1プレイあたりおおむね同じ価値にそろえる。
+const GAME_REWARD_BALANCE = {
+  reaction:{mult:.65,cap:70},quiz:{mult:1.55,cap:90},hangman:{mult:1.05,cap:95},
+  solitaire:{mult:1.35,cap:150},sokoban:{mult:1.25,cap:145},reversi:{mult:1.15,cap:135},
+  minesweeper:{mult:1.15,cap:135},pong:{mult:1.1,cap:130},fighter:{mult:1.1,cap:130},
+  memory:{mult:1.05,cap:125},shiritori:{mult:1.05,cap:125},simon:{mult:1.05,cap:125}
+};
+function rewardVarietyMultiplier(gameId) {
+  const recent=(saveData.scoreHistory||[]).slice(0,2);
+  if(!recent.length||!gameId)return 1;
+  if(recent[0].gameId!==gameId)return 1.1;
+  return recent.length>1&&recent[1].gameId===gameId ? .8 : 1;
+}
+function gamePointReward(score, won=false, gameId='') {
   const raw = Math.max(0, Number(score) || 0);
-  if (raw <= 0) return won ? 30 : 0;
-  if (won) return Math.min(120, Math.round(30 + Math.sqrt(raw) * 1.5));
-  return Math.min(45, Math.round(5 + Math.sqrt(raw) * 0.45));
+  const balance=GAME_REWARD_BALANCE[gameId]||{mult:1,cap:120};
+  if (raw <= 0) return won ? Math.round(30*rewardVarietyMultiplier(gameId)) : 0;
+  if (won) return Math.min(balance.cap,Math.round((30+Math.sqrt(raw)*1.5)*balance.mult*rewardVarietyMultiplier(gameId)));
+  return Math.min(25,Math.round((5+Math.sqrt(raw)*.35)*Math.min(1,balance.mult)));
 }
 
 function addScore(n, gameId, won=false) {
   const raw = Math.max(0, Number(n) || 0);
   if (raw <= 0 && !won) return 0;
-  const reward = DIRECT_POINT_GAMES.has(gameId) ? raw : gamePointReward(raw, won);
+  const reward = DIRECT_POINT_GAMES.has(gameId) ? raw : gamePointReward(raw, won, gameId);
   if(resultSession?.gameId===gameId)resultSession.points+=reward;
   saveData.totalScore += reward;
   normalizeSave(); saveData.daily.score += reward;
